@@ -12,7 +12,8 @@ described below.
 
 ## File layout
 
-- One file per tool, named `<tool>.nf` (lowercase, matches the binary/tool name).
+- One file per tool, at `<tool>/<tool>.nf` — each tool gets its own directory
+  named after the tool (lowercase, matches the binary/tool name).
 - A tool with multiple steps gets multiple `process` blocks in the same file
   (e.g. `bbmap.nf` has `bbwrap` + `pileup`, `samtools.nf` has `sam_to_bam` +
   `sort_bam` + `index_bam`), not one file per process.
