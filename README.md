@@ -24,7 +24,7 @@ Then `include` a process by relative path from wherever your subworkflow or
 workflow file lives, e.g. from `your_pipeline_repo/nextflow_pipeline/subworkflows/`:
 
 ```groovy
-include { genomad } from '../../../nextflow_process_library/modules/genomad.nf'
+include { genomad } from '../../../nextflow_process_library/modules/genomad/genomad.nf'
 ```
 
 Nextflow resolves `include` paths as literal strings at parse time — they
@@ -89,8 +89,8 @@ table here goes stale within a day given how often processes get added or
 promoted from `modules/dev/`. To see what's actually available:
 
 ```bash
-ls modules/*.nf                                     # every process file
-grep -h '^process\|^ process' modules/*.nf | sort    # every process name, across all files
+ls modules/*/*.nf                                   # every process file
+grep -h '^process\|^ process' modules/*/*.nf | sort  # every process name, across all files
 ```
 
 Some tools have multiple processes in one file (e.g. `bbmap.nf` has
@@ -114,7 +114,7 @@ more than one Claude Code session at once. That's exactly how a real
 process-name collision (two processes both defining a process called
 `vibrant`) happened here. Before adding a process:
 
-1. Check `modules/*.nf` for an existing file with the same tool name — don't
+1. Check `modules/*/*.nf` for an existing file with the same tool name — don't
    assume a name is free just because your own source material doesn't
    mention an existing module.
 2. If it already exists, add your process(es) to that file instead of
