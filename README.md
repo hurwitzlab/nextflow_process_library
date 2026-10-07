@@ -5,7 +5,8 @@ Database of all the Hurwitz lab's Nextflow processes — reusable tool wrappers
 container path only has to happen in one place.
 
 This repo holds processes only. It has no pipeline of its own, no `workflow {}`
-entry point, and no config — it's a library that pipeline repos (like
+entry point, and no config of its own (just a template to copy — see
+`templates/base.config` below) — it's a library that pipeline repos (like
 [`viral_inference_benchmark`](https://github.com/hurwitzlab/viral_inference_benchmark))
 include from.
 
@@ -49,15 +50,27 @@ Every process reads its container, output directory, and tool options from
 `.config` (or a config it includes) must define, for each process it uses:
 
 - `params.container__<tool>` — path to the tool's container image
-- `params.<tool>_outdir` — where terminal output gets published (if the
-  process has a `publishDir`)
+- `params.<process>_outdir` — where output gets published, for a process
+  carrying a `publish_final`/`publish_intermediate` label. Keyed by the
+  **process** name, not the file's tool name: `bbmap.nf`'s `pileup` publishes
+  to `params.pileup_outdir`. (A process with its own in-module `publishDir`
+  uses whatever `params.*_outdir` that line names — usually `<tool>_outdir`.)
 - `params.<tool>_<option>` — any tool-specific options the process references
 
 The consuming pipeline is also expected to define `withLabel:process_single`,
 `withLabel:process_low`, `withLabel:process_medium`, and
-`withLabel:process_high` resource selectors (e.g. in its own
-`conf/base.config`) — every process tags its process with one of these labels,
-but resource amounts are the pipeline's call, not this repo's.
+`withLabel:process_high` resource selectors, plus the
+`withLabel:publish_final`/`withLabel:publish_intermediate` blocks that give
+labeled processes a `publishDir` — every process tags itself with one
+resource label (and at most one publish label), but resource amounts are the
+pipeline's call, not this repo's.
+
+**Starting point:** [`templates/base.config`](templates/base.config) defines
+all six labels. Copy it into your pipeline (e.g. as `conf/base.config`),
+`includeConfig` it from your `nextflow.config`, and tune the numbers to what
+your tools actually use (check the run's trace/report files or `seff`). Copy
+it rather than `includeConfig`-ing it from this repo, so later edits here
+don't change your pipeline's resources underneath it.
 
 If a process you need references a param your pipeline's config doesn't have
 yet, add it — see the process's file for the exact `params.*` names it expects.

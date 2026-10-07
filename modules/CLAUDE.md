@@ -41,11 +41,11 @@ described below.
   **no `publishDir` directive at all**. This is the standard convention:
   every pipeline built in this lab is expected to define
   `withLabel:publish_intermediate`/`withLabel:publish_final` blocks in its
-  own config (see `viral_inference_benchmark/nextflow_pipeline/conf/base.config`
-  for the reference implementation — every pipeline modeled on it follows the
-  same structure), which is what actually gives the process a `publishDir`
+  own config (`templates/base.config` at this repo's root is the copy-from
+  starting point), which is what actually gives the process a `publishDir`
   (path *and* `mode`), dispatched per-process via `task.process` to look up
-  that process's own `params.<tool>_outdir` (plain path or a Closure taking
+  that process's own `params.<process>_outdir` — keyed by process name, not
+  tool name, e.g. `pileup_outdir` (plain path or a Closure taking
   `sampleid` — same duality as before, just resolved centrally instead of
   per-module). Skip both labels and any `publishDir` entirely for purely
   intermediate steps that only feed the next process (e.g. `bbwrap`'s raw
