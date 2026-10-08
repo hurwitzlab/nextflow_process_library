@@ -1,0 +1,17 @@
+nextflow_process {
+    name "Test sam_to_bam"
+    script "../samtools.nf"
+    process "sam_to_bam"
+    tag "samtools"
+    tag "sam_to_bam"
+
+    test("To bam conversion with unmapped reads filterd") {
+        when {
+            process {
+                """
+                input[0]
+                """
+            }
+        }
+    }
+}
