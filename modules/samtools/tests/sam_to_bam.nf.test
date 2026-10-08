@@ -9,9 +9,20 @@ nextflow_process {
         when {
             process {
                 """
-                input[0]
+                input[0] = [ 'test_conversion', file("testdata/test.sam") ]
                 """
             }
+        }
+        then {
+            def (sampleid, bam_path) = process.out.bam_file
+            def reads = bam(bam_path).getSamLines()
+
+            assert process.success // make sure the process exited 0
+            assert sampleid = 'test_conversion' // make sure sampleid made it through
+            assert bam_path.endsWith('test_conversion.raw.bam') // make sure file is named as intended
+            assert reads.size() == 2 // make sure there are 2 reads after the filter
+            assert reads.every { ((it.split('\t')[1] as int) & 4) == 0 } // make sure there are no unmapped reads (flag == 4)
+            assert snapshot(bam(bamPath).getReadsMD5()).match() // make sure the reads that made it through are expected. Header intentionally not checked since samtools appends.
         }
     }
 }
