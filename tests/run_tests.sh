@@ -13,4 +13,4 @@ cd "$(dirname "$0")"            # run from the repo root, where nf-test.config l
 nf-test test "$@"
 
 # --- Exit ---
-echo all tests submitted
+echo run_tests.sh: All tests submitted
