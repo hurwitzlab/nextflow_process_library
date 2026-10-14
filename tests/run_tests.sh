@@ -9,7 +9,7 @@ module load nextflow/26.04.3
 module load nf-test/0.9.5
 
 # --- Run test(s) ---
-cd "$(dirname "$0")"            # run from the repo root, where nf-test.config lives
+cd "$(dirname "$0")/.."            # run from the repo root, where nf-test.config lives
 nf-test test "$@"
 
 # --- Exit ---
