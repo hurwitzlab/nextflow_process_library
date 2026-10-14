@@ -223,3 +223,6 @@ __marimo__/
 # nf-test
 .nf-test/
 .nf-test.log
+
+# slurm logs
+test_logs/
