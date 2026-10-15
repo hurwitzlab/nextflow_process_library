@@ -5,8 +5,9 @@ Database of all the Hurwitz lab's Nextflow processes — reusable tool wrappers
 container path only has to happen in one place.
 
 This repo holds processes only. It has no pipeline of its own, no `workflow {}`
-entry point, and no config of its own (just a template to copy — see
-`templates/base.config` below) — it's a library that pipeline repos (like
+entry point, and no pipeline config of its own (just a template to copy — see
+`templates/base.config` below — plus a generated container config for Hazel,
+see **Containers** below) — it's a library that pipeline repos (like
 [`viral_inference_benchmark`](https://github.com/hurwitzlab/viral_inference_benchmark))
 include from.
 
@@ -75,6 +76,60 @@ don't change your pipeline's resources underneath it.
 If a process you need references a param your pipeline's config doesn't have
 yet, add it — see the process's file for the exact `params.*` names it expects.
 
+## Containers
+
+Processes never name an image — each reads `params.container__<tool>`, so the
+same `.nf` file works anywhere you can supply a container.
+
+**On Hazel**, the BRC container repository
+(`/usr/local/usrapps/brc/brc_modules/images`) already has most of them.
+`includeConfig` the generated config to get every available one, at its
+newest version:
+
+```groovy
+// your_pipeline_repo/nextflow.config
+includeConfig '../nextflow_process_library/conf/containers_hazel.config'
+```
+
+To pin a different version for one tool, set that param after the include
+(see `conf/container_catalog.tsv` for the versions available). Tools with no
+image on Hazel yet are listed as comments at the bottom of the config — define
+those yourself if you use them.
+
+**Elsewhere**, define the `params.container__<tool>` values yourself.
+`conf/container_catalog.tsv` has a `public_uri` column (e.g.
+`docker://quay.io/biocontainers/samtools:1.24--h9dcdb79_1`) for every image
+that came from a public registry; a blank `public_uri` means the Hazel image
+is a local build.
+
+**Regenerating:** `conf/container_catalog.tsv` (one row per tool *version*)
+and `conf/containers_hazel.config` (the default per tool) are both written by
+`python3 conf/make_containers.py`, which reads the BRC modulefiles and image
+directory. Images are matched to a param by exact name only; a param whose
+name differs from its image's (`bbmap` → `bbtools`, `gatk` → `gatk4`), a
+pinned default, or a deliberately unset param goes in the script's
+`OVERRIDES`. Rerun it after adding a module or when new images land, and
+review the diff before committing — a new image version becomes the default
+only through that commit.
+
+## Testing
+
+Tests are nf-test, run on Hazel against the BRC images, via
+`tests/run_tests.sh` (submit from `tests/`):
+
+```bash
+cd tests
+sbatch run_tests.sh                    # every test, default container versions
+sbatch run_tests.sh modules/samtools   # extra args pass through to nf-test
+sbatch run_tests.sh --all-versions     # each tested module, once per image version in the catalog
+```
+
+`--all-versions` requires every version to match the **same** snapshot, so
+snapshot only what shouldn't change between tool versions — e.g. core
+alignment fields rather than BAM headers (samtools appends version-stamped
+`@PG` lines). Create or update snapshots with a default run
+(`sbatch run_tests.sh --update-snapshot ...`); `--all-versions` refuses to.
+
 ## Repo layout: `modules/` vs `modules/dev/`
 
 - **`modules/`** — the reviewed set. If a pipeline can `include` it today,
@@ -119,6 +174,9 @@ see **File layout** in `modules/CLAUDE.md` for why.
    it done.
 4. In your PR description, list every `params.*` name the new process
    references, so pipeline maintainers know what to add to their own config.
+5. Run `python3 conf/make_containers.py` so the new `container__<tool>` param
+   lands in the catalog and Hazel config (add an `OVERRIDES` entry if the
+   image is named differently — see **Containers** above).
 
 ## Contributing
 

@@ -1,9 +1,12 @@
 {
     "To bam conversion with unmapped reads filtered": {
         "content": [
-            "18b5905c8869b0ba098a661e4f00bc03"
+            [
+                "read1\t0\tchr1\t1\t60\t10M\t*\t0\t0\tACGTACGTAC\tIIIIIIIIII",
+                "read2\t16\tchr1\t20\t60\t10M\t*\t0\t0\tTTGCATGCAA\tIIIIIIIIII"
+            ]
         ],
-        "timestamp": "2026-10-14T14:51:34.251385097",
+        "timestamp": "2026-10-15T15:44:16.63008562",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.3"
