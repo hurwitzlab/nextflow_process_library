@@ -1090,3 +1090,16 @@ Nothing in `modules/dev/` was promoted to the parent `modules/` directory — pe
   all 11 mandatory SAM fields (QNAME..QUAL, including SEQ). It still leaves out
   the header and optional tags. Job 1310137 regenerated the snapshot; job
   1310139 (all versions) passed samtools 1.23.1 and 1.24 against it.
+- Added a `custom_build` column to `conf/container_catalog.tsv`, using the same
+  lookup as brc-infra-site's `parse_modules.py --custom-build-lookup`: match the
+  tool name case-insensitively and exactly against the `tools/` dirs of
+  `sweavs111/custom_container_module`, and link the directory. It applies to any
+  image whose modulefile `uri` isn't `docker://`. 6 of 7 local images are linked.
+  The links match the site's for 5 of them. The 6th is DeepVirFinder, which the
+  site misses because its modulefile has `uri "DeepVirFinder.1.0.sif"` and no
+  `DockerHub:` line, and the site only flags local builds by a malformed
+  DockerHub URL. That's a site-side gap, not fixed here. checkv's
+  `phorager-checkv-bundle-1.1.sif` has no modulefile and no recipe in that repo,
+  so it has no link. Unlike the site, the generator exits with an error if the
+  GitHub lookup fails, so an offline regeneration can't strip links from the
+  committed catalog.

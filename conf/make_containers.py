@@ -6,7 +6,9 @@ Usage (from the repo root):  python3 conf/make_containers.py
 Writes:
   conf/container_catalog.tsv    one row per (container param, image version); every
                                 params.container__<tool> used under modules/ appears, with an
-                                empty local_image when no image exists on Hazel
+                                empty local_image when no image exists on Hazel. public_uri is
+                                the registry source; locally built images instead get a
+                                custom_build link to their .def recipe directory
   conf/containers_hazel.config  params.container__<tool> = <default image>, for pipelines on
                                 Hazel to includeConfig (and for the nf-test suite)
 
@@ -14,8 +16,16 @@ Images are matched to a container param by exact name — the BRC modulefile dir
 belongs to, or the image's own name with registry prefix/version stripped when it has no
 modulefile. Never by substring. Params whose name differs from the image name go in OVERRIDES.
 The default version is the newest one unless OVERRIDES pins another.
+
+custom_build links follow the BRC infra site (hurwitzlab/brc-infra-site, parse_modules.py
+--custom-build-lookup): a locally built image's tool name is matched case-insensitively and exactly
+against the tools/ directories of CUSTOM_BUILD_REPO (one GitHub API call), linking the directory
+rather than the .def file, since .def filenames aren't consistently named. Unlike the site, a failed
+lookup aborts the run, so regenerating offline can't silently drop links from the committed catalog.
 """
+import json
 import re
+import urllib.request
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -23,6 +33,7 @@ IMAGES = Path("/usr/local/usrapps/brc/brc_modules/images")
 MODULEFILES = Path("/usr/local/usrapps/brc/brc_modules/modules")
 CATALOG = REPO / "conf" / "container_catalog.tsv"
 CONFIG = REPO / "conf" / "containers_hazel.config"
+CUSTOM_BUILD_REPO, CUSTOM_BUILD_PATH, CUSTOM_BUILD_BRANCH = "sweavs111/custom_container_module", "tools", "main"
 
 # param -> {"image": <image name key>, "default": <pinned version>, "note": ...}
 # "image": None means no image on Hazel is valid for this param.
@@ -68,6 +79,29 @@ def read_modulefiles():
     return found
 
 
+def fetch_custom_build_dirs():
+    """{lowercased name: actual name} for each directory under CUSTOM_BUILD_REPO's tools/."""
+    url = (f"https://api.github.com/repos/{CUSTOM_BUILD_REPO}/contents/{CUSTOM_BUILD_PATH}"
+           f"?ref={CUSTOM_BUILD_BRANCH}")
+    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json",
+                                               "User-Agent": "nextflow-process-library"})
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"ERROR: could not list {url} for custom_build links: {exc}")
+    if not isinstance(data, list):
+        raise SystemExit(f"ERROR: unexpected response listing {url}: {data!r}")
+    return {item["name"].lower(): item["name"] for item in data if item.get("type") == "dir"}
+
+
+def custom_build_link(name, build_dirs):
+    match = build_dirs.get(name.lower())
+    if match is None:
+        return ""
+    return f"https://github.com/{CUSTOM_BUILD_REPO}/tree/{CUSTOM_BUILD_BRANCH}/{CUSTOM_BUILD_PATH}/{match}"
+
+
 def module_params():
     params = set()
     for nf in (REPO / "modules").rglob("*.nf"):
@@ -77,15 +111,17 @@ def module_params():
 
 def main():
     modulefiles = read_modulefiles()
-    by_name = {}  # image name key -> [(version, image, public_uri)]
+    build_dirs = fetch_custom_build_dirs()
+    by_name = {}  # image name key -> [(version, image, public_uri, custom_build)]
     for img in sorted(p.name for p in IMAGES.glob("*.sif")):
         if img in modulefiles:
             name, version, uri = modulefiles[img]
         else:
             (name, version), uri = name_and_version(img), ""
+        build = ""
         if not uri.startswith("docker://"):  # local builds record their own .sif path as the uri
-            uri = ""
-        by_name.setdefault(name, []).append((version, img, uri))
+            uri, build = "", custom_build_link(name, build_dirs)
+        by_name.setdefault(name, []).append((version, img, uri, build))
 
     rows, defaults = [], {}
     for param in module_params():
@@ -94,19 +130,19 @@ def main():
         versions = sorted(by_name.get(key, []), key=lambda r: version_key(r[0])) if key else []
         note = ov.get("note", "")
         if not versions:
-            rows.append((param, "", "", "", "", note))
+            rows.append((param, "", "", "", "", "", note))
             continue
         default = ov.get("default", versions[-1][0])
-        if default not in [v for v, _, _ in versions]:
-            raise SystemExit(f"ERROR: pinned default {param}={default} not among {[v for v, _, _ in versions]}")
-        for version, img, uri in versions:
+        if default not in [v[0] for v in versions]:
+            raise SystemExit(f"ERROR: pinned default {param}={default} not among {[v[0] for v in versions]}")
+        for version, img, uri, build in versions:
             is_default = version == default
-            rows.append((param, version, "yes" if is_default else "no", str(IMAGES / img), uri, note))
+            rows.append((param, version, "yes" if is_default else "no", str(IMAGES / img), uri, build, note))
             if is_default:
                 defaults[param] = str(IMAGES / img)
 
     with CATALOG.open("w") as fh:
-        fh.write("param\tversion\tdefault\tlocal_image\tpublic_uri\tnote\n")
+        fh.write("param\tversion\tdefault\tlocal_image\tpublic_uri\tcustom_build\tnote\n")
         fh.writelines("\t".join(r) + "\n" for r in rows)
 
     missing = [r[0] for r in rows if not r[3]]

@@ -99,8 +99,10 @@ those yourself if you use them.
 **Elsewhere**, define the `params.container__<tool>` values yourself.
 `conf/container_catalog.tsv` has a `public_uri` column (e.g.
 `docker://quay.io/biocontainers/samtools:1.24--h9dcdb79_1`) for every image
-that came from a public registry; a blank `public_uri` means the Hazel image
-is a local build.
+that came from a public registry. A locally built image has no `public_uri`;
+its `custom_build` column instead links to the `.def` recipe directory in
+[`custom_container_module`](https://github.com/sweavs111/custom_container_module)
+(same lookup as the BRC infra site), so you can build it yourself.
 
 **Regenerating:** `conf/container_catalog.tsv` (one row per tool *version*)
 and `conf/containers_hazel.config` (the default per tool) are both written by
