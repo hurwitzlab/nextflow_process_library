@@ -1,0 +1,32 @@
+nextflow_process {
+    name "Test sam_to_bam"
+    script "../samtools.nf"
+    process "sam_to_bam"
+    tag "samtools"
+    tag "sam_to_bam"
+
+    test("To bam conversion with unmapped reads filtered") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_conversion', file("${moduleDir}/tests/testdata/test.sam") ]
+                """
+            }
+        }
+        then {
+            assert process.success // make sure the process exited 0
+
+            def (sampleid, bam_path) = process.out.bam_file[0]
+            def reads = bam(bam_path).getSamLines()
+           
+            assert sampleid == 'test_conversion' // make sure sampleid made it through
+            assert bam_path.endsWith('test_conversion.raw.bam') // make sure file is named as intended
+            assert reads.size() == 2 // make sure there are 2 reads after the filter
+            assert reads.every { ((it.split('\t')[1] as int) & 4) == 0 } // make sure there are no unmapped reads (flag == 4)
+            // make sure the reads that made it through are expected. Snapshot only the 11 mandatory SAM
+            // fields (QNAME..QUAL): the header (samtools appends @PG lines) and optional tags can vary
+            // by samtools version, and every catalog version must match this snapshot.
+            assert snapshot(reads.collect { it.split('\t')[0..10].join('\t') }).match()
+        }
+    }
+}

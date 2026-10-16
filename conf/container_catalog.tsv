@@ -1,0 +1,104 @@
+param	version	default	local_image	public_uri	custom_build	note
+bakta	1.12.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bakta:1.12.1--pyhdfd78af_0.sif	docker://quay.io/biocontainers/bakta:1.12.1--pyhdfd78af_0		
+bandage						
+bbmap	39.84	yes	/usr/local/usrapps/brc/brc_modules/images/staphb_bbtools:39.84.sif	docker://staphb/bbtools:39.84		bbmap is part of bbtools
+bbmerge	39.84	yes	/usr/local/usrapps/brc/brc_modules/images/staphb_bbtools:39.84.sif	docker://staphb/bbtools:39.84		bbmerge is part of bbtools
+bbnorm	39.84	yes	/usr/local/usrapps/brc/brc_modules/images/staphb_bbtools:39.84.sif	docker://staphb/bbtools:39.84		bbnorm is part of bbtools
+bcftools	1.23.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bcftools:1.23.1--hb2cee57_0.sif	docker://quay.io/biocontainers/bcftools:1.23.1--hb2cee57_0		
+bcl2fastq						
+bedtools	2.31.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bedtools:2.31.1--hf5e1c6e_0.sif	docker://quay.io/biocontainers/bedtools:2.31.1--hf5e1c6e_0		
+blast						
+bowtie2	2.5.5	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bowtie2:2.5.5--ha27dd3b_0.sif	docker://quay.io/biocontainers/bowtie2:2.5.5--ha27dd3b_0		
+bracken	3.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bracken:3.1--h9948957_0.sif	docker://quay.io/biocontainers/bracken:3.1--h9948957_0		
+busco	6.0.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_busco:6.0.0--pyhdfd78af_0.sif	docker://quay.io/biocontainers/busco:6.0.0--pyhdfd78af_0		
+bwa	0.7.19	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bwa:0.7.19--h577a1d6_0.sif	docker://quay.io/biocontainers/bwa:0.7.19--h577a1d6_0		
+centrifuge						
+checkm	1.2.5	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_checkm-genome:1.2.5--pyhdfd78af_0.sif	docker://quay.io/biocontainers/checkm-genome:1.2.5--pyhdfd78af_0		checkm, not checkm2
+checkm2	1.0.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_checkm2:1.0.1--pyh7cba7a3_0.sif	docker://quay.io/biocontainers/checkm2:1.0.1--pyh7cba7a3_0		
+checkv	1.1	yes	/usr/local/usrapps/brc/brc_modules/images/phorager-checkv-bundle-1.1.sif			checkv is provided by the phorager bundle
+comparem						
+concoct	1.1.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_concoct:1.1.0--py312hb1d17a5_9.sif	docker://quay.io/biocontainers/concoct:1.1.0--py312hb1d17a5_9		
+coverm						
+cutadapt	5.2	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_cutadapt:5.2--py311haab0aaa_0.sif	docker://quay.io/biocontainers/cutadapt:5.2--py311haab0aaa_0		
+deepmicroclass2	git-9622bd6	yes	/usr/local/usrapps/brc/brc_modules/images/DeepMicroClass2-git-9622bd6.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/DeepMicroClass2	
+deepvirfinder	1.0	yes	/usr/local/usrapps/brc/brc_modules/images/DeepVirFinder.1.0.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/DeepVirFinder	
+defensefinder						
+diamond	2.2.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_diamond:2.2.0--he361c42_0.sif	docker://quay.io/biocontainers/diamond:2.2.0--he361c42_0		
+eggnogmapper	2.1.13	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_eggnog-mapper:2.1.13--pyhdfd78af_0.sif	docker://quay.io/biocontainers/eggnog-mapper:2.1.13--pyhdfd78af_0		2.1.13 pinned over the 3.0.0 beta
+eggnogmapper	3.0.0-beta6	no	/usr/local/usrapps/brc/brc_modules/images/eggnog-mapper-3.0.0-beta6.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/eggnog-mapper	2.1.13 pinned over the 3.0.0 beta
+fastp	1.3.3	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_fastp:1.3.3--h43da1c4_0.sif	docker://quay.io/biocontainers/fastp:1.3.3--h43da1c4_0		
+fastqc	0.12.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_fastqc:0.12.1--hdfd78af_0.sif	docker://quay.io/biocontainers/fastqc:0.12.1--hdfd78af_0		
+flye	2.9.6	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_flye:2.9.6--py310h275bdba_0.sif	docker://quay.io/biocontainers/flye:2.9.6--py310h275bdba_0		
+gatk	4.6.2.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_gatk4:4.6.2.0--py310hdfd78af_0.sif	docker://quay.io/biocontainers/gatk4:4.6.2.0--py310hdfd78af_0		
+genomad	1.8.1	no	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_genomad:1.8.1--pyhdfd78af_0.sif	docker://quay.io/biocontainers/genomad:1.8.1--pyhdfd78af_0		
+genomad	1.12.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_genomad:1.12.0--pyhdfd78af_0.sif	docker://quay.io/biocontainers/genomad:1.12.0--pyhdfd78af_0		
+genomad_filterviral						R script step; left unset for now
+genomad_viralselection						R script step; left unset for now
+gtdbtk	2.7.2	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_gtdbtk:2.7.2--pyhdfd78af_0.sif	docker://quay.io/biocontainers/gtdbtk:2.7.2--pyhdfd78af_0		
+hhsuite						
+hhsuiteparse						
+hmmer	v3.1b2dfsg-5-deb_cv1	yes	/usr/local/usrapps/brc/brc_modules/images/biocontainers_hmmer:v3.1b2dfsg-5-deb_cv1.sif	docker://biocontainers/hmmer:v3.1b2dfsg-5-deb_cv1		
+insilicoseq						
+interproscan	5.59-91.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_interproscan:5.59-91.0.sif	docker://quay.io/biocontainers/interproscan:5.59-91.0		
+iphop						
+kmergo						
+kraken2	2.17.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_kraken2:2.17.1--pl5321h077b44d_0.sif	docker://quay.io/biocontainers/kraken2:2.17.1--pl5321h077b44d_0		
+mafft	7.525	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_mafft:7.525--h031d066_1.sif	docker://quay.io/biocontainers/mafft:7.525--h031d066_1		
+marvel						
+maxbin2	2.2.7	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_maxbin2:2.2.7--h503566f_8.sif	docker://quay.io/biocontainers/maxbin2:2.2.7--h503566f_8		
+medaka	2.2.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_medaka:2.2.1--py310h237e959_0.sif	docker://quay.io/biocontainers/medaka:2.2.1--py310h237e959_0		
+megahit	1.2.9	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_megahit:1.2.9--h8b12597_0.sif	docker://quay.io/biocontainers/megahit:1.2.9--h8b12597_0		
+metabat2						
+metabuli						
+metadecoder						
+metaphlan	4.1.2	no	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_metaphlan:4.1.2--pyhdc42f0e_0.sif	docker://quay.io/biocontainers/metaphlan:4.1.2--pyhdc42f0e_0		
+metaphlan	4.2.4	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_metaphlan:4.2.4--pyhdfd78af_0.sif	docker://quay.io/biocontainers/metaphlan:4.2.4--pyhdfd78af_0		
+minimap2	2.30	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_minimap2:2.30--h577a1d6_0.sif	docker://quay.io/biocontainers/minimap2:2.30--h577a1d6_0		
+mlst						
+mmseqs						
+mmseqs2						
+mothur						
+mummer	4.0.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_mummer4:4.0.1--pl5321h9948957_0.sif	docker://quay.io/biocontainers/mummer4:4.0.1--pl5321h9948957_0		
+muscle						
+nanoplot	1.46.2	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_nanoplot:1.46.2--pyhdfd78af_0.sif	docker://quay.io/biocontainers/nanoplot:1.46.2--pyhdfd78af_0		
+nanosim						
+pandaseq						
+phabox	2.1.13	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_phabox:2.1.13--pyhdfd78af_0.sif	docker://quay.io/biocontainers/phabox:2.1.13--pyhdfd78af_0		
+phacts						
+picard	3.4.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_picard:3.4.0--hdfd78af_0.sif	docker://quay.io/biocontainers/picard:3.4.0--hdfd78af_0		
+pilon						
+pirate	1.0.5	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_pirate:1.0.5--hdfd78af_3.sif	docker://quay.io/biocontainers/pirate:1.0.5--hdfd78af_3		
+prokka	1.15.6	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_prokka:1.15.6--pl5321hdfd78af_0.sif	docker://quay.io/biocontainers/prokka:1.15.6--pl5321hdfd78af_0		
+pycoqc						
+quast	5.3.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_quast:5.3.0--py313pl5321h5ca1c30_2.sif	docker://quay.io/biocontainers/quast:5.3.0--py313pl5321h5ca1c30_2		
+resfinder						
+salmon	1.11.4	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_salmon:1.11.4--h7f96273_0.sif	docker://quay.io/biocontainers/salmon:1.11.4--h7f96273_0		
+samestr						
+samtools	1.23.1	no	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_samtools:1.23.1--ha83d96e_0.sif	docker://quay.io/biocontainers/samtools:1.23.1--ha83d96e_0		
+samtools	1.24	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_samtools:1.24--h9dcdb79_1.sif	docker://quay.io/biocontainers/samtools:1.24--h9dcdb79_1		
+semibin						
+seqkit	2.13.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_seqkit:2.13.0--he881be0_0.sif	docker://quay.io/biocontainers/seqkit:2.13.0--he881be0_0		
+shellbasic						
+shortbred						
+shovill						
+sickle						
+snippy						
+snpeff	5.4.0a	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_snpeff:5.4.0a--hdfd78af_0.sif	docker://quay.io/biocontainers/snpeff:5.4.0a--hdfd78af_0		
+sourmash	4.9.4	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_sourmash:4.9.4--hdfd78af_0.sif	docker://quay.io/biocontainers/sourmash:4.9.4--hdfd78af_0		
+spades	4.2.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_spades:4.2.0--haf24da9_0.sif	docker://quay.io/biocontainers/spades:4.2.0--haf24da9_0		
+strainge						
+stringmlst						
+trimmomatic	0.40	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_trimmomatic:0.40--hdfd78af_0.sif	docker://quay.io/biocontainers/trimmomatic:0.40--hdfd78af_0		
+trycycler						
+unicycler						
+uniqsketch						
+usearch						
+vamb						
+vcontact2						
+vibrant	1.2.1	yes	/usr/local/usrapps/brc/brc_modules/images/VIBRANT-1.2.1.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/VIBRANT	
+viralm	git-b7a6f4e	yes	/usr/local/usrapps/brc/brc_modules/images/ViraLM-git-b7a6f4e.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/ViraLM	
+virfinder						DeepVirFinder is a different tool; do not use
+virrep	git-7c7b4b8	yes	/usr/local/usrapps/brc/brc_modules/images/VirRep-git-7c7b4b8.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/VirRep	
+virsorter2						
+virulencefinder						
+vsearch						

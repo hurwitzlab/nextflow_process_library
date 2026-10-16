@@ -20,3 +20,4 @@
     -l !{params.viralinference_minlength} \
     -c !{task.cpus}
     '''
+}
