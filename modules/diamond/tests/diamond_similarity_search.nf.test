@@ -1,0 +1,51 @@
+nextflow_process {
+    name "Test diamond_similarity_search"
+    script "../diamond.nf"
+    process "diamond_similarity_search"
+    tag "diamond"
+    tag "diamond_similarity_search"
+
+    test("blastp of proteins against a .dmnd of themselves, XML output") {
+        setup {
+            run("diamond_makedb") {
+                script "../diamond.nf"
+                process {
+                    """
+                    input[0] = file("${baseDir}/tests/data/proteins.faa")
+                    """
+                }
+            }
+        }
+        when {
+            params {
+                diamond_outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = diamond_makedb.out.diamond_database
+                input[1] = file("${baseDir}/tests/data/proteins.faa")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def xml = process.out.similarity_results[0]
+            assert file(xml).name == 'results.xml'
+
+            // The XML header (BlastOutput_version, reference, db path) is version-specific, so parse
+            // out only (query, hit) pairs. Hit_id holds the subject ID (Hit_def, its description, is empty).
+            def text = path(xml).text
+            def pairs = text.split('<Iteration>').drop(1).collectMany { iter ->
+                def query = (iter =~ /<Iteration_query-def>([^<]*)</)[0][1].trim().split(/\s+/)[0]
+                (iter =~ /<Hit_id>([^<]*)</).collect { m -> [query, m[1].trim().split(/\s+/)[0]] }
+            }
+            def proteins = (1..10).collect { "prot_${it}".toString() }
+
+            assert text.contains('<BlastOutput')
+            assert pairs.collect { it[0] }.unique().sort() == proteins.sort() // every query reported
+            assert proteins.every { p -> [p, p] in pairs } // every protein finds itself
+            assert snapshot(pairs.sort { a, b -> a[0] <=> b[0] ?: a[1] <=> b[1] }).match()
+        }
+    }
+}

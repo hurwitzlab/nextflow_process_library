@@ -1,0 +1,19 @@
+{
+    "Quality-trims single-end reads": {
+        "content": [
+            210,
+            {
+                "passed_filter_reads": 210,
+                "low_quality_reads": 0,
+                "too_many_N_reads": 0,
+                "too_short_reads": 0
+            },
+            "b7a60a9f529b64ddf092a16297e34f71"
+        ],
+        "timestamp": "2026-10-19T15:57:31.366067623",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

@@ -126,6 +126,12 @@ sbatch run_tests.sh modules/samtools   # extra args pass through to nf-test
 sbatch run_tests.sh --all-versions     # each tested module, once per image version in the catalog
 ```
 
+**Test data:** shared inputs live in [`tests/data/`](tests/data/README.md) — a small,
+generated "mini world" around the phiX174 genome (contigs, paired/amplicon/long reads, proteins,
+transcripts, SAM/BAMs, VCFs), referenced from a test as `file("${baseDir}/tests/data/<name>")`.
+Inputs only one module needs go in `modules/<tool>/tests/testdata/`. Tests are one file per
+process, `modules/<tool>/tests/<process>.nf.test`.
+
 `--all-versions` requires every version to match the **same** snapshot, so
 snapshot only what shouldn't change between tool versions — e.g. core
 alignment fields rather than BAM headers (samtools appends version-stamped

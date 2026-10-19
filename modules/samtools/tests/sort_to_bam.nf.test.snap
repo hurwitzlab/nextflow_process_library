@@ -1,0 +1,12 @@
+{
+    "Coordinate-sorts a SAM into BAM": {
+        "content": [
+            "a396cbf946b94c5696e79f236aa9073a"
+        ],
+        "timestamp": "2026-10-19T15:34:46.463406179",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

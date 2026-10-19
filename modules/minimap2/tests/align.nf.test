@@ -1,0 +1,36 @@
+nextflow_process {
+    name "Test align"
+    script "../minimap2.nf"
+    process "align"
+    tag "minimap2"
+    tag "align"
+
+    test("Aligns ONT reads to a reference FASTA") {
+        when {
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/genome.fasta")
+                input[1] = [ 'test_mm2', file("${baseDir}/tests/data/long_reads.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, sam_path) = process.out.aligned_sam[0]
+            def lines = path(sam_path).readLines()
+            def records = lines.findAll { !it.startsWith('@') }
+            // primary records only (no secondary 0x100 / supplementary 0x800)
+            def primary = records.findAll { ((it.split('\t')[1] as int) & 0x900) == 0 }
+
+            assert sampleid == 'test_mm2'
+            assert sam_path.endsWith('test_mm2.sam')
+            assert lines.any { it.startsWith('@SQ\tSN:phiX174\tLN:5386') }
+            assert primary.size() == 30 // one primary record per long read
+            assert primary.collect { it.split('\t')[0] }.toSet() == (0..29).collect { String.format('ont%02d', it) }.toSet()
+            assert primary.every { ((it.split('\t')[1] as int) & 4) == 0 } // every read maps to phiX174
+            // version-agnostic: the 11 mandatory SAM fields only (no header, no optional tags)
+            assert snapshot(records.collect { it.split('\t')[0..10].join('\t') }.join('\n').md5()).match()
+        }
+    }
+}

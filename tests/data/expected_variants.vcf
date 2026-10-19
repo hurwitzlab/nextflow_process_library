@@ -1,0 +1,8 @@
+##fileformat=VCFv4.2
+##contig=<ID=phiX174,length=5386>
+##INFO=<ID=AF,Number=A,Type=Float,Description="Allele frequency">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	expected
+phiX174	100	.	A	G	50	PASS	AF=1.0	GT:AD	1/1:0,20
+phiX174	4000	.	C	A	50	PASS	AF=1.0	GT:AD	1/1:0,20

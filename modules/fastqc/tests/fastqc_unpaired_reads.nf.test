@@ -1,0 +1,42 @@
+import java.util.zip.ZipFile
+
+nextflow_process {
+    name "Test fastqc_unpaired_reads"
+    script "../fastqc.nf"
+    process "fastqc_unpaired_reads"
+    tag "fastqc"
+    tag "fastqc_unpaired_reads"
+
+    test("Writes a single FastQC report zip for merged amplicon reads") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_fastqc_unpaired', file("${baseDir}/tests/data/amplicon_merged.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, zip_path) = process.out.fastqc_report[0]
+            assert sampleid == 'test_fastqc_unpaired'
+            assert file(zip_path).name == 'unpaired_reads_fastqc.zip'
+            assert file(zip_path).parentFile.name == 'test_fastqc_unpaired_fastqc'
+            assert file(zip_path).size() > 0
+
+            // parse the stable numbers out of fastqc_data.txt inside the zip (don't snapshot the report)
+            def zf = new ZipFile(file(zip_path))
+            def data = zf.getInputStream(zf.getEntry('unpaired_reads_fastqc/fastqc_data.txt')).text
+            zf.close()
+            def field = { String key -> data.readLines().find { it.startsWith(key + '\t') }.split('\t')[1] }
+            assert field('Filename') == 'unpaired_reads.fastq.gz'
+            assert field('Total Sequences') == '50'
+            assert field('Sequence length') == '250'
+            // --nogroup: per-base quality is reported for every position, not binned
+            def per_base = data.readLines().dropWhile { !it.startsWith('>>Per base sequence quality') }
+                               .drop(2).takeWhile { !it.startsWith('>>END_MODULE') }
+            assert per_base.size() == 250
+            assert snapshot(field('Total Sequences'), field('Sequence length'), field('%GC')).match()
+        }
+    }
+}

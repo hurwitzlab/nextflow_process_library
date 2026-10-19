@@ -1,0 +1,22 @@
+{
+    "Searches each query in a tarball against a gzipped protein database": {
+        "content": [
+            {
+                "prot_1": [
+                    "prot_1"
+                ],
+                "prot_10": [
+                    "prot_10",
+                    "prot_10_var1",
+                    "prot_10_var2",
+                    "prot_10_var3"
+                ]
+            }
+        ],
+        "timestamp": "2026-10-19T15:53:08.204926916",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

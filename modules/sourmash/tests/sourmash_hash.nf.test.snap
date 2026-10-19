@@ -1,0 +1,16 @@
+{
+    "Computes MinHash signatures for an assembly": {
+        "content": [
+            {
+                "21": "9c7edd4a6ee0410d01d9b575534e0ff0",
+                "31": "a56a6bd099cac4befce704fac5ccaded",
+                "51": "753f31b3357bb3857b6221ff9ac512ac"
+            }
+        ],
+        "timestamp": "2026-10-19T15:53:46.863068028",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

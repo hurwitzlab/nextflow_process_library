@@ -1,0 +1,31 @@
+nextflow_process {
+    name "Test unmapped_reads_to_bam"
+    script "../samtools.nf"
+    process "unmapped_reads_to_bam"
+    tag "samtools"
+    tag "unmapped_reads_to_bam"
+
+    test("Keeps only unmapped reads") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_unmapped', file("${baseDir}/tests/data/alignments.sam") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, bam_path) = process.out.unmapped_bam[0]
+            def reads = bam(bam_path).getSamLines()
+
+            assert sampleid == 'test_unmapped'
+            assert bam_path.endsWith('test_unmapped.unmapped.bam')
+            assert reads.size() == 20 // the 10 random pairs
+            assert reads.every { ((it.split('\t')[1] as int) & 4) != 0 } // all carry the unmapped flag
+            assert reads.collect { it.split('\t')[0] }.unique().size() == 10 // both mates of 10 pairs
+            // version-agnostic: the 11 mandatory SAM fields only (no header, no optional tags)
+            assert snapshot(reads.collect { it.split('\t')[0..10].join('\t') }).match()
+        }
+    }
+}

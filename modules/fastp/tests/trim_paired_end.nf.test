@@ -1,0 +1,69 @@
+nextflow_process {
+    name "Test trim_paired_end"
+    script "../fastp.nf"
+    process "trim_paired_end"
+    tag "fastp"
+    tag "trim_paired_end"
+
+    test("Adapter- and quality-trims paired reads, keeping pairs in sync") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_fastp_pe',
+                             file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, r1_path, r2_path) = process.out.trimmed_reads[0]
+            def (unpaired_id, unpaired_path) = process.out.unpaired_reads[0]
+            def (html_id, html_path) = process.out.html_report[0]
+            def (json_id, json_path) = process.out.json_report[0]
+
+            assert [sampleid, unpaired_id, html_id, json_id].every { it == 'test_fastp_pe' }
+            assert file(r1_path).name == 'test_fastp_pe_R1.trimmed.fq.gz'
+            assert file(r2_path).name == 'test_fastp_pe_R2.trimmed.fq.gz'
+            assert file(unpaired_path).name == 'test_fastp_pe_single_reads.fq.gz'
+            assert file(html_path).name == 'test_fastp_pe_fastp.html'
+            assert file(json_path).name == 'test_fastp_pe_fastp.json'
+            assert path(html_path).text.size() > 0
+
+            // FASTQ records as [name, seq, +, qual]
+            def r1 = path(r1_path).linesGzip.collate(4)
+            def r2 = path(r2_path).linesGzip.collate(4)
+            def unpaired = path(unpaired_path).linesGzip.collate(4)
+            def stats = path(json_path).json
+
+            // reads stay paired: same count, same mates in the same order
+            assert r1.size() == r2.size()
+            assert r1.collect { it[0].split()[0] - ~/\/1$/ } == r2.collect { it[0].split()[0] - ~/\/2$/ }
+
+            // JSON stats agree with what was written
+            assert stats.summary.before_filtering.total_reads == 420
+            assert stats.summary.after_filtering.total_reads == r1.size() * 2
+            assert stats.filtering_result.passed_filter_reads == r1.size() * 2
+            assert r1.size() > 150 && r1.size() <= 210
+
+            // --length_required 50
+            assert (r1 + r2 + unpaired).every { it[1].length() >= 50 }
+            // adapter read-through was trimmed (11 raw reads carry >= 13 bp of TruSeq adapter)
+            assert stats.adapter_cutting.adapter_trimmed_reads > 0
+            assert (r1 + r2).every { !it[1].contains('AGATCGGAAGAGC') }
+            // degraded 3' tails were quality-trimmed: some reads are now shorter than 100 bp
+            assert (r1 + r2).any { it[1].length() < 100 }
+
+            // version-agnostic: read records (sorted, in case of thread-dependent order) and counts
+            assert snapshot(
+                r1.size(),
+                unpaired.size(),
+                stats.filtering_result.subMap(['passed_filter_reads', 'low_quality_reads', 'too_many_N_reads', 'too_short_reads']),
+                r1.collect { it.join('\n') }.sort().join('\n').md5(),
+                r2.collect { it.join('\n') }.sort().join('\n').md5(),
+                unpaired.collect { it.join('\n') }.sort().join('\n').md5()
+            ).match()
+        }
+    }
+}

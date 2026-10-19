@@ -1,0 +1,57 @@
+nextflow_process {
+    name "Test bbwrap"
+    script "../bbmap.nf"
+    process "bbwrap"
+    tag "bbmap"
+    tag "bbwrap"
+
+    test("Aligns paired reads to contigs") {
+        when {
+            params {
+                bbmap_kfilter = 22
+                bbmap_subfilter = 15
+                bbmap_maxindel = 80
+            }
+            process {
+                """
+                input[0] = [ 'test_bbwrap',
+                             file("${baseDir}/tests/data/contigs.fasta"),
+                             file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, sam_path) = process.out.mapped_files[0]
+            assert sampleid == 'test_bbwrap'
+            assert file(sam_path).name == 'test_bbwrap_aln.sam.gz'
+
+            def lines = path(sam_path).linesGzip
+            def sq = lines.findAll { it.startsWith('@SQ') }.collect { it.split('\t').findAll { f -> f =~ /^(SN|LN):/ }.join('\t') }
+            def records = lines.findAll { !it.startsWith('@') }.collect { it.split('\t') }
+            def is_mapped = { r -> ((r[1] as int) & 4) == 0 }
+            def qname = { r -> r[0].split()[0] - ~/\/[12]$/ }
+            def random_pairs = (200..209).collect { "pair${it}".toString() }
+
+            // header lists the three contigs
+            assert sq == [ 'SN:contig_1\tLN:2500', 'SN:contig_2\tLN:1800', 'SN:contig_3\tLN:1086' ]
+            // one record per read (bbwrap writes unmapped reads too), primary alignments only
+            assert records.size() == 420
+            assert records.every { r -> ((r[1] as int) & 0x900) == 0 }
+            // phiX reads map to the contigs, the 10 random pairs don't
+            def mapped = records.findAll(is_mapped)
+            assert mapped.size() >= 300
+            assert mapped.every { it[2] in ['contig_1', 'contig_2', 'contig_3'] }
+            assert records.findAll { qname(it) in random_pairs }.every { !is_mapped(it) }
+
+            // version-agnostic: the 11 mandatory SAM fields only (no header, no optional tags), sorted
+            // in case of thread-dependent output order
+            assert snapshot(
+                mapped.size(),
+                records.collect { it[0..10].join('\t') }.sort().join('\n').md5()
+            ).match()
+        }
+    }
+}

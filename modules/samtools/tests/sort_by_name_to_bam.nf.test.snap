@@ -1,0 +1,12 @@
+{
+    "Name-sorts a coordinate-sorted BAM": {
+        "content": [
+            "9ce32184af62da43c496f0fbccd6da47"
+        ],
+        "timestamp": "2026-10-19T15:40:43.324579025",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

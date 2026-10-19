@@ -1,0 +1,23 @@
+{
+    "Writes a FastQC report for each mate of a pair": {
+        "content": [
+            {
+                "R1": [
+                    "210",
+                    "100",
+                    "44"
+                ],
+                "R2": [
+                    "210",
+                    "100",
+                    "44"
+                ]
+            }
+        ],
+        "timestamp": "2026-10-19T15:57:47.458851033",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

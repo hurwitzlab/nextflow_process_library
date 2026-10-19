@@ -1,0 +1,37 @@
+nextflow_process {
+    name "Test pileup"
+    script "../bbmap.nf"
+    process "pileup"
+    tag "bbmap"
+    tag "pileup"
+
+    test("Reports per-contig coverage from a SAM") {
+        when {
+            params {
+                pileup_outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = [ 'test_pileup', file("${baseDir}/tests/data/alignments.sam") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, cov_path) = process.out.pileuped_files[0]
+            def lines = path(cov_path).readLines()
+            def header = lines[0].split('\t')
+            def row = [header, lines[1].split('\t')].transpose().collectEntries()
+
+            assert sampleid == 'test_pileup'
+            assert file(cov_path).name == 'coverage.txt'
+            assert lines.size() == 2 // header + the one phiX174 record
+            assert header[0] == '#ID'
+            assert row['#ID'] == 'phiX174'
+            assert row['Length'] as int == 5386
+            assert (row['Avg_fold'] as double) > 0
+            assert snapshot(path(cov_path).text).match() // plain, deterministic table
+        }
+    }
+}

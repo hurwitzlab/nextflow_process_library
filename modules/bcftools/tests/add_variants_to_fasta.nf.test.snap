@@ -1,0 +1,12 @@
+{
+    "Applies SNVs to the reference to make a consensus FASTA": {
+        "content": [
+            "30088cf254c5aac8cffbfdf704b6c95a"
+        ],
+        "timestamp": "2026-10-19T15:52:27.178714617",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

@@ -1,0 +1,48 @@
+nextflow_process {
+    name "Test downsample_paired_end"
+    script "../bbnorm.nf"
+    process "downsample_paired_end"
+    tag "bbnorm"
+    tag "downsample_paired_end"
+
+    test("Normalizes paired reads by k-mer depth, keeping pairs in sync") {
+        when {
+            params {
+                bbnorm_target = 3
+            }
+            process {
+                """
+                input[0] = [ 'test_bbnorm',
+                             file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, r1_path) = process.out.r1_normalized[0]
+            def (sampleid2, r2_path) = process.out.r2_normalized[0]
+            assert sampleid == 'test_bbnorm' && sampleid2 == 'test_bbnorm'
+            assert file(r1_path).name == 'test_bbnorm.r1_sub.fq.gz'
+            assert file(r2_path).name == 'test_bbnorm.r2_sub.fq.gz'
+
+            def r1 = path(r1_path).linesGzip.collate(4)
+            def r2 = path(r2_path).linesGzip.collate(4)
+            def input_r1 = path("${baseDir}/tests/data/reads_R1.fastq").readLines().collate(4)*.join('\n')
+            def name = { rec, mate -> rec[0].split()[0] - ~/\/${mate}$/ }
+
+            // reads were dropped, not altered, and pairs stay in sync
+            assert r1.size() > 0 && r1.size() < 210
+            assert r1.size() == r2.size()
+            assert r1.collect { name(it, 1) } == r2.collect { name(it, 2) }
+            assert r1.every { it.join('\n') in input_r1 }
+            // the random (non-phiX) pairs have k-mer depth ~1, below bbnorm's default min depth
+            assert r1.every { !(name(it, 1) in (200..209).collect { "@pair${it}".toString() }) }
+
+            // No snapshot: which reads bbnorm keeps is not reproducible run-to-run with its multithreaded
+            // (task.cpus) normalization even with deterministic=t (two identical runs kept 63 vs 69 pairs),
+            // so only the invariants above are checked.
+        }
+    }
+}

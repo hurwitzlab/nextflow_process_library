@@ -1,0 +1,75 @@
+nextflow_process {
+    name "Test annotate_metagenome"
+    script "../prokka.nf"
+    process "annotate_metagenome"
+    tag "prokka"
+    tag "annotate_metagenome"
+
+    test("Annotates a fragmented 12-contig assembly in --metagenome mode") {
+        when {
+            // Prokka 1.15.6 always runs prodigal in single mode (its `$prodigal_mode` line is
+            // `(... && !$metagenome) || defined $prodigaltf ? 'single' : 'meta'`, and $prodigaltf is
+            // always defined), and single mode needs >= 20 kb to train, so the 5.4 kb phiX174
+            // fixtures give 0 CDS. Build a 21.5 kb input at test time from 4 copies of
+            // tests/data/contigs.fasta (12 contigs, 1086-2500 bp; each copy's contigs renamed _a.._d).
+            def recs = []
+            new File("${baseDir}/tests/data/contigs.fasta").readLines().each { l ->
+                if (l.startsWith('>')) recs << [l.substring(1).split(/\s+/)[0], '']
+                else recs[-1][1] += l.trim()
+            }
+            def input_fasta = new File("${outputDir}/contigs_x4.fasta")
+            input_fasta.parentFile.mkdirs()
+            input_fasta.text = ['a', 'b', 'c', 'd'].collectMany { c ->
+                recs.collect { r -> ">${r[0]}_${c}\n" + r[1].toList().collate(70)*.join('').join('\n') + "\n" }
+            }.join('')
+            process {
+                """
+                input[0] = [ 'test_metagenome', file("${input_fasta}") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def outs = [
+                predicted_proteins       : 'annotated_genome.faa',
+                annotated_nucleotide     : 'annotated_genome.fna',
+                genbank_annotation       : 'annotated_genome.gbk',
+                gff_annotation           : 'annotated_genome.gff',
+                gene_nucleotide_sequences: 'annotated_genome.ffn'
+            ]
+            outs.each { emit, name ->
+                assert process.out[emit].size() == 1 // errorStrategy can hide a failure as an empty channel
+                def (sampleid, f) = process.out[emit][0]
+                assert sampleid == 'test_metagenome'
+                assert f.endsWith("test_metagenome/${name}")
+            }
+            def (dir_id, dir) = process.out.annotation_dir[0]
+            assert dir_id == 'test_metagenome' && file(dir).name == 'test_metagenome'
+
+            // GenBank/GFF/FASTA headers embed dates, the prokka version and DB-dependent product
+            // names, so assert counts and snapshot only the predicted protein sequences.
+            def faaSeqs = { p ->
+                def seqs = []
+                path(p).readLines().each { line ->
+                    if (line.startsWith('>')) seqs << ''
+                    else seqs[-1] += line.trim()
+                }
+                seqs
+            }
+            def proteins = faaSeqs(process.out.predicted_proteins[0][1])
+            def gffCds = path(process.out.gff_annotation[0][1]).readLines()
+                .findAll { !it.startsWith('#') && it.split('\t').size() > 2 && it.split('\t')[2] == 'CDS' }
+            def gbkCds = path(process.out.genbank_annotation[0][1]).readLines().findAll { it ==~ /^\s{5}CDS\s+.*/ }
+            def ffnCount = path(process.out.gene_nucleotide_sequences[0][1]).readLines().count { it.startsWith('>') }
+            def fnaCount = path(process.out.annotated_nucleotide[0][1]).readLines().count { it.startsWith('>') }
+
+            assert proteins.size() > 0
+            assert gffCds.size() == proteins.size()
+            assert gbkCds.size() == proteins.size()
+            assert ffnCount >= proteins.size() // CDS + any tRNA/rRNA features
+            assert fnaCount == 12 // all 12 contigs pass --mincontiglen 200
+            assert snapshot(proteins.size(), proteins.sort(false).join('\n').md5()).match()
+        }
+    }
+}

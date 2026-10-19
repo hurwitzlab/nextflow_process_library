@@ -1,0 +1,37 @@
+nextflow_process {
+    name "Test deduplicate_sequences"
+    script "../seqkit.nf"
+    process "deduplicate_sequences"
+    tag "seqkit"
+    tag "deduplicate_sequences"
+
+    test("Removes sequence duplicates and strips headers to the ID") {
+        when {
+            process {
+                """
+                input[0] = file("${moduleDir}/tests/testdata/with_duplicates.faa")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def faa = process.out.deduplicated_sequences[0]
+            assert file(faa).name == 'query_dedup.faa'
+
+            // parse FASTA into [header: sequence] (ignore line wrapping, which is seqkit-version-specific)
+            def seqs = [:]
+            def name = null
+            path(faa).readLines().each { line ->
+                if (line.startsWith('>')) { name = line.substring(1); seqs[name] = '' }
+                else { seqs[name] += line.trim() }
+            }
+
+            // input: prot_8, prot_9, prot_8_copy (= prot_8), prot_10, prot_9_copy (= prot_9)
+            assert seqs.keySet() as List == ['prot_8', 'prot_9', 'prot_10'] // first occurrence kept, order preserved
+            assert (seqs.values() as List).unique().size() == 3
+            assert seqs.prot_10 == 'MRKFDLSLRSSRSSYFATFRHQLTILSKTDALDEEKWLNMLGTFVKDWFRYESHFVHGRDSLVDILKERGLLSESDAVQPLIGKKS'
+            assert snapshot(seqs).match()
+        }
+    }
+}

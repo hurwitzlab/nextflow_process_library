@@ -1,0 +1,12 @@
+{
+    "Indexes a FASTA and passes it through": {
+        "content": [
+            "phiX174\t5386\t123\t70\t71\n"
+        ],
+        "timestamp": "2026-10-19T15:33:32.135138325",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

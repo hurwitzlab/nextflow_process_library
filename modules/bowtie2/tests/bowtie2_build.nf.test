@@ -1,0 +1,30 @@
+nextflow_process {
+    name "Test bowtie2_build"
+    script "../bowtie2.nf"
+    process "bowtie2_build"
+    tag "bowtie2"
+    tag "bowtie2_build"
+
+    test("Builds a large-index bowtie2 index") {
+        when {
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/genome.fasta")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def index_files = process.out.indexed_reference[0]
+            def names = index_files.collect { file(it).name }.sort()
+
+            // --large-index: six .bt2l files under the fixed host_index prefix
+            assert names == [ 'host_index.1.bt2l', 'host_index.2.bt2l', 'host_index.3.bt2l',
+                              'host_index.4.bt2l', 'host_index.rev.1.bt2l', 'host_index.rev.2.bt2l' ]
+            assert index_files.every { path(it).size() > 0 }
+            // index files are binary and version-dependent: snapshot the file set only
+            assert snapshot(names).match()
+        }
+    }
+}

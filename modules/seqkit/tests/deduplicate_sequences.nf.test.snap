@@ -1,0 +1,16 @@
+{
+    "Removes sequence duplicates and strips headers to the ID": {
+        "content": [
+            {
+                "prot_8": "MFSCLQILEAFLWFVLITLLNVTLIILTLSVSRLLNLLLRLVAFLLFLNPQCLASISRWITASSSWKRFCLFVCRALSSIMVICMLTAIRLLLTFVMSLYLLLRS",
+                "prot_9": "MAVNIHITIIELNALHTKRQNLFQELDAVIHLLMEAKHWGLRKSRNATSLNSRFKSLDTLKVKIISVTFRRVIRTNHKKASKIWRHENIQLGGCQS",
+                "prot_10": "MRKFDLSLRSSRSSYFATFRHQLTILSKTDALDEEKWLNMLGTFVKDWFRYESHFVHGRDSLVDILKERGLLSESDAVQPLIGKKS"
+            }
+        ],
+        "timestamp": "2026-10-19T15:53:37.090618072",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

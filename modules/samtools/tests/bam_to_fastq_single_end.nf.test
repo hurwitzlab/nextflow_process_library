@@ -1,0 +1,40 @@
+nextflow_process {
+    name "Test bam_to_fastq_single_end"
+    script "../samtools.nf"
+    process "bam_to_fastq_single_end"
+    tag "samtools"
+    tag "bam_to_fastq_single_end"
+
+    test("Converts a single-end BAM back to FASTQ") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_b2fq_se', file("${baseDir}/tests/data/alignments_single_end.sorted.bam") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (r1_id, r1_path) = process.out.r1_reads[0]
+            def (r2_id, r2_path) = process.out.r2_reads[0]
+            def (se_id, se_path) = process.out.single_end_reads[0]
+            def single = path(se_path).linesGzip
+            def records = single.collate(4)
+            def original = path("${baseDir}/tests/data/reads_R1.fastq").readLines().collate(4)
+
+            assert [r1_id, r2_id, se_id].every { it == 'test_b2fq_se' }
+            assert r1_path.endsWith('test_b2fq_se_R1.fq.gz')
+            assert r2_path.endsWith('test_b2fq_se_R2.fq.gz')
+            assert se_path.endsWith('test_b2fq_se_single.fq.gz')
+            // no READ1/READ2 flags in a single-end BAM: R1/R2 stay empty, everything goes to -0
+            assert path(r1_path).linesGzip.size() == 0
+            assert path(r2_path).linesGzip.size() == 0
+            assert records.size() == 210
+            // same reads as reads_R1.fastq (coordinate order here, and no /1 suffix on the names)
+            assert records.collect { [it[0], it[1], it[3]] }.sort() ==
+                   original.collect { [it[0] - ~/\/1$/, it[1], it[3]] }.sort()
+            assert snapshot(single.join('\n').md5()).match()
+        }
+    }
+}

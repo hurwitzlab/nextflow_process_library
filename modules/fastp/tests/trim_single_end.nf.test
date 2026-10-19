@@ -1,0 +1,48 @@
+nextflow_process {
+    name "Test trim_single_end"
+    script "../fastp.nf"
+    process "trim_single_end"
+    tag "fastp"
+    tag "trim_single_end"
+
+    test("Quality-trims single-end reads") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_fastp_se', file("${baseDir}/tests/data/reads_R1.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, r1_path) = process.out.trimmed_reads[0]
+            def (html_id, html_path) = process.out.html_report[0]
+            def (json_id, json_path) = process.out.json_report[0]
+
+            assert [sampleid, html_id, json_id].every { it == 'test_fastp_se' }
+            assert file(r1_path).name == 'test_fastp_se_R1.trimmed.fq.gz'
+            assert file(html_path).name == 'test_fastp_se_fastp.html'
+            assert file(json_path).name == 'test_fastp_se_fastp.json'
+            assert path(html_path).text.size() > 0
+
+            def reads = path(r1_path).linesGzip.collate(4)
+            def stats = path(json_path).json
+            def input_names = path("${baseDir}/tests/data/reads_R1.fastq").readLines().collate(4).collect { it[0] }
+
+            assert stats.summary.before_filtering.total_reads == 210
+            assert stats.summary.after_filtering.total_reads == reads.size()
+            assert reads.size() > 150 && reads.size() <= 210
+            assert reads.every { it[0] in input_names } // reads are a subset of the input, names unchanged
+            assert reads.every { it[1].length() >= 50 } // --length_required 50
+            assert reads.any { it[1].length() < 100 }   // degraded 3' tails were quality-trimmed
+
+            // version-agnostic: read records (sorted, in case of thread-dependent order) and counts
+            assert snapshot(
+                reads.size(),
+                stats.filtering_result.subMap(['passed_filter_reads', 'low_quality_reads', 'too_many_N_reads', 'too_short_reads']),
+                reads.collect { it.join('\n') }.sort().join('\n').md5()
+            ).match()
+        }
+    }
+}

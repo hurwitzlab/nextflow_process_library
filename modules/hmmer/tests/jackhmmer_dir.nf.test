@@ -1,0 +1,61 @@
+nextflow_process {
+    name "Test jackhmmer_dir"
+    script "../hmmer.nf"
+    process "jackhmmer_dir"
+    tag "hmmer"
+    tag "jackhmmer_dir"
+
+    test("Searches each query in a tarball against a gzipped protein database") {
+        when {
+            params {
+                hmmer_outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = file("${moduleDir}/tests/testdata/queries.tar.gz")    // ./prot_1.faa, ./prot_10.faa
+                input[1] = file("${moduleDir}/tests/testdata/protein_db.faa.gz") // proteins.faa + 3 prot_10 variants
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def alignments = process.out.alignments[0]
+            def tables = process.out.hit_tables[0]
+            def hmms = process.out.hmms[0]
+            def log = process.out.jackhmmer_log[0]
+
+            assert file(alignments).name == 'alignments.tar.gz'
+            assert file(tables).name == 'tables.tar.gz'
+            assert file(hmms).name == 'hmms.tar.gz'
+            assert file(log).name == 'jackhmmer_dir.log'
+
+            // tar contents (system tar in the test JVM's environment; no tool image needed)
+            def tarList = { p -> ['tar', '-tzf', p.toString()].execute().text.readLines()
+                .collect { it.replaceFirst(/^\.\//, '') }.findAll { it }.sort() }
+            def tarCat = { p, member -> ['tar', '-xzOf', p.toString(), "./${member}".toString()].execute().text }
+            def hitsIn = { text -> text.readLines().findAll { !it.startsWith('#') && it.trim() }
+                .collect { it.split(/\s+/)[0] }.sort() }
+
+            assert tarList(alignments) == ['prot_1.sto', 'prot_10.sto']
+            assert tarList(tables) == ['prot_1.txt', 'prot_10.txt']
+
+            def hits = [
+                prot_1 : hitsIn(tarCat(tables, 'prot_1.txt')),
+                prot_10: hitsIn(tarCat(tables, 'prot_10.txt'))
+            ]
+            assert hits.prot_1 == ['prot_1']
+            assert hits.prot_10 == ['prot_10', 'prot_10_var1', 'prot_10_var2', 'prot_10_var3']
+            assert tarCat(alignments, 'prot_10.sto').startsWith('# STOCKHOLM 1.0')
+
+            // TODO(module bug): hmmbuild writes "${out}.hmm" to the work dir instead of hmms/, so
+            // hmms.tar.gz is always empty. Once fixed, assert:
+            //     assert tarList(hmms) == ['prot_1.hmm', 'prot_10.hmm']
+            // TODO(module bug): each jackhmmer call uses `-o jackhmmer_dir.log`, which overwrites the
+            // log (and the "seq -> out" lines echoed into it) on every iteration, so only the last
+            // query's output survives. Once fixed, assert the log mentions both queries, e.g.
+            //     assert path(log).text.contains('prot_1') && path(log).text.contains('prot_10')
+            assert snapshot(hits).match()
+        }
+    }
+}

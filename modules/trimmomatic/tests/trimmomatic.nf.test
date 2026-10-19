@@ -1,0 +1,53 @@
+nextflow_process {
+    name "Test trimmomatic"
+    script "../trimmomatic.nf"
+    process "trimmomatic"
+    tag "trimmomatic"
+    tag "trimmomatic"
+
+    test("Quality-trims paired reads, keeping only surviving pairs") {
+        when {
+            params {
+                trimmomatic_leading = 3
+                trimmomatic_trailing = 3
+                trimmomatic_slidingwindow = '4:15'
+                trimmomatic_minlen = 36
+            }
+            process {
+                """
+                input[0] = [ 'test_trimmomatic',
+                             file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, r1_path, r2_path) = process.out.clean_reads[0]
+            assert sampleid == 'test_trimmomatic'
+            assert file(r1_path).name == 'clean_r1.fastq'
+            assert file(r2_path).name == 'clean_r2.fastq'
+
+            def r1 = path(r1_path).readLines().collate(4)
+            def r2 = path(r2_path).readLines().collate(4)
+
+            // reads stay paired: same count, same mates in the same order
+            assert r1.size() == r2.size()
+            assert r1.size() > 150 && r1.size() <= 210
+            assert r1.collect { it[0].split()[0] - ~/\/1$/ } == r2.collect { it[0].split()[0] - ~/\/2$/ }
+            // MINLEN:36, and the degraded 3' tails were trimmed by SLIDINGWINDOW/TRAILING
+            assert (r1 + r2).every { it[1].length() >= 36 && it[1].length() == it[3].length() }
+            assert (r1 + r2).any { it[1].length() < 100 }
+            // no trailing base below TRAILING:3 (phred+33 '$' = Q3)
+            assert (r1 + r2).every { (it[3][-1] as char) >= ('$' as char) }
+
+            // version-agnostic: read records only
+            assert snapshot(
+                r1.size(),
+                r1.collect { it.join('\n') }.join('\n').md5(),
+                r2.collect { it.join('\n') }.join('\n').md5()
+            ).match()
+        }
+    }
+}

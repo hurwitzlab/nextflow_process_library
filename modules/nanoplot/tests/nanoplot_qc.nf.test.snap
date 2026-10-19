@@ -1,0 +1,13 @@
+{
+    "Writes NanoPlot QC stats and report for long reads": {
+        "content": [
+            30,
+            53694
+        ],
+        "timestamp": "2026-10-19T16:35:09.330067953",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

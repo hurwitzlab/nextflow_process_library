@@ -227,3 +227,4 @@ __marimo__/
 
 # slurm logs
 test_logs/
+.nf-test-*.nf

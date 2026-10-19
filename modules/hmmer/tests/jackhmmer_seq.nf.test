@@ -1,0 +1,44 @@
+nextflow_process {
+    name "Test jackhmmer_seq"
+    script "../hmmer.nf"
+    process "jackhmmer_seq"
+    tag "hmmer"
+    tag "jackhmmer_seq"
+
+    test("Iterative search of one protein against a gzipped protein database") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_jackhmmer', file("${moduleDir}/tests/testdata/prot_10.faa") ]
+                input[1] = file("${moduleDir}/tests/testdata/protein_db.faa.gz") // proteins.faa + 3 prot_10 variants
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (aln_id, aln) = process.out.alignment[0]
+            def (tbl_id, tbl) = process.out.hit_table[0]
+            def (log_id, log) = process.out.jackhmmer_log[0]
+
+            assert [aln_id, tbl_id, log_id].every { it == 'test_jackhmmer' }
+            assert file(aln).name == 'test_jackhmmer.alignment.sto'
+            assert file(tbl).name == 'test_jackhmmer.table.txt'
+            assert file(log).name == 'test_jackhmmer.jackhmmer.log'
+
+            // --tblout: target name is column 1, query name column 3; '#' lines are comments
+            def hits = path(tbl).readLines().findAll { !it.startsWith('#') && it.trim() }
+                .collect { it.split(/\s+/)[0] }.sort()
+            def stoNames = path(aln).readLines()
+                .findAll { it.trim() && !it.startsWith('#') && it != '//' }
+                .collect { it.split(/\s+/)[0].replaceFirst(/\/\d+-\d+$/, '') }.unique().sort() // drop /start-end
+
+            assert hits == ['prot_10', 'prot_10_var1', 'prot_10_var2', 'prot_10_var3'] // the family, nothing else
+            assert path(aln).readLines()[0].startsWith('# STOCKHOLM 1.0')
+            assert stoNames == hits // the alignment holds exactly the included hits
+            assert path(log).text.contains('[ok]')
+            // version-agnostic: hit target names only (scores, the log and Stockholm #= lines carry versions/stats)
+            assert snapshot(hits).match()
+        }
+    }
+}

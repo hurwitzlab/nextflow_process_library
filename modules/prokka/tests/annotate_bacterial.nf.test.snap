@@ -1,0 +1,13 @@
+{
+    "Annotates a 21.5 kb phiX174-derived genome (one contig, passes --mincontiglen 2000)": {
+        "content": [
+            32,
+            "dee8724aa52685c6b140fc67d4222028"
+        ],
+        "timestamp": "2026-10-19T16:28:12.64201171",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}
