@@ -72,6 +72,8 @@
     out1=adapter_trimmed_r1.fastq \
     out2=adapter_trimmed_r2.fastq \
     ref=!{adapters_file} \
+    threads=!{task.cpus} \
+    -Xmx!{(task.memory.toMega() * 0.85) as int}m \
     ktrim=!{params.bbduk_ktrim} \
     k=!{params.bbduk_k} \
     mink=!{params.bbduk_mink} \
