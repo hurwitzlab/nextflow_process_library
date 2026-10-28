@@ -17,9 +17,8 @@ nextflow_process {
             }
         }
         then {
-            // TODO(module bug): cutadapt.nf:42 builds the adapter flags with `paste -sd ""`, which the
-            // cutadapt image's busybox paste rejects ("paste: -d '' is not supported"), so the task exits 1
-            // before cutadapt runs. Until that's made portable (e.g. `tr -d '\n'`), this test fails here.
+            // cutadapt.nf builds the adapter flags with printf (not echo + `paste -sd ""`, which the
+            // cutadapt image's busybox paste rejects), so this works regardless of the image's coreutils
             assert process.success
 
             def (sampleid, trimmed_path) = process.out.trimmed_reads[0]

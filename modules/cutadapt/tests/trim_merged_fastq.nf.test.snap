@@ -1,0 +1,16 @@
+{
+    "Trims both anchored primers off merged amplicon reads": {
+        "content": [
+            "3b4de6fe82c44df708b78ce1f9d43910",
+            {
+                "input": 50,
+                "output": 50
+            }
+        ],
+        "timestamp": "2026-10-28T15:40:29.472769845",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}
