@@ -64,16 +64,19 @@ described below.
     samples, or runs once per whole batch/run (e.g. an `*_index`/`build_*`
     step, a cross-sample `compare_*`/`cluster_*` step, a demux step) — has
     no such variable, and referencing it anyway is a hard compile-time error
-    (`sampleid is not defined`), not a harmless no-op. These processes keep
-    the older, in-module form instead:
-    `publishDir { params.<tool>_outdir instanceof Closure ? params.<tool>_outdir(sampleid) : params.<tool>_outdir }, mode: 'copy'`
-    (no `sampleid` reference in the ternary's own construction — it's inside
-    the Closure body, only evaluated if `params.<tool>_outdir` actually is
-    one — so this form works whether or not the process is per-sample, as
-    long as whoever wires it up never passes a sampleid-taking Closure for a
-    non-per-sample process). See `bbmap.nf`'s `bbstats`, `checkv.nf`'s
-    `checkv_end_to_end`, and `megahit.nf`'s `megahit_paired_end`/
-    `megahit_single_end` for worked examples.
+    (`sampleid is not defined`), not a harmless no-op. These processes use
+    a plain in-module `publishDir` instead, with no publish label:
+    `publishDir "${params.<tool>_outdir}", mode: 'copy'`
+    Don't use a `params.<tool>_outdir instanceof Closure ? params.<tool>_outdir(sampleid) : ...`
+    ternary here: even though `sampleid` only sits inside the Closure
+    branch, Nextflow's strict syntax parser (the default in recent versions,
+    and what `nextflow lint` checks) resolves every variable at compile
+    time, so any mention of `sampleid` in a process without it fails with
+    `sampleid is not defined`. When a file has several non-per-sample
+    processes that would otherwise publish over each other, give each its
+    own `params.<process>_outdir` instead of sharing `<tool>_outdir`. See
+    `coverm.nf`'s `coverm`, `bakta.nf`, `bcftools.nf`, and `metapop.nf`'s
+    `metapop_*` processes for worked examples.
 
 ## Input / output
 
@@ -125,8 +128,9 @@ described below.
 
 ## Checklist before considering a module done
 
-1. Shebang, comment, process name, label, container, (publishDir as a Closure,
-   per above, if terminal output).
+1. Shebang, comment, process name, label, container, and for terminal output
+   either a `publish_*` label (per-sample) or a plain in-module `publishDir`
+   (no `sampleid` in scope), per above.
 2. Inputs as `tuple val(sampleid), path(...)` + separate db paths as needed.
 3. Outputs all named via `emit:`, `sampleid` preserved.
 4. `shell:` + `!{...}`, no `${...}` mixed in.
