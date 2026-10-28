@@ -47,10 +47,12 @@ nextflow_process {
             assert records.findAll { qname(it) in random_pairs }.every { !is_mapped(it) }
 
             // version-agnostic: the 11 mandatory SAM fields only (no header, no optional tags), sorted
-            // in case of thread-dependent output order
+            // in case of thread-dependent output order. TLEN (field 9) is left out: bbtools 40.x
+            // stopped counting soft-clipped bases in it for mates hanging off a contig end (39.84: 138,
+            // 40.01: 97 for pair120), so it differs between catalog versions
             assert snapshot(
                 mapped.size(),
-                records.collect { it[0..10].join('\t') }.sort().join('\n').md5()
+                records.collect { (it[0..7] + it[9..10]).join('\t') }.sort().join('\n').md5()
             ).match()
         }
     }

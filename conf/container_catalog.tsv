@@ -1,9 +1,9 @@
 param	version	default	local_image	public_uri	custom_build	note
 bakta	1.12.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bakta:1.12.1--pyhdfd78af_0.sif	docker://quay.io/biocontainers/bakta:1.12.1--pyhdfd78af_0		
 bandage						
-bbmap	39.84	yes	/usr/local/usrapps/brc/brc_modules/images/staphb_bbtools:39.84.sif	docker://staphb/bbtools:39.84		bbmap is part of bbtools
-bbmerge	39.84	yes	/usr/local/usrapps/brc/brc_modules/images/staphb_bbtools:39.84.sif	docker://staphb/bbtools:39.84		bbmerge is part of bbtools
-bbnorm	39.84	yes	/usr/local/usrapps/brc/brc_modules/images/staphb_bbtools:39.84.sif	docker://staphb/bbtools:39.84		bbnorm is part of bbtools
+bbmap	40.01	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_staphb_bbtools:40.01.sif	docker://quay.io/staphb/bbtools:40.01		bbmap is part of bbtools
+bbmerge	40.01	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_staphb_bbtools:40.01.sif	docker://quay.io/staphb/bbtools:40.01		bbmerge is part of bbtools
+bbnorm	40.01	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_staphb_bbtools:40.01.sif	docker://quay.io/staphb/bbtools:40.01		bbnorm is part of bbtools
 bcftools	1.23.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bcftools:1.23.1--hb2cee57_0.sif	docker://quay.io/biocontainers/bcftools:1.23.1--hb2cee57_0		
 bcl2fastq						
 bedtools	2.31.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bedtools:2.31.1--hf5e1c6e_0.sif	docker://quay.io/biocontainers/bedtools:2.31.1--hf5e1c6e_0		
@@ -14,7 +14,8 @@ busco	6.0.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_
 bwa	0.7.19	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bwa:0.7.19--h577a1d6_0.sif	docker://quay.io/biocontainers/bwa:0.7.19--h577a1d6_0		
 centrifuge						
 checkm	1.2.5	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_checkm-genome:1.2.5--pyhdfd78af_0.sif	docker://quay.io/biocontainers/checkm-genome:1.2.5--pyhdfd78af_0		checkm, not checkm2
-checkm2	1.0.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_checkm2:1.0.1--pyh7cba7a3_0.sif	docker://quay.io/biocontainers/checkm2:1.0.1--pyh7cba7a3_0		
+checkm2	1.0.1	no	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_checkm2:1.0.1--pyh7cba7a3_0.sif	docker://quay.io/biocontainers/checkm2:1.0.1--pyh7cba7a3_0		
+checkm2	1.1.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_checkm2:1.1.0--pyhdfd78af_2.sif	docker://quay.io/biocontainers/checkm2:1.1.0--pyhdfd78af_2		
 checkv	1.1	yes	/usr/local/usrapps/brc/brc_modules/images/phorager-checkv-bundle-1.1.sif			checkv is provided by the phorager bundle
 comparem						
 concoct	1.1.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_concoct:1.1.0--py312hb1d17a5_9.sif	docker://quay.io/biocontainers/concoct:1.1.0--py312hb1d17a5_9		
@@ -53,6 +54,7 @@ metabuli
 metadecoder						
 metaphlan	4.1.2	no	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_metaphlan:4.1.2--pyhdc42f0e_0.sif	docker://quay.io/biocontainers/metaphlan:4.1.2--pyhdc42f0e_0		
 metaphlan	4.2.4	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_metaphlan:4.2.4--pyhdfd78af_0.sif	docker://quay.io/biocontainers/metaphlan:4.2.4--pyhdfd78af_0		
+metapop	0.0.60	yes	/usr/local/usrapps/brc/brc_modules/images/metapop-0.0.60.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/metapop	
 minimap2	2.30	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_minimap2:2.30--h577a1d6_0.sif	docker://quay.io/biocontainers/minimap2:2.30--h577a1d6_0		
 mlst						
 mmseqs						
