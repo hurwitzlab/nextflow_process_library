@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=xfer
-#SBATCH --qos=xfer
+#SBATCH --partition=compute_partners
+#SBATCH --qos=p_brc
 #SBATCH --job-name=nf-test
 #SBATCH --output=test_logs/%x_%j.out
 #SBATCH --err=test_logs/%x_%j.err
@@ -15,6 +15,11 @@
 #   sbatch run_tests.sh --all-versions [nf-test args]  every module that has tests is run once per
 #                                                       image version in conf/container_catalog.tsv;
 #                                                       all versions must match the same snapshot
+#
+# Runs on compute nodes, which have no internet. The only download the suite needs is the nf-test
+# plugins in nf-test.config, cached under .nf-test/plugins/ after the first run; on a fresh clone,
+# run once on xfer to fetch them:
+#   sbatch --partition=xfer --qos=xfer run_tests.sh [nf-test args]
 
 set -euo pipefail
 
@@ -29,12 +34,29 @@ module use /usr/local/usrapps/brc/brc_modules/modules
 module load nextflow/26.04.3
 module load nf-test/0.9.5
 module load apptainer   # processes run in their containers; don't rely on the submitting shell's PATH
+# Nextflow checks online for a newer release at startup; with no internet on compute nodes that
+# check hangs ~280 s per test before timing out
+export NXF_DISABLE_CHECK_LATEST=true
 
 # --- Run test(s) ---
 # Run from the repo root, where nf-test.config lives. Under sbatch, $0 points at a copy of this
 # script in Slurm's spool dir, so resolve the repo from the submit dir instead.
 REPO="$(git -C "${SLURM_SUBMIT_DIR:-$(dirname "$0")}" rev-parse --show-toplevel)"
 cd "$REPO"
+
+# nf-test downloads the plugins listed in nf-test.config on first use. Compute nodes can't, so fail
+# early with instructions unless they're cached (no internet check needed on xfer or a login node).
+if [[ -n "${SLURM_JOB_ID:-}" && "${SLURM_JOB_PARTITION:-}" != xfer ]]; then
+    for plugin in $(grep -oE 'load[[:space:]]+"[^"]+@[^"]+"' nf-test.config | grep -oE '"[^"]+"' | tr -d '"'); do
+        name="${plugin%@*}" version="${plugin#*@}"
+        [[ -f ".nf-test/plugins/${name}/${version}/${name}-${version}.jar" ]] || {
+            echo "ERROR: nf-test plugin ${plugin} is not cached in .nf-test/plugins/ and this node has no internet." >&2
+            echo "       Run once on the xfer partition to download it, e.g.:" >&2
+            echo "         sbatch --partition=xfer --qos=xfer tests/run_tests.sh $*" >&2
+            exit 1
+        }
+    done
+fi
 
 # Give this run its own workDir so concurrent runs don't share (or delete) each other's work dirs.
 # nf-test has no workDir flag, so write a per-run copy of nf-test.config and pass it with -c.
