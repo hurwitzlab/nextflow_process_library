@@ -28,11 +28,11 @@ nextflow_process {
 
             def (sampleid, r1_path, r2_path) = process.out.clean_reads[0]
             assert sampleid == 'test_bbduk'
-            assert file(r1_path).name == 'adapter_trimmed_r1.fastq'
-            assert file(r2_path).name == 'adapter_trimmed_r2.fastq'
+            assert file(r1_path).name == 'test_bbduk_adapter_trimmed_r1.fastq.gz'
+            assert file(r2_path).name == 'test_bbduk_adapter_trimmed_r2.fastq.gz'
 
-            def r1 = path(r1_path).readLines().collate(4)
-            def r2 = path(r2_path).readLines().collate(4)
+            def r1 = path(r1_path).linesGzip.collate(4)
+            def r2 = path(r2_path).linesGzip.collate(4)
             def raw = path("${baseDir}/tests/data/reads_R1.fastq").readLines().collate(4) +
                       path("${baseDir}/tests/data/reads_R2.fastq").readLines().collate(4)
             def has_adapter = { rec -> rec[1].contains('AGATCGGAAGAGC') }

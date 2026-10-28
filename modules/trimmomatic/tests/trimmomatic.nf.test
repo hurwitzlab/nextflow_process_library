@@ -26,11 +26,11 @@ nextflow_process {
 
             def (sampleid, r1_path, r2_path) = process.out.clean_reads[0]
             assert sampleid == 'test_trimmomatic'
-            assert file(r1_path).name == 'clean_r1.fastq'
-            assert file(r2_path).name == 'clean_r2.fastq'
+            assert file(r1_path).name == 'test_trimmomatic_clean_r1.fastq.gz'
+            assert file(r2_path).name == 'test_trimmomatic_clean_r2.fastq.gz'
 
-            def r1 = path(r1_path).readLines().collate(4)
-            def r2 = path(r2_path).readLines().collate(4)
+            def r1 = path(r1_path).linesGzip.collate(4)
+            def r2 = path(r2_path).linesGzip.collate(4)
 
             // reads stay paired: same count, same mates in the same order
             assert r1.size() == r2.size()
