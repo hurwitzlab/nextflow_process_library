@@ -1,35 +1,22 @@
 ---
 name: notebook
-description: Append a dated entry to this project's NOTEBOOK.md summarizing recent work, debugging, or experiment results. Use when the user asks to log/journal progress, update the lab notebook, or invokes /notebook — typically before a commit or at the end of a work session.
+description: Write a dated entry in this project's notebook/ directory summarizing recent work, debugging, or experiment results. Use when the user asks to log/journal progress, update the lab notebook, or invokes /notebook — typically before a commit or at the end of a work session.
 ---
 
 # Lab notebook entry
 
-`NOTEBOOK.md` at the project root is a chronological lab notebook (see its header for the
-entry format). Your job: write one well-formed entry covering what happened since the last
-entry, and append it.
+`notebook/` at the project root is a chronological lab notebook with one Markdown file per
+entry (see `notebook/README.md` for the rules and entry format). Your job: write one well-formed
+entry covering what happened since the user's last entry, as a new file.
 
 ## Steps
 
-0. If `NOTEBOOK.md` doesn't exist at the project root yet, create it first with this header,
-   then continue to step 1 as normal (there will be no prior entries):
+0. If `notebook/` doesn't exist at the project root yet, create it with a `README.md` holding
+   the rules and entry format below, then continue to step 1 as normal (there will be no prior
+   entries).
 
-   ```markdown
-   # Lab Notebook — <project name>
-
-   Chronological log of work sessions on this project. Newest entries at the bottom.
-   Append-only — never edit or reorder past entries.
-
-   Entry format:
-   ## YYYY-MM-DD
-   - What was done / tried
-   - What happened (concrete results, errors, numbers — not a diff restatement)
-   - Decision or next step
-
-   ---
-   ```
-
-1. Read `NOTEBOOK.md` and find the date of the last entry.
+1. List `notebook/` and read the most recent entries, especially the user's own last one
+   (match its `Author:` line against `git config user.name`), to find where to pick up.
 2. Reconstruct what happened since then:
    - If this is a git repo (`git rev-parse --is-inside-work-tree` succeeds): `git log --oneline`
      since the last entry's approximate date, and `git diff` / `git status` for anything
@@ -37,13 +24,25 @@ entry, and append it.
    - The current conversation's own context (what was debugged, decided, tried, and the
      outcome — numbers, errors, results — not just "edited file X").
 3. Write ONE entry dated today (`YYYY-MM-DD`, use the actual current date — check it via the
-   session context or `date +%F`, never guess). If an entry for today already exists, add to
-   it rather than creating a duplicate heading.
-4. Follow the notebook's existing format: what was done, what happened (concrete
-   results/errors/numbers), and the decision or next step. Skip anything that's just visible
-   in `git log`/`git diff` with no added context — the notebook is for the *why* and *outcome*,
-   not a diff restatement.
-5. Append at the bottom. Never edit or reorder past entries.
+   session context or `date +%F`, never guess). If the user already has an entry file for today
+   (same date, same `Author:`), add to it instead of creating a second file.
+4. Name the new file `notebook/YYYY-MM-DD_<short-slug>.md`, where the slug is a few lowercase
+   hyphenated words naming the main topic. Make sure the name isn't already taken. Use this
+   format:
+
+   ```markdown
+   # YYYY-MM-DD
+   Author: <git config user.name>
+
+   - What was done / tried
+   - What happened (concrete results, errors, numbers — not a diff restatement)
+   - Decision or next step
+   ```
+
+   Skip anything that's just visible in `git log`/`git diff` with no added context — the
+   notebook is for the *why* and *outcome*, not a diff restatement.
+5. Never edit, rename or delete anyone else's entry, or any past entry other than the user's own
+   entry from today.
 
 Keep it tight: a few bullets, not a report. If nothing notable happened since the last entry,
 say so rather than inventing content.
