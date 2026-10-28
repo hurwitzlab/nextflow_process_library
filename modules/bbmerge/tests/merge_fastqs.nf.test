@@ -18,11 +18,9 @@ nextflow_process {
             }
         }
         then {
-            // TODO(module bug): with the catalog's bbtools 39.84 image, bbmerge.sh aborts with
-            // java.lang.AssertionError at stream.WriterFactory.makeWriter(WriterFactory.java:140) whenever
-            // paired unmerged outputs (outu1= + outu2=) are requested (bbtools runs with -ea). Verified by
-            // hand: out= alone or outu1= alone works; adding -da avoids it. Until bbmerge.nf works around it
-            // (e.g. -da, or a different image), this test fails at process.success.
+            // Without ordered=t, bbtools 39.84 fails `assert ffout1.ordered()` in
+            // stream.WriterFactory.makeWriter (WriterFactory.java:140) when outu1= + outu2= are both
+            // requested, then hangs; bbmerge.nf passes ordered=t to satisfy it.
             assert process.success
 
             def outs = ['merged_reads', 'unmerged_r1', 'unmerged_r2', 'detected_adapters', 'log']
@@ -40,12 +38,14 @@ nextflow_process {
             def joined = (log =~ /Joined:\s+(\d+)/)[0][1] as int
 
             // all 50 pairs overlap by 50 bp -> (nearly) all merge into reads spanning the whole 250 bp
-            // amplicon (48/50 with veryloose when run by hand with -da), forward primer at the start,
+            // amplicon (48/50 with veryloose when run by hand), forward primer at the start,
             // reverse complement of the reverse primer at the end; the rest stay paired in outu1/outu2
             assert joined == merged.size()
             assert merged.size() >= 45
             assert merged.size() + u1.size() == 50
             assert u1.size() == u2.size()
+            // unmerged mates stay in sync: the Nth R1 record pairs with the Nth R2 record
+            assert u1.collect { it[0].split()[0] - ~/\/1$/ } == u2.collect { it[0].split()[0] - ~/\/2$/ }
             assert merged.every { it[1].length() == it[3].length() }
             assert merged.count { it[1].length() == 250 } >= 45
             assert merged.count { it[1].startsWith('ATGTCTAATATTCAAACTGG') } >= 45

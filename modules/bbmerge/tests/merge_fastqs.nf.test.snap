@@ -1,0 +1,13 @@
+{
+    "Merges overlapping amplicon pairs into full-length amplicons": {
+        "content": [
+            48,
+            "62787d8c96ea971f56d890cf4f91ece1"
+        ],
+        "timestamp": "2026-10-28T13:03:00.88877076",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}
