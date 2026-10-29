@@ -35,7 +35,7 @@ nextflow_process {
             assert gt[100] == '0/1' && gt[1500] == '0/1' && gt[3000] == '1/1' // called genotypes untouched
             assert gt[4000] in ['0/0', '0|0'] // uncalled expected variant filled in as reference (--missing-to-ref)
             // version-agnostic: VCF body records only (no header): CHROM..INFO + the sample's GT
-            // (other FORMAT fields left out: tests/data VCFs currently have AD in a stray 11th column)
+            // (other FORMAT fields left out, so the snapshot doesn't depend on how a version writes them)
             assert snapshot(records.collect { r -> def f = r.split('\t'); (f[0..7] + [f[9].split(':')[0]]).join('\t') }).match()
         }
     }

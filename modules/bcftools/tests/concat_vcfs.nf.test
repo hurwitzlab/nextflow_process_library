@@ -32,7 +32,7 @@ nextflow_process {
             assert positions == [100, 1500, 3000, 4500]
             assert records.collect { it.split('\t')[9].split(':')[0] } == ['0/1', '0/1', '1/1', '0/1']
             // version-agnostic: VCF body records only (no header): CHROM..INFO + the sample's GT
-            // (other FORMAT fields left out: tests/data VCFs currently have AD in a stray 11th column)
+            // (other FORMAT fields left out, so the snapshot doesn't depend on how a version writes them)
             assert snapshot(records.collect { r -> def f = r.split('\t'); (f[0..7] + [f[9].split(':')[0]]).join('\t') }).match()
         }
     }

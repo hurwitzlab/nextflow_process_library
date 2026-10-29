@@ -9,8 +9,7 @@ nextflow_process {
         when {
             process {
                 """
-                // tests/data/variants.vcf with AD in the sample column (see testdata/README.md)
-                input[0] = file("${moduleDir}/tests/testdata/variants_ad.vcf")
+                input[0] = file("${baseDir}/tests/data/variants.vcf")
                 """
             }
         }
