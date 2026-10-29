@@ -10,7 +10,8 @@ bedtools	2.31.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontain
 blast						
 bowtie2	2.5.5	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bowtie2:2.5.5--ha27dd3b_0.sif	docker://quay.io/biocontainers/bowtie2:2.5.5--ha27dd3b_0		
 bracken	3.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bracken:3.1--h9948957_0.sif	docker://quay.io/biocontainers/bracken:3.1--h9948957_0		
-busco	6.0.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_busco:6.0.0--pyhdfd78af_0.sif	docker://quay.io/biocontainers/busco:6.0.0--pyhdfd78af_0		
+busco	6.0.0	no	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_busco:6.0.0--pyhdfd78af_0.sif	docker://quay.io/biocontainers/busco:6.0.0--pyhdfd78af_0		
+busco	6.1.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_busco:6.1.0--pyhdfd78af_0.sif	docker://quay.io/biocontainers/busco:6.1.0--pyhdfd78af_0		
 bwa	0.7.19	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bwa:0.7.19--h577a1d6_0.sif	docker://quay.io/biocontainers/bwa:0.7.19--h577a1d6_0		
 centrifuge						
 checkm	1.2.5	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_checkm-genome:1.2.5--pyhdfd78af_0.sif	docker://quay.io/biocontainers/checkm-genome:1.2.5--pyhdfd78af_0		checkm, not checkm2
@@ -32,13 +33,14 @@ fastqc	0.12.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainer
 flye	2.9.6	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_flye:2.9.6--py310h275bdba_0.sif	docker://quay.io/biocontainers/flye:2.9.6--py310h275bdba_0		
 gatk	4.6.2.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_gatk4:4.6.2.0--py310hdfd78af_0.sif	docker://quay.io/biocontainers/gatk4:4.6.2.0--py310hdfd78af_0		
 genomad	1.8.1	no	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_genomad:1.8.1--pyhdfd78af_0.sif	docker://quay.io/biocontainers/genomad:1.8.1--pyhdfd78af_0		
-genomad	1.12.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_genomad:1.12.0--pyhdfd78af_0.sif	docker://quay.io/biocontainers/genomad:1.12.0--pyhdfd78af_0		
+genomad	1.12.0	no	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_genomad:1.12.0--pyhdfd78af_0.sif	docker://quay.io/biocontainers/genomad:1.12.0--pyhdfd78af_0		
+genomad	1.13.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_genomad:1.13.0--pyhdfd78af_0.sif	docker://quay.io/biocontainers/genomad:1.13.0--pyhdfd78af_0		
 genomad_filterviral						R script step; left unset for now
 genomad_viralselection						R script step; left unset for now
 gtdbtk	2.7.2	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_gtdbtk:2.7.2--pyhdfd78af_0.sif	docker://quay.io/biocontainers/gtdbtk:2.7.2--pyhdfd78af_0		
 hhsuite						
 hhsuiteparse						
-hmmer	v3.1b2dfsg-5-deb_cv1	yes	/usr/local/usrapps/brc/brc_modules/images/biocontainers_hmmer:v3.1b2dfsg-5-deb_cv1.sif	docker://biocontainers/hmmer:v3.1b2dfsg-5-deb_cv1		
+hmmer	3.4	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_hmmer:3.4--h7d74f8d_5.sif	docker://quay.io/biocontainers/hmmer:3.4--h7d74f8d_5		
 insilicoseq						
 interproscan	5.59-91.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_interproscan:5.59-91.0.sif	docker://quay.io/biocontainers/interproscan:5.59-91.0		
 iphop						
@@ -74,7 +76,7 @@ prokka	1.15.6	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainer
 pycoqc						
 quast	5.3.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_quast:5.3.0--py313pl5321h5ca1c30_2.sif	docker://quay.io/biocontainers/quast:5.3.0--py313pl5321h5ca1c30_2		
 resfinder						
-salmon	1.11.4	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_salmon:1.11.4--h7f96273_0.sif	docker://quay.io/biocontainers/salmon:1.11.4--h7f96273_0		
+salmon	1.10.3	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_salmon:1.10.3--h45fbf2d_5.sif	docker://quay.io/biocontainers/salmon:1.10.3--h45fbf2d_5		
 samestr						
 samtools	1.23.1	no	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_samtools:1.23.1--ha83d96e_0.sif	docker://quay.io/biocontainers/samtools:1.23.1--ha83d96e_0		
 samtools	1.24	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_samtools:1.24--h9dcdb79_1.sif	docker://quay.io/biocontainers/samtools:1.24--h9dcdb79_1		
