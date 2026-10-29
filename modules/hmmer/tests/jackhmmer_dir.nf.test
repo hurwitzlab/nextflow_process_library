@@ -48,13 +48,17 @@ nextflow_process {
             assert hits.prot_10 == ['prot_10', 'prot_10_var1', 'prot_10_var2', 'prot_10_var3']
             assert tarCat(alignments, 'prot_10.sto').startsWith('# STOCKHOLM 1.0')
 
-            // TODO(module bug): hmmbuild writes "${out}.hmm" to the work dir instead of hmms/, so
-            // hmms.tar.gz is always empty. Once fixed, assert:
-            //     assert tarList(hmms) == ['prot_1.hmm', 'prot_10.hmm']
-            // TODO(module bug): each jackhmmer call uses `-o jackhmmer_dir.log`, which overwrites the
-            // log (and the "seq -> out" lines echoed into it) on every iteration, so only the last
-            // query's output survives. Once fixed, assert the log mentions both queries, e.g.
-            //     assert path(log).text.contains('prot_1') && path(log).text.contains('prot_10')
+            // one HMM per query, built from that query's alignment of hits
+            assert tarList(hmms) == ['prot_1.hmm', 'prot_10.hmm']
+            assert tarCat(hmms, 'prot_10.hmm').startsWith('HMMER3/')
+            // the log accumulates every query: its "seq -> out" line and its full jackhmmer report.
+            // Match whole names, since "prot_10" also contains "prot_1"
+            def logText = path(log).text
+            ['prot_1', 'prot_10'].each { q ->
+                assert logText.contains("seqs/${q}.faa -> ${q}\n")
+                assert logText =~ /(?m)^Query:\s+${q}\s/
+            }
+            assert logText.count('[ok]') == 2
             assert snapshot(hits).match()
         }
     }

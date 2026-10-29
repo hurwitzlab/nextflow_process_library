@@ -35,7 +35,7 @@ process jackhmmer_seq {
     '''
 }
 
-// Search a tarball directory of query files against a gzipped protein database with jackhmmer, building an HMM from each hit
+// Search a tarball directory of query files against a gzipped protein database with jackhmmer, building one HMM per query from its alignment of hits
 process jackhmmer_dir {
     label "process_high"
     container "${params.container__hmmer}"
@@ -81,13 +81,12 @@ process jackhmmer_dir {
         --F1 0.0005 \
         --F2 0.00005 \
         --F3 0.0000005 \
-        -o jackhmmer_dir.log \
         -A "alignments/${out}.sto" \
         --tblout "tables/${out}.txt" \
         "${seq}" \
-        "db.fasta"
+        "db.fasta" >> jackhmmer_dir.log
 
-        hmmbuild "${out}.hmm" "alignments/${out}.sto"
+        hmmbuild "hmms/${out}.hmm" "alignments/${out}.sto"
     done
 
     tar -zcf alignments.tar.gz -C alignments .
