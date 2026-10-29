@@ -14,11 +14,8 @@ nextflow_process {
             }
         }
         then {
-            // TODO(module bug): kraken2.nf:229 writes `+ "\n")` inside the shell: '''...''' block; Groovy
-            // turns the \n escape into a literal newline before the shell/python sees it, so the
-            // python heredoc has an unterminated string literal (SyntaxError) and the process always
-            // fails. It needs `"\\n"` in the .nf source. Everything below is the intended behaviour
-            // and should pass unchanged once that is fixed.
+            // kraken2.nf writes each row with print() instead of + "\n": inside the shell: '''...'''
+            // block Groovy turns \n into a real newline, which broke the python string literal
             assert process.success
 
             def (sampleid, json) = process.out.kreport_json[0]
