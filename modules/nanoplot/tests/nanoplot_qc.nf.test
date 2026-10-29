@@ -1,0 +1,48 @@
+nextflow_process {
+    name "Test nanoplot_qc"
+    script "../nanoplot.nf"
+    process "nanoplot_qc"
+    tag "nanoplot"
+    tag "nanoplot_qc"
+
+    test("Writes NanoPlot QC stats and report for long reads") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_nanoplot', file("${baseDir}/tests/data/long_reads.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            // errorStrategy 'ignore': a failed task still counts as success, so check the outputs exist
+            assert process.success
+            assert process.out.html_report.size() == 1
+            assert process.out.report_dir.size() == 1
+
+            def (sampleid, html_path) = process.out.html_report[0]
+            def (dir_id, report_dir) = process.out.report_dir[0]
+            assert sampleid == 'test_nanoplot' && dir_id == 'test_nanoplot'
+            assert file(html_path).name == 'NanoPlot-report.html'
+            assert file(report_dir).name == 'test_nanoplot_NanoPlot_out'
+            assert file(html_path).size() > 0
+
+            def stats_file = file("${report_dir}/NanoStats.txt")
+            assert stats_file.exists() && stats_file.size() > 0
+
+            // stable numbers from NanoStats.txt (30 reads, 53694 bases in tests/data/long_reads.fastq.gz)
+            // NanoStats.txt is "Number of reads:   30.0" (older/current) or "number_of_reads\t30.0" (TSV form)
+            def stat = { List<String> keys ->
+                def line = stats_file.readLines().find { l -> keys.any { l.startsWith(it) } }
+                assert line != null : "none of ${keys} in NanoStats.txt"
+                def key = keys.find { line.startsWith(it) }
+                line.substring(key.length()).trim().replace(',', '') as double
+            }
+            def n_reads = stat(['Number of reads:', 'number_of_reads']) as long
+            def n_bases = stat(['Total bases:', 'number_of_bases']) as long
+            assert n_reads == 30
+            assert n_bases == 53694
+
+            assert snapshot(n_reads, n_bases).match()
+        }
+    }
+}

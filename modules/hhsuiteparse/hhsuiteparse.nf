@@ -31,7 +31,7 @@ process join_clusters_to_hhr {
         path(hhr_tsv)
 
     output:
-        path("results", type: 'dir'), emit: per_sample_results
+        path "results", emit: per_sample_results, type: 'dir'
 
     shell:
     '''

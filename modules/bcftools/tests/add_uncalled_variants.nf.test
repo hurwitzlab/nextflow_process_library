@@ -1,0 +1,42 @@
+nextflow_process {
+    name "Test add_uncalled_variants"
+    script "../bcftools.nf"
+    process "add_uncalled_variants"
+    tag "bcftools"
+    tag "add_uncalled_variants"
+
+    test("Adds expected-but-uncalled variants to sample 1 as ref calls") {
+        when {
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/variants.vcf.gz")          // called: 100, 1500, 3000 (sample "1")
+                input[1] = file("${baseDir}/tests/data/expected_variants.vcf.gz") // expected: 100, 4000 (sample "expected")
+                input[2] = file("${baseDir}/tests/data/expected_variants.vcf.gz.tbi")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def vcf = process.out.merged_variants[0]
+            assert file(vcf).name == 'result.vcf.gz'
+            assert file(process.out.merged_variants_tabix[0]).name == 'result.vcf.gz.tbi'
+
+            def lines = path(vcf).linesGzip
+            def samples = lines.find { it.startsWith('#CHROM') }.split('\t')[9..-1]
+            def records = lines.findAll { !it.startsWith('#') }
+            def gt = records.collectEntries { r ->
+                def f = r.split('\t')
+                [(f[1] as int): f[9].split(':')[0]]
+            }
+
+            assert samples == ['1'] // only the real sample is kept
+            assert gt.keySet() as List == [100, 1500, 3000, 4000] // union of called + expected
+            assert gt[100] == '0/1' && gt[1500] == '0/1' && gt[3000] == '1/1' // called genotypes untouched
+            assert gt[4000] in ['0/0', '0|0'] // uncalled expected variant filled in as reference (--missing-to-ref)
+            // version-agnostic: VCF body records only (no header): CHROM..INFO + the sample's GT
+            // (other FORMAT fields left out, so the snapshot doesn't depend on how a version writes them)
+            assert snapshot(records.collect { r -> def f = r.split('\t'); (f[0..7] + [f[9].split(':')[0]]).join('\t') }).match()
+        }
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "Assembly statistics for a 3-contig assembly": {
+        "content": [
+            {
+                "n_scaffolds": "3",
+                "n_contigs": "3",
+                "scaf_bp": "5386",
+                "contig_bp": "5386",
+                "gap_pct": "0.000",
+                "scaf_N50": "2",
+                "scaf_L50": "1800",
+                "ctg_N50": "2",
+                "ctg_L50": "1800",
+                "scaf_max": "2500",
+                "ctg_max": "2500",
+                "gc_avg": "0.44709"
+            }
+        ],
+        "timestamp": "2026-10-19T15:40:16.585589696",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

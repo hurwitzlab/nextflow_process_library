@@ -1,0 +1,14 @@
+{
+    "Quality-trims paired reads, keeping only surviving pairs": {
+        "content": [
+            210,
+            "1911aa18ed75565ce5c52ad492ba8049",
+            "044e97f1a08be7cdbc33250c4f91c44d"
+        ],
+        "timestamp": "2026-10-19T15:42:56.713178747",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

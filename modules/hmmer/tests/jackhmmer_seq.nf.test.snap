@@ -1,0 +1,17 @@
+{
+    "Iterative search of one protein against a gzipped protein database": {
+        "content": [
+            [
+                "prot_10",
+                "prot_10_var1",
+                "prot_10_var2",
+                "prot_10_var3"
+            ]
+        ],
+        "timestamp": "2026-10-19T16:32:58.833168091",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

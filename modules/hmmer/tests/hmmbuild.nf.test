@@ -1,0 +1,34 @@
+nextflow_process {
+    name "Test hmmbuild"
+    script "../hmmer.nf"
+    process "hmmbuild"
+    tag "hmmer"
+    tag "hmmbuild"
+
+    test("Builds a profile HMM from a Stockholm MSA") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_hmmbuild', file("${moduleDir}/tests/testdata/prot_10_family.sto") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, hmm) = process.out.hmm_profile[0]
+            def lines = path(hmm).readLines()
+            def field = { key -> lines.find { it.startsWith(key + ' ') }?.substring(key.length()).trim() }
+
+            assert sampleid == 'test_hmmbuild'
+            assert file(hmm).name == 'test_hmmbuild.hmm'
+            assert lines[0].startsWith('HMMER3/')
+            assert field('ALPH') == 'amino'
+            assert field('NSEQ') == '4'
+            assert field('LENG') == '86' // 86 match columns: the 4-column gap in prot_10_var2 is a minority
+            assert lines.last() == '//'
+            // version-agnostic: header fields only (the HMMER3/ line, DATE, and emission values vary)
+            assert snapshot([field('NAME'), field('LENG'), field('ALPH'), field('NSEQ')]).match()
+        }
+    }
+}

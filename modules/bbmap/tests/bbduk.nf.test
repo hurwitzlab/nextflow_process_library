@@ -1,0 +1,57 @@
+nextflow_process {
+    name "Test bbduk"
+    script "../bbmap.nf"
+    process "bbduk"
+    tag "bbmap"
+    tag "bbduk"
+
+    test("Trims TruSeq adapter read-through from paired reads") {
+        when {
+            params {
+                bbduk_ktrim = 'r'
+                bbduk_k = 23
+                bbduk_mink = 11
+                bbduk_hdist = 1
+                bbduk_additional_flags = 'tpe tbo'
+            }
+            process {
+                """
+                input[0] = [ 'test_bbduk',
+                             file("${baseDir}/tests/data/reads_R1.fastq"),
+                             file("${baseDir}/tests/data/reads_R2.fastq") ]
+                input[1] = file("${baseDir}/tests/data/adapters.fa")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, r1_path, r2_path) = process.out.clean_reads[0]
+            assert sampleid == 'test_bbduk'
+            assert file(r1_path).name == 'test_bbduk_adapter_trimmed_r1.fastq.gz'
+            assert file(r2_path).name == 'test_bbduk_adapter_trimmed_r2.fastq.gz'
+
+            def r1 = path(r1_path).linesGzip.collate(4)
+            def r2 = path(r2_path).linesGzip.collate(4)
+            def raw = path("${baseDir}/tests/data/reads_R1.fastq").readLines().collate(4) +
+                      path("${baseDir}/tests/data/reads_R2.fastq").readLines().collate(4)
+            def has_adapter = { rec -> rec[1].contains('AGATCGGAAGAGC') }
+
+            // every pair survives (shortest insert is 60 bp) and stays in sync
+            assert r1.size() == 210 && r2.size() == 210
+            assert r1.collect { it[0].split()[0] - ~/\/1$/ } == r2.collect { it[0].split()[0] - ~/\/2$/ }
+            // adapters were actually removed
+            assert raw.count(has_adapter) > 0
+            assert (r1 + r2).count(has_adapter) == 0
+            assert (r1 + r2).count { it[1].length() < 100 } > 0
+            assert (r1 + r2).every { it[1].length() == it[3].length() }
+
+            // version-agnostic: read records (sorted, in case of thread-dependent order)
+            assert snapshot(
+                (r1 + r2).sum { it[1].length() },
+                r1.collect { it.join('\n') }.sort().join('\n').md5(),
+                r2.collect { it.join('\n') }.sort().join('\n').md5()
+            ).match()
+        }
+    }
+}

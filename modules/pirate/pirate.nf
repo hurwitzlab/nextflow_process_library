@@ -61,7 +61,7 @@ process build_pangenome {
     do
         cat output/modified_gffs/$strain.gff | \
             awk -F '\t' '$3 == "CDS" {print $9}' | \
-            sed "s/^ID=\([^;]*\);.*;prev_locus=\([^;]*\).*/${strain},\1,\2/g" >> \
+            sed "s/^ID=\\([^;]*\\);.*;prev_locus=\\([^;]*\\).*/${strain},\\1,\\2/g" >> \
             output/PIRATE.locus_id_translation.csv
     done
 

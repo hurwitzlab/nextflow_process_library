@@ -1,0 +1,36 @@
+nextflow_process {
+    name "Test bwa_align_single_end"
+    script "../bwa.nf"
+    process "bwa_align_single_end"
+    tag "bwa"
+    tag "bwa_align_single_end"
+
+    test("Indexes the reference and aligns single-end reads") {
+        when {
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/genome.fasta")
+                input[1] = [ 'test_bwa_se', file("${baseDir}/tests/data/reads_R1.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, sam_path) = process.out.sam_file[0]
+            def fields = { p -> path(p).readLines().findAll { !it.startsWith('@') }
+                                .collect { it.split('\t')[0..10].join('\t') } }
+            def records = fields(sam_path)
+
+            assert sampleid == 'test_bwa_se'
+            assert sam_path.endsWith('test_bwa_se.sam')
+            assert records.size() == 210
+            assert records.every { ((it.split('\t')[1] as int) & 1) == 0 } // no paired flag
+            assert records.count { ((it.split('\t')[1] as int) & 4) != 0 } == 10 // the 10 random reads
+            // same reads, same aligner: matches the shared fixture built with bwa mem
+            assert records == fields("${baseDir}/tests/data/alignments_single_end.sam")
+            // version-agnostic: the 11 mandatory SAM fields only (no header, no optional tags)
+            assert snapshot(records.join('\n').md5()).match()
+        }
+    }
+}

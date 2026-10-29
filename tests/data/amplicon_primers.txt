@@ -1,0 +1,3 @@
+forward	ATGTCTAATATTCAAACTGG
+reverse_complement_of_3prime	TTATGGTGAACAGTGGATTA
+reverse_primer	TAATCCACTGTTCACCATAA

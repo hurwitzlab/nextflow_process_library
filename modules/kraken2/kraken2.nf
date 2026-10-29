@@ -223,10 +223,13 @@ import json
 
 header = ["percent_reads", "rooted_reads", "tax_reads", "rank_code", "tax_id", "scientific_name"]
 with open("!{kreport}") as handle, open("!{sampleid}.json", "w") as out_handle:
-    for line in csv.reader(handle, delimiter="\t", skipinitialspace=True):
+    # Doubled backslash and print() instead of a newline escape: Groovy turns backslash escapes in
+    # this shell block into the real characters before Python sees them, and a raw newline breaks
+    # the string literal
+    for line in csv.reader(handle, delimiter="\\t", skipinitialspace=True):
         # Writes each line as its own JSON formatted dict
         # This is invalid json, but its what athena ingests
-        out_handle.write(json.dumps(dict(zip(header, line))) + "\n")
+        print(json.dumps(dict(zip(header, line))), file=out_handle)
 PYEOF
     '''
 }

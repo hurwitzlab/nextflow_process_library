@@ -1,0 +1,22 @@
+{
+    "Adapter- and quality-trims paired reads, keeping pairs in sync": {
+        "content": [
+            210,
+            0,
+            {
+                "passed_filter_reads": 420,
+                "low_quality_reads": 0,
+                "too_many_N_reads": 0,
+                "too_short_reads": 0
+            },
+            "02ae5841799969cd5dca2876f1d9c4ef",
+            "57dac58d67197fe29a74cb6565aceed1",
+            "d41d8cd98f00b204e9800998ecf8427e"
+        ],
+        "timestamp": "2026-10-19T15:57:25.446399119",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

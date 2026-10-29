@@ -1,0 +1,55 @@
+nextflow_process {
+    name "Test trim_merged_fastq"
+    script "../cutadapt.nf"
+    process "trim_merged_fastq"
+    tag "cutadapt"
+    tag "trim_merged_fastq"
+
+    test("Trims both anchored primers off merged amplicon reads") {
+        when {
+            process {
+                """
+                // tests/data/amplicon_primers.txt: "<forward>-<reverse complement of 3' primer>",
+                // both oriented relative to the merged read
+                input[0] = [ 'test_trim_merged', file("${baseDir}/tests/data/amplicon_merged.fastq.gz") ]
+                input[1] = 'ATGTCTAATATTCAAACTGG-TTATGGTGAACAGTGGATTA'
+                """
+            }
+        }
+        then {
+            // cutadapt.nf builds the adapter flags with printf (not echo + `paste -sd ""`, which the
+            // cutadapt image's busybox paste rejects), so this works regardless of the image's coreutils
+            assert process.success
+
+            def (sampleid, trimmed_path) = process.out.trimmed_reads[0]
+            def (untrimmed_id, untrimmed_path) = process.out.untrimmed_reads[0]
+            def (log_id, log_path) = process.out.log[0]
+            def (stats_id, stats_path) = process.out.stats[0]
+
+            assert [sampleid, untrimmed_id, log_id, stats_id].every { it == 'test_trim_merged' }
+            assert file(trimmed_path).name == 'trimmed.fastq.gz'
+            assert file(untrimmed_path).name == 'untrimmed.fastq.gz'
+            assert file(log_path).name == 'cutadapt.log'
+            assert file(stats_path).name == 'stats.json'
+            assert path(log_path).text.size() > 0
+
+            def trimmed = path(trimmed_path).linesGzip.collate(4)
+            def untrimmed = path(untrimmed_path).linesGzip.collate(4)
+            def stats = path(stats_path).json
+
+            // every 250 bp merged read carries both primers -> 250 - 20 - 20 = 210 bp insert left
+            assert stats.read_counts.input == 50
+            assert trimmed.size() == 50
+            assert untrimmed.size() == 0
+            assert stats.read_counts.output == 50
+            assert trimmed.every { it[1].length() == 210 && it[3].length() == 210 }
+            assert trimmed.every { !it[1].startsWith('ATGTCTAATATTCAAACTGG') && !it[1].endsWith('TTATGGTGAACAGTGGATTA') }
+
+            // version-agnostic: trimmed read records, not the log/JSON (which carry version + command line)
+            assert snapshot(
+                trimmed.collect { it.join('\n') }.sort().join('\n').md5(),
+                stats.read_counts.subMap(['input', 'output'])
+            ).match()
+        }
+    }
+}

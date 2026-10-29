@@ -1,0 +1,43 @@
+{
+    "Estimates per-read and mean identity of ONT reads": {
+        "content": [
+            [
+                "ont00",
+                "ont01",
+                "ont02",
+                "ont03",
+                "ont04",
+                "ont05",
+                "ont06",
+                "ont07",
+                "ont08",
+                "ont09",
+                "ont10",
+                "ont11",
+                "ont12",
+                "ont13",
+                "ont14",
+                "ont15",
+                "ont16",
+                "ont17",
+                "ont18",
+                "ont19",
+                "ont20",
+                "ont21",
+                "ont22",
+                "ont23",
+                "ont24",
+                "ont25",
+                "ont26",
+                "ont27",
+                "ont28",
+                "ont29"
+            ]
+        ],
+        "timestamp": "2026-10-19T18:14:57.573854101",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

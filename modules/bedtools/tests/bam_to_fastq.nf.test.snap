@@ -1,0 +1,13 @@
+{
+    "Converts a name-sorted paired-end BAM back to R1/R2 FASTQ": {
+        "content": [
+            "479560b8e072b47569f1a7b7ce289106",
+            "469340027cb447c785c0c82fbbed334c"
+        ],
+        "timestamp": "2026-10-19T15:39:58.096984559",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

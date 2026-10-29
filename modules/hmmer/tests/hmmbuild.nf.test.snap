@@ -1,0 +1,17 @@
+{
+    "Builds a profile HMM from a Stockholm MSA": {
+        "content": [
+            [
+                "prot_10_family",
+                "86",
+                "amino",
+                "4"
+            ]
+        ],
+        "timestamp": "2026-10-19T15:53:01.96098846",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

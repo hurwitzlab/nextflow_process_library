@@ -38,8 +38,8 @@ process trim_merged_fastq {
 
     shell:
     '''
-    # This is annoying for some reason the last $2 prints a newline, so I need to strip it before setting the adapters
-    CUTADAPT_ADAPTERS=$(echo "!{adapters}" | awk  'BEGIN{ RS = "," ; FS = "-"; ORS=" " } {print ("-g ^" $1 "..."$2 "\$") }' | paste -sd "")
+    # printf, not echo: echo's trailing newline would end up in the last $2 (RS is ",") and split off the "$" anchor
+    CUTADAPT_ADAPTERS=$(printf '%s' "!{adapters}" | awk  'BEGIN{ RS = "," ; FS = "-"; ORS=" " } {print ("-g ^" $1 "..."$2 "\$") }')
 
     cutadapt ${CUTADAPT_ADAPTERS} \
     --output trimmed.fastq.gz \

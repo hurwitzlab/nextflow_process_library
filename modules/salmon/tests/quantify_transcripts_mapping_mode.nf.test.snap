@@ -1,0 +1,23 @@
+{
+    "Indexes transcripts and quantifies paired reads against them": {
+        "content": [
+            {
+                "tx_1": 1284,
+                "tx_2": 987,
+                "tx_3": 609,
+                "tx_4": 558,
+                "tx_5": 528,
+                "tx_6": 459,
+                "tx_7": 396,
+                "tx_8": 318,
+                "tx_9": 291,
+                "tx_10": 261
+            }
+        ],
+        "timestamp": "2026-10-19T16:43:48.542275469",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

@@ -1,0 +1,42 @@
+nextflow_process {
+    name "Test to_bam"
+    script "../samtools.nf"
+    process "to_bam"
+    tag "samtools"
+    tag "to_bam"
+
+    test("Converts a coordinate-sorted alignment file to an indexed BAM, keeping every record") {
+        // TODO(module bug): to_bam indexes without sorting, so an unsorted SAM/BAM (e.g.
+        // tests/data/alignments.sam, bwa mem order) fails in `samtools index` with "Unsorted
+        // positions". Only coordinate-sorted input works today. Once to_bam sorts (or the
+        // precondition is enforced/documented), add a test feeding alignments.sam and assert the
+        // output is coordinate-sorted with all 420 records.
+        when {
+            process {
+                """
+                input[0] = [ 'test_to_bam', file("${baseDir}/tests/data/alignments.sorted.bam") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, bam_path) = process.out.bam_file[0]
+            def (index_sampleid, bai_path) = process.out.bam_index[0]
+            def reads = bam(bam_path).getSamLines()
+            def fields = reads.collect { it.split('\t')[0..10].join('\t') }
+            def expected = bam("${baseDir}/tests/data/alignments.sorted.bam").getSamLines()
+                .collect { it.split('\t')[0..10].join('\t') }
+
+            assert sampleid == 'test_to_bam'
+            assert index_sampleid == 'test_to_bam'
+            assert bam_path.endsWith('test_to_bam.bam')
+            assert bai_path.endsWith('test_to_bam.bam.bai')
+            assert path(bai_path).size() > 0
+            assert reads.size() == 420 // unmapped reads are kept (no -F 4 here)
+            assert fields == expected // records unchanged, same order
+            // version-agnostic: the 11 mandatory SAM fields only (no header, no optional tags)
+            assert snapshot(fields.join('\n').md5()).match()
+        }
+    }
+}

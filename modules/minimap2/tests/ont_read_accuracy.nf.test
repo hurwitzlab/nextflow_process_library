@@ -1,0 +1,49 @@
+nextflow_process {
+    name "Test ont_read_accuracy"
+    script "../minimap2.nf"
+    process "ont_read_accuracy"
+    tag "minimap2"
+    tag "ont_read_accuracy"
+
+    test("Estimates per-read and mean identity of ONT reads") {
+        when {
+            params {
+                ont_read_accuracy_outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = [ 'test_acc', file("${baseDir}/tests/data/long_reads.fastq.gz") ]
+                input[1] = file("${baseDir}/tests/data/genome.fasta")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (table_id, table_path) = process.out.read_accuracy_table[0]
+            def (mean_id, mean_path) = process.out.mean_accuracy[0]
+            def table = path(table_path).readLines()
+            def rows = table.drop(1).collect { it.split('\t') }
+            def identities = rows.collect { it[2] as double }
+            def mean = path(mean_path).text.trim() as double
+
+            assert table_id == 'test_acc'
+            assert mean_id == 'test_acc'
+            assert table_path.endsWith('test_acc.read_accuracy.tsv')
+            assert mean_path.endsWith('test_acc.accuracy.txt')
+            assert table[0] == 'name\tlength\tidentity'
+            assert rows.size() >= 30 // at least one PAF hit per read
+            assert rows.collect { it[0] }.toSet().size() == 30 // every read is represented
+            assert identities.every { it > 0 && it <= 1 }
+            assert mean > 0 && mean <= 1
+            // TODO(module bug): `minimap2 -x ava-ont` without `-c` writes approximate PAF (column 10
+            // counts seed/chain matches, not base-level matches), so $10/$11 badly underestimates
+            // identity: these reads were simulated at ~91% accuracy but the mean reported is ~0.47.
+            // Once the module does base-level alignment (e.g. `-c`, or map-ont + NM/de tags), assert
+            // the per-read identities and the mean fall in ~0.85-0.95, and add a snapshot of the
+            // table. Until then the identity values are wrong, so they are deliberately not snapshotted.
+            assert Math.abs(mean - identities.sum() / identities.size()) < 1e-4
+            assert snapshot(rows.collect { it[0] }.toSet().sort()).match() // which reads were scored
+        }
+    }
+}

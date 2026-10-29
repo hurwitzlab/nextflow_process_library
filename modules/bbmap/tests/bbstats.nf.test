@@ -1,0 +1,41 @@
+nextflow_process {
+    name "Test bbstats"
+    script "../bbmap.nf"
+    process "bbstats"
+    tag "bbmap"
+    tag "bbstats"
+
+    test("Assembly statistics for a 3-contig assembly") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_stats', file("${baseDir}/tests/data/contigs.fasta") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, tsv) = process.out.assembly_stats[0]
+            assert sampleid == 'test_stats'
+            assert file(tsv).name == 'test_stats_stats.tsv'
+
+            // format=6: one '#'-prefixed header row + one value row; parse into a map
+            def lines = path(tsv).readLines().findAll { it.trim() }
+            def header = lines[0].replaceFirst(/^#/, '').split('\t')
+            def stats = [header, lines[1].split('\t')].transpose().collectEntries { [(it[0]): it[1]] }
+
+            assert lines.size() == 2
+            assert stats.n_scaffolds == '3'
+            assert stats.n_contigs == '3'
+            assert stats.scaf_bp == '5386'
+            assert stats.contig_bp == '5386'
+            assert stats.scaf_max == '2500'
+            assert stats.scaf_N50 == '2' // L/N naming in stats.sh: N50 = count, L50 = length
+            // snapshot the core size/contiguity/GC fields only (column set can grow across versions)
+            def core = ['n_scaffolds', 'n_contigs', 'scaf_bp', 'contig_bp', 'gap_pct', 'scaf_N50', 'scaf_L50',
+                        'ctg_N50', 'ctg_L50', 'scaf_max', 'ctg_max', 'gc_avg']
+            assert snapshot(core.collectEntries { [(it): stats[it]] }).match()
+        }
+    }
+}

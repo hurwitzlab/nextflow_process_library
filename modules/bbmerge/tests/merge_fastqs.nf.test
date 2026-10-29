@@ -1,0 +1,61 @@
+nextflow_process {
+    name "Test merge_fastqs"
+    script "../bbmerge.nf"
+    process "merge_fastqs"
+    tag "bbmerge"
+    tag "merge_fastqs"
+
+    test("Merges overlapping amplicon pairs into full-length amplicons") {
+        when {
+            process {
+                """
+                // "<forward>-<reverse complement of 3' primer>", oriented relative to the merged read
+                input[0] = [ 'test_bbmerge',
+                             file("${baseDir}/tests/data/amplicon_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/amplicon_R2.fastq.gz") ]
+                input[1] = 'ATGTCTAATATTCAAACTGG-TTATGGTGAACAGTGGATTA'
+                """
+            }
+        }
+        then {
+            // Without ordered=t, bbtools 39.84 fails `assert ffout1.ordered()` in
+            // stream.WriterFactory.makeWriter (WriterFactory.java:140) when outu1= + outu2= are both
+            // requested, then hangs; bbmerge.nf passes ordered=t to satisfy it.
+            assert process.success
+
+            def outs = ['merged_reads', 'unmerged_r1', 'unmerged_r2', 'detected_adapters', 'log']
+            assert outs.every { process.out[it][0][0] == 'test_bbmerge' }
+            assert file(process.out.merged_reads[0][1]).name == 'test_bbmerge.merged.fq.gz'
+            assert file(process.out.unmerged_r1[0][1]).name == 'test_bbmerge.unaligned.r1.fq.gz'
+            assert file(process.out.unmerged_r2[0][1]).name == 'test_bbmerge.unaligned.r2.fq.gz'
+            assert file(process.out.detected_adapters[0][1]).name == 'test_bbmerge.adapters.fq'
+            assert file(process.out.log[0][1]).name == 'test_bbmerge.log.txt'
+
+            def merged = path(process.out.merged_reads[0][1]).linesGzip.collate(4)
+            def u1 = path(process.out.unmerged_r1[0][1]).linesGzip.collate(4)
+            def u2 = path(process.out.unmerged_r2[0][1]).linesGzip.collate(4)
+            def log = path(process.out.log[0][1]).text
+            def joined = (log =~ /Joined:\s+(\d+)/)[0][1] as int
+
+            // all 50 pairs overlap by 50 bp -> (nearly) all merge into reads spanning the whole 250 bp
+            // amplicon (48/50 with veryloose when run by hand), forward primer at the start,
+            // reverse complement of the reverse primer at the end; the rest stay paired in outu1/outu2
+            assert joined == merged.size()
+            assert merged.size() >= 45
+            assert merged.size() + u1.size() == 50
+            assert u1.size() == u2.size()
+            // unmerged mates stay in sync: the Nth R1 record pairs with the Nth R2 record
+            assert u1.collect { it[0].split()[0] - ~/\/1$/ } == u2.collect { it[0].split()[0] - ~/\/2$/ }
+            assert merged.every { it[1].length() == it[3].length() }
+            assert merged.count { it[1].length() == 250 } >= 45
+            assert merged.count { it[1].startsWith('ATGTCTAATATTCAAACTGG') } >= 45
+            assert merged.count { it[1].endsWith('TTATGGTGAACAGTGGATTA') } >= 45
+
+            // version-agnostic: merged read records (sorted, in case of thread-dependent order)
+            assert snapshot(
+                joined,
+                merged.collect { it.join('\n') }.sort().join('\n').md5()
+            ).match()
+        }
+    }
+}

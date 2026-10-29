@@ -1,0 +1,14 @@
+{
+    "Trims TruSeq adapter read-through from paired reads": {
+        "content": [
+            41268,
+            "098ee2ecbff67d926951ba7abe7fdba2",
+            "1230fc0f60c92277051c7bb21e3ccd6b"
+        ],
+        "timestamp": "2026-10-19T15:44:02.518985216",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

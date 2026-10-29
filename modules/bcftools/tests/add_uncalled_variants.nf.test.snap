@@ -1,0 +1,17 @@
+{
+    "Adds expected-but-uncalled variants to sample 1 as ref calls": {
+        "content": [
+            [
+                "phiX174\t100\t.\tA\tG\t50\tPASS\tAF=1;AC=1;AN=2\t0/1",
+                "phiX174\t1500\t.\tA\tC\t50\tPASS\tAF=0.4;AC=1;AN=2\t0/1",
+                "phiX174\t3000\t.\tG\tA\t50\tPASS\tAF=1;AC=2;AN=2\t1/1",
+                "phiX174\t4000\t.\tC\tA\t50\tPASS\tAF=1;AC=0;AN=2\t0/0"
+            ]
+        ],
+        "timestamp": "2026-10-19T15:44:25.729144712",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

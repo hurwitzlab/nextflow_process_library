@@ -1,0 +1,27 @@
+nextflow_process {
+    name "Test diamond_makedb"
+    script "../diamond.nf"
+    process "diamond_makedb"
+    tag "diamond"
+    tag "diamond_makedb"
+
+    test("Builds a .dmnd database from a protein FASTA") {
+        when {
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/proteins.faa")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def db = file(process.out.diamond_database[0])
+            assert db.name == 'out.dmnd'
+            assert db.size() > 0
+            // The .dmnd is binary and embeds the diamond build/version, so it isn't snapshotted.
+            // Its contents are exercised in diamond_similarity_search.nf.test, which searches a
+            // database built by this process.
+        }
+    }
+}

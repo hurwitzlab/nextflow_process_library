@@ -1,0 +1,48 @@
+import java.util.zip.ZipFile
+
+nextflow_process {
+    name "Test fastqc"
+    script "../fastqc.nf"
+    process "fastqc"
+    tag "fastqc"
+    tag "fastqc"
+
+    test("Writes a FastQC report for each mate of a pair") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_fastqc',
+                             file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, report_dir) = process.out.fastqc_reports[0]
+            assert sampleid == 'test_fastqc'
+            assert file(report_dir).name == 'test_fastqc_fastqc'
+
+            // inputs are staged as R1.fastq.gz / R2.fastq.gz, so reports are named after those
+            def basic_stats = [:]
+            ['R1', 'R2'].each { mate ->
+                def html = file("${report_dir}/${mate}_fastqc.html")
+                def zip = file("${report_dir}/${mate}_fastqc.zip")
+                assert html.exists() && html.size() > 0
+                assert zip.exists() && zip.size() > 0
+
+                // parse the stable numbers out of fastqc_data.txt inside the zip (don't snapshot the reports)
+                def zf = new ZipFile(zip)
+                def data = zf.getInputStream(zf.getEntry("${mate}_fastqc/fastqc_data.txt")).text
+                zf.close()
+                def field = { String key -> data.readLines().find { it.startsWith(key + '\t') }.split('\t')[1] }
+                assert field('Filename') == "${mate}.fastq.gz"
+                assert field('Total Sequences') == '210'
+                assert field('Sequence length') == '100'
+                basic_stats[mate] = [ field('Total Sequences'), field('Sequence length'), field('%GC') ]
+            }
+            assert snapshot(basic_stats).match()
+        }
+    }
+}

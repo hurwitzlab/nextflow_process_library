@@ -1,0 +1,12 @@
+{
+    "Aligns ONT reads to a reference FASTA": {
+        "content": [
+            "6114fe702b1d778e24215fc6ce8d88a3"
+        ],
+        "timestamp": "2026-10-19T15:48:16.130874558",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

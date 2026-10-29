@@ -1,0 +1,14 @@
+{
+    "Writes a single FastQC report zip for merged amplicon reads": {
+        "content": [
+            "50",
+            "250",
+            "48"
+        ],
+        "timestamp": "2026-10-19T15:58:05.934936719",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

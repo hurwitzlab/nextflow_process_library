@@ -1,0 +1,18 @@
+{
+    "Trims the anchored forward primer from single reads in either orientation": {
+        "content": [
+            "3fe13e8cb0a773c327a0044a4ce14e90",
+            "0c0f51b2609e2fa023ec4a977347e41a",
+            {
+                "input": 60,
+                "output": 50,
+                "reverse_complemented": 10
+            }
+        ],
+        "timestamp": "2026-10-19T15:42:45.280692632",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

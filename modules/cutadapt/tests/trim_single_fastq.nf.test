@@ -1,0 +1,57 @@
+nextflow_process {
+    name "Test trim_single_fastq"
+    script "../cutadapt.nf"
+    process "trim_single_fastq"
+    tag "cutadapt"
+    tag "trim_single_fastq"
+
+    test("Trims the anchored forward primer from single reads in either orientation") {
+        when {
+            process {
+                """
+                // single_reads.fastq: 40 forward amplicon R1 reads + 10 reverse-complemented R1 reads
+                // (forward primer only found with --revcomp) + 10 R2 reads (no forward primer).
+                // Only the 5' (forward) half of the "<5'>-<3'>" adapter string is used by this process.
+                input[0] = [ 'test_trim_single', file("${moduleDir}/tests/testdata/single_reads.fastq") ]
+                input[1] = 'ATGTCTAATATTCAAACTGG-TTATGGTGAACAGTGGATTA'
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, trimmed_path) = process.out.trimmed_reads[0]
+            def (untrimmed_id, untrimmed_path) = process.out.untrimmed_reads[0]
+            def (log_id, log_path) = process.out.log[0]
+            def (stats_id, stats_path) = process.out.stats[0]
+
+            assert [sampleid, untrimmed_id, log_id, stats_id].every { it == 'test_trim_single' }
+            assert file(trimmed_path).name == 'trimmed.fastq'
+            assert file(untrimmed_path).name == 'untrimmed.fastq'
+            assert file(log_path).name == 'cutadapt.log'
+            assert file(stats_path).name == 'stats.json'
+            assert path(log_path).text.size() > 0
+
+            def trimmed = path(trimmed_path).readLines().collate(4)
+            def untrimmed = path(untrimmed_path).readLines().collate(4)
+            def stats = path(stats_path).json
+            def names = { recs -> recs.collect { it[0].split()[0] } }
+
+            assert stats.read_counts.input == 60
+            // all 50 R1 reads had the primer removed (150 - 20 = 130 bp), 10 of them via --revcomp
+            assert trimmed.size() == 50
+            assert names(trimmed).sort() == (0..49).collect { String.format('@amp%02d/1', it) }
+            assert stats.read_counts.reverse_complemented == 10
+            assert trimmed.every { it[1].length() == 130 && !it[1].startsWith('ATGTCTAATATTCAAACTGG') }
+            // the R2 reads have no forward primer
+            assert names(untrimmed).sort() == (0..9).collect { String.format('@amp%02d/2', it) }
+
+            // version-agnostic: read records, not the log/JSON (which carry version + command line)
+            assert snapshot(
+                trimmed.collect { it.join('\n') }.sort().join('\n').md5(),
+                untrimmed.collect { it.join('\n') }.sort().join('\n').md5(),
+                stats.read_counts.subMap(['input', 'output', 'reverse_complemented'])
+            ).match()
+        }
+    }
+}

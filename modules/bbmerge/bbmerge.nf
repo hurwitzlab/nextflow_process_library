@@ -24,6 +24,7 @@ process merge_fastqs {
     echo !{adapters} | awk 'BEGIN { RS = "," ; FS = "-"} {print ">adapter_1_" NR; print $1}' > adapter_r1.fa
     echo !{adapters} | awk 'BEGIN { RS = "," ; FS = "-"} {print ">adapter_2_" NR; print $2}' > adapter_r2.fa
 
+    # ordered=t keeps outu1/outu2 mates in sync; bbtools 39.84 asserts on it (and hangs) without it
     bbmerge.sh in1=!{r1} \
                in2=!{r2} \
                adapter1=adapter_r1.fa \
@@ -32,6 +33,7 @@ process merge_fastqs {
                outu1=!{sampleid}.unaligned.r1.fq.gz \
                outu2=!{sampleid}.unaligned.r2.fq.gz \
                outadapter=!{sampleid}.adapters.fq \
+               ordered=t \
                veryloose 2> !{sampleid}.log.txt
     '''
 }

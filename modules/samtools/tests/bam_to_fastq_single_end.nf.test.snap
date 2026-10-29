@@ -1,0 +1,12 @@
+{
+    "Converts a single-end BAM back to FASTQ": {
+        "content": [
+            "211c024ad1222a643cc414933cb8fa62"
+        ],
+        "timestamp": "2026-10-19T15:39:55.265091553",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

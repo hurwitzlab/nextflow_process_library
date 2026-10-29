@@ -1,0 +1,32 @@
+{
+    "Sends pairs without the primers to the untrimmed outputs": {
+        "content": [
+            {
+                "input": 210,
+                "read1_with_adapter": 0,
+                "read2_with_adapter": 0
+            }
+        ],
+        "timestamp": "2026-10-19T15:42:26.022298315",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    },
+    "Keeps amplicon pairs carrying both primers and quality-trims them": {
+        "content": [
+            "cb9762f3ce4d5c881ba7117c2357d3a8",
+            "ae4a7181c3fd6cd71b221176e0eb7ac8",
+            {
+                "input": 50,
+                "read1_with_adapter": 50,
+                "read2_with_adapter": 50
+            }
+        ],
+        "timestamp": "2026-10-19T15:42:15.746867607",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

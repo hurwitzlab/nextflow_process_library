@@ -1,0 +1,20 @@
+nextflow_process {
+    name "Test diamond_test"
+    script "../diamond.nf"
+    process "diamond_test"
+    tag "diamond"
+    tag "diamond_test"
+
+    test("diamond's built-in self test passes in the container") {
+        when {
+            process {
+                """
+                """
+            }
+        }
+        then {
+            // no inputs or outputs: `diamond test` exits non-zero if any of its built-in checks fail
+            assert process.success
+        }
+    }
+}

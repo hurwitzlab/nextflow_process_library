@@ -1,0 +1,39 @@
+nextflow_process {
+    name "Test concat_vcfs"
+    script "../bcftools.nf"
+    process "concat_vcfs"
+    tag "bcftools"
+    tag "concat_vcfs"
+
+    test("Concatenates two VCFs of the same sample into one sorted call set") {
+        when {
+            params {
+                bcftools_outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/variants.vcf.gz")       // 100, 1500, 3000
+                input[1] = file("${baseDir}/tests/data/variants_extra.vcf.gz") // 4500
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def vcf = process.out.final_variants[0]
+            assert file(vcf).name == 'final_variants.vcf.gz'
+            assert file(process.out.final_variants_tabix[0]).name == 'final_variants.vcf.gz.tbi'
+
+            def lines = path(vcf).linesGzip
+            def records = lines.findAll { !it.startsWith('#') }
+            def positions = records.collect { it.split('\t')[1] as int }
+
+            assert lines.find { it.startsWith('#CHROM') }.split('\t')[9..-1] == ['1']
+            assert positions == [100, 1500, 3000, 4500]
+            assert records.collect { it.split('\t')[9].split(':')[0] } == ['0/1', '0/1', '1/1', '0/1']
+            // version-agnostic: VCF body records only (no header): CHROM..INFO + the sample's GT
+            // (other FORMAT fields left out, so the snapshot doesn't depend on how a version writes them)
+            assert snapshot(records.collect { r -> def f = r.split('\t'); (f[0..7] + [f[9].split(':')[0]]).join('\t') }).match()
+        }
+    }
+}

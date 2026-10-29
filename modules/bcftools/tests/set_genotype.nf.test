@@ -1,0 +1,38 @@
+nextflow_process {
+    name "Test set_genotype"
+    script "../bcftools.nf"
+    process "set_genotype"
+    tag "bcftools"
+    tag "set_genotype"
+
+    test("Sets every genotype to the allele with the most read depth (FORMAT/AD)") {
+        when {
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/variants.vcf")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def vcf = process.out.regenotyped_variants[0]
+            assert file(vcf).name == 'result.vcf.gz'
+            assert file(process.out.regenotyped_variants_tabix[0]).name == 'result.vcf.gz.tbi'
+
+            def records = path(vcf).linesGzip.findAll { !it.startsWith('#') }
+            def gt = records.collectEntries { r ->
+                def f = r.split('\t')
+                [(f[1] as int): f[9].split(':')[0]]
+            }
+
+            assert gt.keySet() as List == [100, 1500, 3000] // no records dropped
+            // input: 100 0/1 AD=2,18 ; 1500 0/1 AD=12,8 ; 3000 1/1 AD=0,20
+            assert gt[100] == '1/1'  // ALT has more depth
+            assert gt[1500] == '0/0' // REF has more depth
+            assert gt[3000] == '1/1'
+            assert records.collect { it.split('\t')[9].split(':')[1] } == ['2,18', '12,8', '0,20'] // AD kept
+            assert snapshot(records).match()
+        }
+    }
+}

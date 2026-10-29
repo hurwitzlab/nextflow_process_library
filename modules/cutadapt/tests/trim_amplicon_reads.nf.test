@@ -1,0 +1,89 @@
+nextflow_process {
+    name "Test trim_amplicon_reads"
+    script "../cutadapt.nf"
+    process "trim_amplicon_reads"
+    tag "cutadapt"
+    tag "trim_amplicon_reads"
+
+    test("Keeps amplicon pairs carrying both primers and quality-trims them") {
+        when {
+            process {
+                """
+                // "<forward>-<reverse complement of 3' primer>", oriented relative to the merged read;
+                // the process reverse-complements the 3' half to get the R2 (reverse) primer
+                input[0] = [ 'test_trim_amplicon',
+                             file("${baseDir}/tests/data/amplicon_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/amplicon_R2.fastq.gz") ]
+                input[1] = 'ATGTCTAATATTCAAACTGG-TTATGGTGAACAGTGGATTA'
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def outs = ['trimmed_r1', 'trimmed_r2', 'untrimmed_r1', 'untrimmed_r2', 'log', 'stats']
+            assert outs.every { process.out[it][0][0] == 'test_trim_amplicon' }
+            assert file(process.out.trimmed_r1[0][1]).name == 'r1.trimmed.fq.gz'
+            assert file(process.out.trimmed_r2[0][1]).name == 'r2.trimmed.fq.gz'
+            assert file(process.out.untrimmed_r1[0][1]).name == 'untrimmed.r1.fq.gz'
+            assert file(process.out.untrimmed_r2[0][1]).name == 'untrimmed.r2.fq.gz'
+            assert file(process.out.log[0][1]).name == 'cutadapt.log'
+            assert file(process.out.stats[0][1]).name == 'stats.json'
+
+            def r1 = path(process.out.trimmed_r1[0][1]).linesGzip.collate(4)
+            def r2 = path(process.out.trimmed_r2[0][1]).linesGzip.collate(4)
+            def u1 = path(process.out.untrimmed_r1[0][1]).linesGzip.collate(4)
+            def u2 = path(process.out.untrimmed_r2[0][1]).linesGzip.collate(4)
+            def stats = path(process.out.stats[0][1]).json
+
+            // every pair has the forward primer on R1 and the reverse primer on R2
+            assert stats.read_counts.input == 50
+            assert r1.size() == 50 && r2.size() == 50
+            assert u1.size() == 0 && u2.size() == 0
+            assert stats.read_counts.read1_with_adapter == 50
+            assert stats.read_counts.read2_with_adapter == 50
+            assert r1.collect { it[0].split()[0] - ~/\/1$/ } == r2.collect { it[0].split()[0] - ~/\/2$/ }
+            // NOTE: --action retain keeps the matched primers in the reads (they're only used to
+            // select pairs), so primer presence/absence is deliberately not asserted here
+            // --quality-cutoff/--nextseq-trim 25 trimmed the degraded 3' tails
+            assert (r1 + r2).every { it[1].length() <= 150 && it[1].length() >= 10 }
+            assert (r1 + r2).any { it[1].length() < 150 }
+
+            // version-agnostic: read records, not the log/JSON (which carry version + command line)
+            assert snapshot(
+                r1.collect { it.join('\n') }.sort().join('\n').md5(),
+                r2.collect { it.join('\n') }.sort().join('\n').md5(),
+                stats.read_counts.subMap(['input', 'read1_with_adapter', 'read2_with_adapter'])
+            ).match()
+        }
+    }
+
+    test("Sends pairs without the primers to the untrimmed outputs") {
+        when {
+            process {
+                """
+                // shotgun phiX reads: no amplicon primers at their 5' ends
+                input[0] = [ 'test_trim_amplicon_none',
+                             file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                input[1] = 'ATGTCTAATATTCAAACTGG-TTATGGTGAACAGTGGATTA'
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def r1 = path(process.out.trimmed_r1[0][1]).linesGzip.collate(4)
+            def u1 = path(process.out.untrimmed_r1[0][1]).linesGzip.collate(4)
+            def u2 = path(process.out.untrimmed_r2[0][1]).linesGzip.collate(4)
+            def stats = path(process.out.stats[0][1]).json
+
+            assert process.out.trimmed_r1[0][0] == 'test_trim_amplicon_none'
+            assert stats.read_counts.input == 210
+            assert r1.size() == 0
+            assert u1.size() == 210 && u2.size() == 210
+            assert u1.collect { it[0].split()[0] - ~/\/1$/ } == u2.collect { it[0].split()[0] - ~/\/2$/ }
+            assert snapshot(stats.read_counts.subMap(['input', 'read1_with_adapter', 'read2_with_adapter'])).match()
+        }
+    }
+}

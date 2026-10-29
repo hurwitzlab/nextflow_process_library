@@ -108,7 +108,11 @@ described below.
 
 ## Params naming (used from `params.*` inside modules)
 
-- Container: `container__<tool>` (double underscore).
+- Container: `container__<tool>` (double underscore). Never put an image path
+  in a module. After adding or renaming one, run `python3 conf/make_containers.py`
+  to regenerate `conf/container_catalog.tsv` and `conf/containers_hazel.config`;
+  if the BRC image is named differently from `<tool>`, add an `OVERRIDES` entry
+  in that script rather than renaming the param.
 - Output dir: `<tool>_outdir`.
 - Tool options: `<tool>_<option>`, snake_case, matching the tool's own flag
   name where reasonable (e.g. `bbmap_kfilter`, `coverm_minident`,
@@ -135,3 +139,7 @@ described below.
 7. Every `process` block's braces balance — count `{` vs `}`.
 8. Every `params.*` the module references is listed in the PR/commit description
    so pipeline maintainers know what to add to their own config.
+9. `conf/make_containers.py` rerun, so its `container__<tool>` is in the catalog.
+10. Any test snapshot is version-agnostic (no headers, version strings, or
+    timestamps), since `run_tests.sh --all-versions` checks every image version
+    against the same snapshot.

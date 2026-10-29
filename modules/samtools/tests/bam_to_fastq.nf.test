@@ -1,0 +1,39 @@
+nextflow_process {
+    name "Test bam_to_fastq"
+    script "../samtools.nf"
+    process "bam_to_fastq"
+    tag "samtools"
+    tag "bam_to_fastq"
+
+    test("Converts a name-sorted paired-end BAM back to R1/R2 FASTQ") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_b2fq', file("${baseDir}/tests/data/alignments.namesorted.bam") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (r1_id, r1_path) = process.out.r1_reads[0]
+            def (r2_id, r2_path) = process.out.r2_reads[0]
+            def r1 = path(r1_path).linesGzip
+            def r2 = path(r2_path).linesGzip
+            // compare records ignoring any /1 /2 name suffix (samtools fastq leaves names as in the
+            // BAM by default, where bwa stripped the suffix)
+            def norm = { lines -> lines.collate(4).collect { [it[0] - ~/\/[12]$/, it[1], it[3]] } }
+
+            assert r1_id == 'test_b2fq'
+            assert r2_id == 'test_b2fq'
+            assert r1_path.endsWith('test_b2fq_R1.fq.gz')
+            assert r2_path.endsWith('test_b2fq_R2.fq.gz')
+            // all 210 pairs (mapped and unmapped) round-trip to the original reads
+            assert r1.size() == 210 * 4
+            assert r2.size() == 210 * 4
+            assert norm(r1) == norm(path("${baseDir}/tests/data/reads_R1.fastq").readLines())
+            assert norm(r2) == norm(path("${baseDir}/tests/data/reads_R2.fastq").readLines())
+            assert snapshot(r1.join('\n').md5(), r2.join('\n').md5()).match()
+        }
+    }
+}

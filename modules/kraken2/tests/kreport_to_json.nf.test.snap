@@ -1,0 +1,77 @@
+{
+    "Converts a kreport to line-delimited JSON": {
+        "content": [
+            [
+                {
+                    "percent_reads": "20.00",
+                    "rooted_reads": "10",
+                    "tax_reads": "10",
+                    "rank_code": "U",
+                    "tax_id": "0",
+                    "scientific_name": "unclassified"
+                },
+                {
+                    "percent_reads": "80.00",
+                    "rooted_reads": "40",
+                    "tax_reads": "0",
+                    "rank_code": "R",
+                    "tax_id": "1",
+                    "scientific_name": "root"
+                },
+                {
+                    "percent_reads": "80.00",
+                    "rooted_reads": "40",
+                    "tax_reads": "0",
+                    "rank_code": "D",
+                    "tax_id": "10239",
+                    "scientific_name": "Viruses"
+                },
+                {
+                    "percent_reads": "80.00",
+                    "rooted_reads": "40",
+                    "tax_reads": "0",
+                    "rank_code": "K",
+                    "tax_id": "2731341",
+                    "scientific_name": "Duplodnaviria"
+                },
+                {
+                    "percent_reads": "80.00",
+                    "rooted_reads": "40",
+                    "tax_reads": "0",
+                    "rank_code": "P",
+                    "tax_id": "2731618",
+                    "scientific_name": "Phixviricota"
+                },
+                {
+                    "percent_reads": "80.00",
+                    "rooted_reads": "40",
+                    "tax_reads": "0",
+                    "rank_code": "F",
+                    "tax_id": "10842",
+                    "scientific_name": "Microviridae"
+                },
+                {
+                    "percent_reads": "80.00",
+                    "rooted_reads": "40",
+                    "tax_reads": "0",
+                    "rank_code": "G",
+                    "tax_id": "10843",
+                    "scientific_name": "Sinsheimervirus"
+                },
+                {
+                    "percent_reads": "80.00",
+                    "rooted_reads": "40",
+                    "tax_reads": "40",
+                    "rank_code": "S",
+                    "tax_id": "10847",
+                    "scientific_name": "Escherichia phage phiX174"
+                }
+            ]
+        ],
+        "timestamp": "2026-10-19T16:33:04.942570294",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

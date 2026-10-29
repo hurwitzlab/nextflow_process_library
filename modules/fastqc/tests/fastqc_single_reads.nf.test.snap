@@ -1,0 +1,14 @@
+{
+    "Writes a FastQC report for single-end reads": {
+        "content": [
+            "210",
+            "100",
+            "44"
+        ],
+        "timestamp": "2026-10-19T15:57:56.634270036",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

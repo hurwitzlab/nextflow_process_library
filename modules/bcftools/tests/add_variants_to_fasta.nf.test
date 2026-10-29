@@ -1,0 +1,44 @@
+nextflow_process {
+    name "Test add_variants_to_fasta"
+    script "../bcftools.nf"
+    process "add_variants_to_fasta"
+    tag "bcftools"
+    tag "add_variants_to_fasta"
+
+    test("Applies SNVs to the reference to make a consensus FASTA") {
+        when {
+            params {
+                bcftools_outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/variants.vcf.gz") // A100G, A1500C, G3000A
+                input[1] = file("${baseDir}/tests/data/variants.vcf.gz.tbi")
+                input[2] = file("${baseDir}/tests/data/genome.fasta")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def fasta = process.out.edited_genome[0]
+            assert file(fasta).name == 'edited_genome.fasta'
+
+            def seqOf = { p -> path(p).readLines().findAll { !it.startsWith('>') }.join('') }
+            def ref = seqOf("${baseDir}/tests/data/genome.fasta")
+            def edited = seqOf(fasta)
+            def headers = path(fasta).readLines().findAll { it.startsWith('>') }
+            def diffs = (0..<ref.length()).findAll { ref[it] != edited[it] }.collect { it + 1 }
+
+            assert headers.size() == 1 && headers[0].split(/\s+/)[0] == '>phiX174'
+            assert edited.length() == 5386 // SNVs only, length unchanged
+            assert diffs == [100, 1500, 3000] // exactly the variant positions changed
+            // 1-based pos -> 0-based index. Hom-alt (3000 G>A, 1/1) gets the ALT base; bcftools writes
+            // the 0/1 hets as either the ALT base or the REF/ALT IUPAC code (A/G = R, A/C = M)
+            assert edited[2999] == 'A'
+            assert edited[99] in ['G', 'R']
+            assert edited[1499] in ['C', 'M']
+            assert snapshot(edited.md5()).match()
+        }
+    }
+}

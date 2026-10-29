@@ -1,0 +1,16 @@
+{
+    "Sets every genotype to the allele with the most read depth (FORMAT/AD)": {
+        "content": [
+            [
+                "phiX174\t100\t.\tA\tG\t50\tPASS\tAF=0.9\tGT:AD\t1/1:2,18",
+                "phiX174\t1500\t.\tA\tC\t50\tPASS\tAF=0.4\tGT:AD\t0/0:12,8",
+                "phiX174\t3000\t.\tG\tA\t50\tPASS\tAF=1\tGT:AD\t1/1:0,20"
+            ]
+        ],
+        "timestamp": "2026-10-19T15:44:41.281446547",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

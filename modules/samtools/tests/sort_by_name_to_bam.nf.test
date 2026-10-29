@@ -1,0 +1,36 @@
+nextflow_process {
+    name "Test sort_by_name_to_bam"
+    script "../samtools.nf"
+    process "sort_by_name_to_bam"
+    tag "samtools"
+    tag "sort_by_name_to_bam"
+
+    test("Name-sorts a coordinate-sorted BAM") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_namesort', file("${baseDir}/tests/data/alignments.sorted.bam") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, bam_path) = process.out.sorted_by_name_bam[0]
+            def reads = bam(bam_path).getSamLines()
+            def names = reads.collect { it.split('\t')[0] }
+
+            assert sampleid == 'test_namesort'
+            assert bam_path.endsWith('test_namesort.sorted_by_name.bam')
+            assert reads.size() == 420
+            assert names == names.sort(false) // pairNNN names are zero-padded, so natural == lexical order
+            // mates are adjacent, READ1 (0x40) before READ2 (0x80)
+            assert reads.collate(2).every { pair ->
+                pair[0].split('\t')[0] == pair[1].split('\t')[0] &&
+                ((pair[0].split('\t')[1] as int) & 64) && ((pair[1].split('\t')[1] as int) & 128)
+            }
+            // version-agnostic: the 11 mandatory SAM fields only (no header, no optional tags)
+            assert snapshot(reads.collect { it.split('\t')[0..10].join('\t') }.join('\n').md5()).match()
+        }
+    }
+}

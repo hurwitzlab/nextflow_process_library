@@ -1,0 +1,13 @@
+{
+    "Annotates a fragmented 12-contig assembly in --metagenome mode": {
+        "content": [
+            40,
+            "9f007846355d1690c5b33c5769bc7212"
+        ],
+        "timestamp": "2026-10-19T16:28:29.042818655",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

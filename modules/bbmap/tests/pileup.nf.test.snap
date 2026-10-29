@@ -1,0 +1,12 @@
+{
+    "Reports per-contig coverage from a SAM": {
+        "content": [
+            "#ID\tAvg_fold\tLength\tRef_GC\tCovered_percent\tCovered_bases\tPlus_reads\tMinus_reads\tRead_GC\tMedian_fold\tStd_Dev\nphiX174\t7.2935\t5386\t0.0000\t99.3316\t5350\t200\t200\t0.4453\t7\t3.15\n"
+        ],
+        "timestamp": "2026-10-19T15:44:21.261652281",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

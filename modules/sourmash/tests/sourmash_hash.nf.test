@@ -1,0 +1,37 @@
+nextflow_process {
+    name "Test sourmash_hash"
+    script "../sourmash.nf"
+    process "sourmash_hash"
+    tag "sourmash"
+    tag "sourmash_hash"
+
+    test("Computes MinHash signatures for an assembly") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_sourmash', file("${baseDir}/tests/data/contigs.fasta") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, sig) = process.out.signature[0]
+            assert sampleid == 'test_sourmash'
+            assert file(sig).name == 'contigs.sig'
+
+            // The .sig JSON embeds the sourmash version, filename and license, so parse out only
+            // the MinHash sketches: one per k-mer size, keyed by ksize.
+            def json = new groovy.json.JsonSlurper().parseText(path(sig).text)
+            def sketches = json.collectMany { it.signatures }
+            def byK = sketches.collectEntries { s -> [(s.ksize): s] }
+
+            assert json.size() == 1 // one signature set for the one input file
+            assert byK.keySet().sort() == [21, 31, 51] // `sourmash compute` default k-mer sizes
+            assert sketches.every { it.molecule.toLowerCase() == 'dna' && it.num == 500 && it.mins.size() == 500 }
+            assert sketches.every { it.mins == it.mins.sort(false) } // mins are stored sorted
+            // snapshot the hashes themselves (deterministic MurmurHash of the k-mers), one md5 per k
+            assert snapshot(byK.keySet().sort().collectEntries { k -> [(k): byK[k].mins.join(',').md5()] }).match()
+        }
+    }
+}

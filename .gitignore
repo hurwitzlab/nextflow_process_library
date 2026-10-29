@@ -219,3 +219,12 @@ __marimo__/
 
 # macOS
 .DS_Store
+
+# nf-test
+.nf-test/
+.nf-test.log
+.nf-test.*.config
+
+# slurm logs
+test_logs/
+.nf-test-*.nf

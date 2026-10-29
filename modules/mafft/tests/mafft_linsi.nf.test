@@ -1,0 +1,41 @@
+nextflow_process {
+    name "Test mafft_linsi"
+    script "../mafft.nf"
+    process "mafft_linsi"
+    tag "mafft"
+    tag "mafft_linsi"
+
+    test("L-INS-i alignment of four prot_10 homologs") {
+        when {
+            params {
+                mafft_outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = file("${moduleDir}/tests/testdata/homologs.faa")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def aln = process.out.aligned_fasta[0]
+            assert file(aln).name == 'aligned.fasta'
+
+            // parse FASTA into [name: sequence] (mafft lowercases residues by default; normalise)
+            def seqs = [:]
+            def name = null
+            path(aln).readLines().each { line ->
+                if (line.startsWith('>')) { name = line.substring(1).trim(); seqs[name] = '' }
+                else { seqs[name] += line.trim().toUpperCase() }
+            }
+
+            assert seqs.keySet() as List == ['prot_10', 'prot_10_var1', 'prot_10_var2', 'prot_10_var3']
+            assert seqs.values().collect { it.length() }.unique() == [86] // all rows the same aligned length
+            assert seqs.prot_10.replace('-', '').length() == 86 && !seqs.prot_10.contains('-')
+            assert seqs.prot_10_var2.count('-') == 4 // the 4-residue deletion is gapped
+            assert seqs.prot_10_var2.replace('-', '').length() == 82
+            assert snapshot(seqs).match()
+        }
+    }
+}

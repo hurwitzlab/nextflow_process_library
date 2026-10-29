@@ -1,0 +1,54 @@
+nextflow_process {
+    name "Test quantify_transcripts_mapping_mode"
+    script "../salmon.nf"
+    process "quantify_transcripts_mapping_mode"
+    tag "salmon"
+    tag "quantify_transcripts_mapping_mode"
+
+    test("Indexes transcripts and quantifies paired reads against them") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_salmon',
+                             file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                input[1] = file("${baseDir}/tests/data/transcripts.fasta")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (q_id, quant) = process.out.quantifications[0]
+            def (m_id, meta) = process.out.meta_info[0]
+            def (a_id, ambig) = process.out.ambig_info[0]
+
+            assert [q_id, m_id, a_id].every { it == 'test_salmon' }
+            assert quant.endsWith('test_salmon/quant.sf')
+            assert meta.endsWith('test_salmon/aux_info/meta_info.json')
+            assert ambig.endsWith('test_salmon/aux_info/ambig_info.tsv')
+
+            // quant.sf: Name Length EffectiveLength TPM NumReads
+            def rows = path(quant).readLines().drop(1).collect { it.split('\t') }
+            def lengths = rows.collectEntries { [(it[0]): it[1] as int] }
+            def totalReads = rows.sum { it[4] as double }
+            def txLengths = [:]
+            def name = null
+            path("${baseDir}/tests/data/transcripts.fasta").readLines().each { line ->
+                if (line.startsWith('>')) { name = line.substring(1).trim(); txLengths[name] = 0 }
+                else { txLengths[name] += line.trim().length() }
+            }
+            def info = path(meta).json
+
+            assert rows.size() == 10
+            assert lengths == txLengths // every transcript reported with its true length
+            assert info.num_processed == 210 // all read pairs seen
+            assert info.num_mapped > 0 && info.num_mapped <= 200 // the 10 random pairs can't map
+            assert totalReads > 0
+            assert path(ambig).readLines().size() == 11 // header + one row per transcript
+            // version-agnostic: transcript names + lengths only (EM estimates, effective lengths and
+            // mapping rates depend on salmon's version/bias models; the JSON embeds versions and timings)
+            assert snapshot(lengths).match()
+        }
+    }
+}

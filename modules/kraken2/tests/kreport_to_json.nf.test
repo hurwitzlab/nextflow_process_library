@@ -1,0 +1,37 @@
+nextflow_process {
+    name "Test kreport_to_json"
+    script "../kraken2.nf"
+    process "kreport_to_json"
+    tag "kraken2"
+    tag "kreport_to_json"
+
+    test("Converts a kreport to line-delimited JSON") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_kreport', file("${moduleDir}/tests/testdata/test.kreport") ]
+                """
+            }
+        }
+        then {
+            // kraken2.nf writes each row with print() instead of + "\n": inside the shell: '''...'''
+            // block Groovy turns \n into a real newline, which broke the python string literal
+            assert process.success
+
+            def (sampleid, json) = process.out.kreport_json[0]
+            assert sampleid == 'test_kreport'
+            assert file(json).name == 'test_kreport.json'
+
+            def rows = path(json).readLines().collect { new groovy.json.JsonSlurper().parseText(it) }
+            def keys = ['percent_reads', 'rooted_reads', 'tax_reads', 'rank_code', 'tax_id', 'scientific_name']
+
+            assert rows.size() == 8 // one JSON object per kreport line
+            assert rows.every { it.keySet() as List == keys }
+            assert rows[0] == [percent_reads: '20.00', rooted_reads: '10', tax_reads: '10',
+                               rank_code: 'U', tax_id: '0', scientific_name: 'unclassified']
+            assert rows.last().tax_id == '10847' && rows.last().rank_code == 'S'
+            assert rows.last().scientific_name == 'Escherichia phage phiX174' // indentation stripped (skipinitialspace)
+            assert snapshot(rows).match()
+        }
+    }
+}

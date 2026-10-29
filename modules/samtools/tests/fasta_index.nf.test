@@ -1,0 +1,27 @@
+nextflow_process {
+    name "Test fasta_index"
+    script "../samtools.nf"
+    process "fasta_index"
+    tag "samtools"
+    tag "fasta_index"
+
+    test("Indexes a FASTA and passes it through") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_faidx', file("${baseDir}/tests/data/genome.fasta") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, fasta_path, fai_path) = process.out.indexed_fasta[0]
+
+            assert sampleid == 'test_faidx'
+            assert file(fasta_path).name == 'genome.fasta'
+            assert file(fai_path).name == 'genome.fasta.fai'
+            assert snapshot(path(fai_path).text).match() // .fai is plain, deterministic text
+        }
+    }
+}

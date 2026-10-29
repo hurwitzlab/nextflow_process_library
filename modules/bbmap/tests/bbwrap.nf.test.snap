@@ -1,0 +1,13 @@
+{
+    "Aligns paired reads to contigs": {
+        "content": [
+            390,
+            "03701e10dc24b40d29775da3b26b344e"
+        ],
+        "timestamp": "2026-10-28T13:24:02.576670783",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

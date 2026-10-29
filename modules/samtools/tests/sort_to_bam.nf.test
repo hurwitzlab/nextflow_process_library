@@ -1,0 +1,32 @@
+nextflow_process {
+    name "Test sort_to_bam"
+    script "../samtools.nf"
+    process "sort_to_bam"
+    tag "samtools"
+    tag "sort_to_bam"
+
+    test("Coordinate-sorts a SAM into BAM") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_sort', file("${baseDir}/tests/data/alignments.sam") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, bam_path) = process.out.sorted_bam[0]
+            def reads = bam(bam_path).getSamLines()
+            def mapped = reads.findAll { ((it.split('\t')[1] as int) & 4) == 0 }
+            def positions = mapped.collect { it.split('\t')[3] as int }
+
+            assert sampleid == 'test_sort'
+            assert bam_path.endsWith('test_sort.sorted.bam')
+            assert reads.size() == 420 // every record in alignments.sam kept (unmapped included)
+            assert positions == positions.sort(false) // coordinate order
+            // version-agnostic: the 11 mandatory SAM fields only (no header, no optional tags)
+            assert snapshot(reads.collect { it.split('\t')[0..10].join('\t') }.join('\n').md5()).match()
+        }
+    }
+}
