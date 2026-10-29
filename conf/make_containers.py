@@ -54,6 +54,9 @@ IGNORE_PARAMS = {"TOOLNAME"}  # TEMPLATE.nf placeholder
 
 
 def version_key(v):
+    # Drop a leading "v" before a digit ("v3.1b2" -> "3.1b2"): otherwise "v" sorts after the empty
+    # string a plain "3.4" starts with, and the v-prefixed version always looks newest
+    v = re.sub(r"^v(?=\d)", "", v)
     return [int(t) if t.isdigit() else t for t in re.split(r"(\d+)", v)]
 
 
