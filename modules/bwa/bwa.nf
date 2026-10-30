@@ -18,7 +18,7 @@
     '''
 }
 
-// Align reads to a reference indexed by bwa_index (e.g. reads.combine(bwa_index.out.indexed_sequence))
+// Align paired-end reads to a reference indexed by bwa_index (e.g. reads.combine(bwa_index.out.indexed_sequence))
 process bwa_mem {
     label "process_high"
     container "${params.container__bwa}"
@@ -36,7 +36,7 @@ process bwa_mem {
 }
 
 // Align paired-end reads to a reference genome with bwa mem (indexing the reference first)
-process bwa_align {
+process bwa_align_paired_end {
     label "process_high"
     container "${params.container__bwa}"
 

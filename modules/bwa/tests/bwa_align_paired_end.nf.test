@@ -1,9 +1,9 @@
 nextflow_process {
-    name "Test bwa_align"
+    name "Test bwa_align_paired_end"
     script "../bwa.nf"
-    process "bwa_align"
+    process "bwa_align_paired_end"
     tag "bwa"
-    tag "bwa_align"
+    tag "bwa_align_paired_end"
 
     test("Indexes the reference and aligns paired-end reads") {
         when {
