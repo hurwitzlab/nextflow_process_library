@@ -1,49 +1,44 @@
 #!/usr/bin/env nextflow
 
 
-// Index a reference sequence with bwa
+// Index a reference sequence with bwa; emits the reference together with its index files
  process bwa_index {
     label "process_single"
     container "${params.container__bwa}"
                         
     input:
-        path(sequence_to_map)
+        path(reference_genome)
 
     output:
-        path("${sequence_to_map}"), emit: indexed_sequence
+        tuple path(reference_genome), path("${reference_genome}.{amb,ann,bwt,pac,sa}"), emit: indexed_sequence
 
     shell:
     '''
-    bwa index \
-    !{sequence_to_map} \
-    -p !{sequence_to_map}
-
+    bwa index !{reference_genome}
     '''
 }
 
-// Align reads to an indexed reference with bwa mem
+// Align paired-end reads to a reference indexed by bwa_index (e.g. reads.combine(bwa_index.out.indexed_sequence))
 process bwa_mem {
     label "process_high"
     container "${params.container__bwa}"
 
     input:
-        tuple val(sampleid), path(clean_r1), path(clean_r2), path(indexed_sequence)
+        // index_prefix is bwa_index's FASTA: bwa never reads it, but its name is the prefix of the
+        // staged index files (genome.fa -> genome.fa.{amb,ann,bwt,pac,sa})
+        tuple val(sampleid), path(clean_r1), path(clean_r2), path(index_prefix), path(index_files)
 
     output:
         tuple val(sampleid), path("${sampleid}.sam"), emit: sam_file
 
     shell:
     '''
-    bwa mem \
-    !{indexed_sequence} \
-    !{clean_r1} \
-    !{clean_r2} \
-    -t !{task.cpus} > !{sampleid}.sam
+    bwa mem -t !{task.cpus} !{index_prefix} !{clean_r1} !{clean_r2} > !{sampleid}.sam
     '''
 }
 
 // Align paired-end reads to a reference genome with bwa mem (indexing the reference first)
-process bwa_align {
+process bwa_align_paired_end {
     label "process_high"
     container "${params.container__bwa}"
 

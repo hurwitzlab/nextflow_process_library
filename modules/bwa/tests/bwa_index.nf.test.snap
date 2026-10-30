@@ -1,0 +1,15 @@
+{
+    "Indexes a reference FASTA": {
+        "content": [
+            [
+                "5386 1 0\n",
+                "5386 1 11\n0 phiX174 Enterobacteria phage phiX174, complete genome (CP004084.1, from /rs1/shares/brc/admin/databases/phiX174_virus.fa)\n0 5386 0\n"
+            ]
+        ],
+        "timestamp": "2026-10-30T10:31:21.59746749",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

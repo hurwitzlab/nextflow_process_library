@@ -1,18 +1,28 @@
 nextflow_process {
-    name "Test bwa_align"
+    name "Test bwa_mem"
     script "../bwa.nf"
-    process "bwa_align"
+    process "bwa_mem"
     tag "bwa"
-    tag "bwa_align"
+    tag "bwa_mem"
 
-    test("Indexes the reference and aligns paired-end reads") {
+    test("Aligns paired-end reads to the output of bwa_index") {
+        setup {
+            run("bwa_index") {
+                script "../bwa.nf"
+                process {
+                    """
+                    input[0] = file("${baseDir}/tests/data/genome.fasta")
+                    """
+                }
+            }
+        }
         when {
             process {
                 """
-                input[0] = file("${baseDir}/tests/data/genome.fasta")
-                input[1] = [ 'test_bwa_pe',
-                             file("${baseDir}/tests/data/reads_R1.fastq.gz"),
-                             file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                input[0] = Channel.of([ 'test_bwa_mem',
+                                        file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                                        file("${baseDir}/tests/data/reads_R2.fastq.gz") ])
+                               .combine(bwa_index.out.indexed_sequence)
                 """
             }
         }
@@ -24,8 +34,8 @@ nextflow_process {
                                 .collect { it.split('\t')[0..10].join('\t') } }
             def records = fields(sam_path)
 
-            assert sampleid == 'test_bwa_pe'
-            assert sam_path.endsWith('test_bwa_pe.sam')
+            assert sampleid == 'test_bwa_mem'
+            assert sam_path.endsWith('test_bwa_mem.sam')
             assert path(sam_path).readLines().any { it.startsWith('@SQ\tSN:phiX174\tLN:5386') }
             assert records.size() == 420
             assert records.count { ((it.split('\t')[1] as int) & 4) != 0 } == 20 // the 10 random pairs

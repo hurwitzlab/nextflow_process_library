@@ -16,14 +16,15 @@ nextflow_process {
         then {
             assert process.success
 
-            def indexed = process.out.indexed_sequence[0]
+            def (reference, index_files) = process.out.indexed_sequence[0]
 
-            assert file(indexed).name == 'genome.fasta'
-            assert path(indexed).text == path("${baseDir}/tests/data/genome.fasta").text // passed through unchanged
-            // TODO(module bug): bwa_index declares only `path("${sequence_to_map}")` as output, so the
-            // index files bwa writes (genome.fasta.{amb,ann,bwt,pac,sa}) are never emitted and a
-            // downstream bwa_mem gets a bare FASTA. Once the output also captures them, assert that all
-            // five are emitted with those names, and snapshot genome.fasta.ann / .amb (plain text).
+            assert file(reference).name == 'genome.fasta'
+            assert path(reference).text == path("${baseDir}/tests/data/genome.fasta").text
+            assert index_files.collect { file(it).name }.sort() ==
+                ['amb', 'ann', 'bwt', 'pac', 'sa'].collect { "genome.fasta.${it}".toString() }
+            // .ann/.amb are plain text (sequence names, lengths, ambiguous-base runs); the binary
+            // .bwt/.pac/.sa are only checked by bwa_mem.nf.test, which aligns against them
+            assert snapshot(index_files.findAll { it ==~ /.*\.(ann|amb)$/ }.sort().collect { path(it).text }).match()
         }
     }
 }
