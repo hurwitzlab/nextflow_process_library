@@ -1,0 +1,40 @@
+nextflow_process {
+    name "Test collect_base_distribution_by_cycle"
+    script "../picard.nf"
+    process "collect_base_distribution_by_cycle"
+    tag "picard"
+    tag "collect_base_distribution_by_cycle"
+
+    test("Collects base distribution by cycle and a chart") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_base_dist',
+                             file("${baseDir}/tests/data/alignments.sorted.bam"),
+                                 file("${baseDir}/tests/data/alignments.sorted.bam.bai") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            // Picard metrics files start with '#' lines (command line, date), then a tab-separated
+            // header + rows; read rows as maps keyed by column name rather than snapshotting the file
+            def metricRows = { p ->
+                def lines = path(p).readLines().dropWhile { !it || it.startsWith('#') }
+                def header = lines[0].split('\t')
+                // the metrics table ends at the first blank line (a histogram section may follow)
+                lines.drop(1).takeWhile { it }
+                     .collect { [header, it.split('\t', -1)].transpose().collectEntries() }
+            }
+            def (sampleid, txt) = process.out.base_distribution_metrics[0]
+            def (sampleid2, pdf) = process.out.base_distribution_chart[0]
+            def rows = metricRows(txt)
+
+            assert sampleid == 'test_base_dist' && sampleid2 == sampleid
+            assert rows.size() == 200 // 100 cycles x 2 read ends
+            assert rows.every { r -> Math.abs(['A', 'C', 'G', 'T', 'N'].sum { r["PCT_$it"] as double } - 100) < 0.01 }
+            assert path(pdf).toFile().length() > 0
+        }
+    }
+}

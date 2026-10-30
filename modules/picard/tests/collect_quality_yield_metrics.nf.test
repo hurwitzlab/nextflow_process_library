@@ -1,0 +1,39 @@
+nextflow_process {
+    name "Test collect_quality_yield_metrics"
+    script "../picard.nf"
+    process "collect_quality_yield_metrics"
+    tag "picard"
+    tag "collect_quality_yield_metrics"
+
+    test("Collects quality yield metrics") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_quality_yield',
+                             file("${baseDir}/tests/data/alignments.sorted.bam"),
+                                 file("${baseDir}/tests/data/alignments.sorted.bam.bai") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            // Picard metrics files start with '#' lines (command line, date), then a tab-separated
+            // header + rows; read rows as maps keyed by column name rather than snapshotting the file
+            def metricRows = { p ->
+                def lines = path(p).readLines().dropWhile { !it || it.startsWith('#') }
+                def header = lines[0].split('\t')
+                // the metrics table ends at the first blank line (a histogram section may follow)
+                lines.drop(1).takeWhile { it }
+                     .collect { [header, it.split('\t', -1)].transpose().collectEntries() }
+            }
+            def (sampleid, txt) = process.out.quality_yield_metrics[0]
+            def m = metricRows(txt)[0]
+
+            assert sampleid == 'test_quality_yield'
+            assert m.TOTAL_READS == '420'
+            assert m.READ_LENGTH == '100'
+            assert m.TOTAL_BASES == '42000'
+        }
+    }
+}
