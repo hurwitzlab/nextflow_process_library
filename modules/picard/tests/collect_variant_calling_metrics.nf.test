@@ -1,0 +1,51 @@
+nextflow_process {
+    name "Test collect_variant_calling_metrics"
+    script "../picard.nf"
+    process "collect_variant_calling_metrics"
+    tag "picard"
+    tag "collect_variant_calling_metrics"
+
+    test("Collects variant calling metrics against a known-variants VCF") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_variant_calling',
+                             file("${baseDir}/tests/data/variants.vcf.gz"), // pos 100, 1500, 3000
+                             file("${baseDir}/tests/data/variants.vcf.gz.tbi") ]
+                input[1] = file("${baseDir}/tests/data/expected_variants.vcf.gz") // pos 100, 4000
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            // Picard metrics files start with '#' lines (command line, date), then a tab-separated
+            // header + rows; read rows as maps keyed by column name rather than snapshotting the file
+            def metricRows = { p ->
+                def lines = path(p).readLines().dropWhile { !it || it.startsWith('#') }
+                def header = lines[0].split('\t')
+                // the metrics table ends at the first blank line (a histogram section may follow)
+                lines.drop(1).takeWhile { it }
+                     .collect { [header, it.split('\t', -1)].transpose().collectEntries() }
+            }
+            def (sampleid, detail) = process.out.variant_calling_detail_metrics[0]
+            def (sampleid2, summary) = process.out.variant_calling_summary_metrics[0]
+
+            assert sampleid == 'test_variant_calling' && sampleid2 == sampleid
+            assert detail.endsWith('test_variant_calling.variant_calling_detail_metrics')
+            assert summary.endsWith('test_variant_calling.variant_calling_summary_metrics')
+
+            // detail: one row per sample in the VCF (just sample '1' here)
+            def rows = metricRows(detail)
+            assert rows.size() == 1
+            assert rows[0].SAMPLE_ALIAS == '1'
+
+            // only pos 100 is in both VCFs: 1 known SNP, 2 novel, in both the detail and summary rows
+            [rows[0], metricRows(summary)[0]].each { m ->
+                assert m.TOTAL_SNPS == '3'
+                assert m.NUM_IN_DB_SNP == '1'
+                assert m.NOVEL_SNPS == '2'
+            }
+        }
+    }
+}

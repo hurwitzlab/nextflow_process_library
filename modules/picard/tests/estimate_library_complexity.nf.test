@@ -1,0 +1,49 @@
+nextflow_process {
+    name "Test estimate_library_complexity"
+    script "../picard.nf"
+    process "estimate_library_complexity"
+    tag "picard"
+    tag "estimate_library_complexity"
+
+    test("Estimates library complexity from the unmapped BAM made by fastq_to_sam") {
+        setup {
+            run("fastq_to_sam") {
+                script "../picard.nf"
+                process {
+                    """
+                    input[0] = [ 'test_elc',
+                                 file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                                 file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                    """
+                }
+            }
+        }
+        when {
+            process {
+                """
+                input[0] = fastq_to_sam.out.unmapped_bam
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            // Picard metrics files start with '#' lines (command line, date), then a tab-separated
+            // header + rows; read rows as maps keyed by column name rather than snapshotting the file
+            def metricRows = { p ->
+                def lines = path(p).readLines().dropWhile { !it || it.startsWith('#') }
+                def header = lines[0].split('\t')
+                // the metrics table ends at the first blank line (a histogram section may follow)
+                lines.drop(1).takeWhile { it }
+                     .collect { [header, it.split('\t', -1)].transpose().collectEntries() }
+            }
+            def (sampleid, txt) = process.out.library_complexity[0]
+            def m = metricRows(txt)[0]
+
+            assert sampleid == 'test_elc'
+            assert txt.endsWith('test_elc.complexity.txt')
+            assert m.READ_PAIRS_EXAMINED == '210'
+            assert m.READ_PAIR_DUPLICATES == '0' // simulated pairs have distinct inserts
+        }
+    }
+}
