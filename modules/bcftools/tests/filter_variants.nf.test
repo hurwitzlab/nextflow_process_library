@@ -1,0 +1,33 @@
+nextflow_process {
+    name "Test filter_variants"
+    script "../bcftools.nf"
+    process "filter_variants"
+    tag "bcftools"
+    tag "filter_variants"
+
+    test("Drops variants below the allele-frequency cutoff (INFO/AF)") {
+        when {
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/variants.vcf") // AF: 100=0.9, 1500=0.4, 3000=1.0
+                input[1] = 0.5
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def vcf = process.out.filtered_variants[0]
+            assert file(vcf).name == 'result.vcf.gz'
+            assert file(process.out.filtered_variants_tabix[0]).name == 'result.vcf.gz.tbi'
+
+            def lines = path(vcf).linesGzip
+            // bgzipped VCF text, not BCF (tabix can't index BCF)
+            assert lines[0].startsWith('##fileformat=VCF')
+
+            def records = lines.findAll { !it.startsWith('#') }
+            assert records.collect { it.split('\t')[1] as int } == [100, 3000] // 1500 (AF=0.4) dropped
+            assert snapshot(records).match()
+        }
+    }
+}

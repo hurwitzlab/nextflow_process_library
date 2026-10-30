@@ -1,0 +1,17 @@
+{
+    "Splits multiallelic records and left-aligns indels against the reference": {
+        "content": [
+            [
+                "phiX174\t2000\t.\tG\tA\t50\tPASS\tAF=0.3\tGT:AD\t1/0:2,6",
+                "phiX174\t2000\t.\tG\tC\t50\tPASS\tAF=0.6\tGT:AD\t0/1:2,12",
+                "phiX174\t2430\t.\tCT\tC\t50\tPASS\tAF=0.5\tGT:AD\t0/1:10,10",
+                "phiX174\t2430\t.\tC\tCT\t50\tPASS\tAF=0.5\tGT:AD\t0/1:10,10"
+            ]
+        ],
+        "timestamp": "2026-10-30T15:15:42.232189219",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}
