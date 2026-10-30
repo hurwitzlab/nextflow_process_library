@@ -24,14 +24,16 @@ process bwa_mem {
     container "${params.container__bwa}"
 
     input:
-        tuple val(sampleid), path(clean_r1), path(clean_r2), path(reference_genome), path(index_files)
+        // index_prefix is bwa_index's FASTA: bwa never reads it, but its name is the prefix of the
+        // staged index files (genome.fa -> genome.fa.{amb,ann,bwt,pac,sa})
+        tuple val(sampleid), path(clean_r1), path(clean_r2), path(index_prefix), path(index_files)
 
     output:
         tuple val(sampleid), path("${sampleid}.sam"), emit: sam_file
 
     shell:
     '''
-    bwa mem -t !{task.cpus} !{reference_genome} !{clean_r1} !{clean_r2} > !{sampleid}.sam
+    bwa mem -t !{task.cpus} !{index_prefix} !{clean_r1} !{clean_r2} > !{sampleid}.sam
     '''
 }
 
