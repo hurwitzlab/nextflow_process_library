@@ -50,7 +50,7 @@ process normalize_variants {
                   --fasta-ref !{genome} \
                   --multiallelics -both \
                   --output result.vcf.gz \
-                  --output-type b
+                  --output-type z
     tabix result.vcf.gz
     '''
 }
@@ -97,7 +97,7 @@ process filter_variants {
     bcftools view !{variants} \
              --output result.vcf.gz \
              --exclude "AF<!{vaf}" \
-             --output-type b
+             --output-type z
     tabix result.vcf.gz
     '''
 }
