@@ -1,0 +1,12 @@
+{
+    "Aligns paired-end reads to the output of bwa_index": {
+        "content": [
+            "9ce32184af62da43c496f0fbccd6da47"
+        ],
+        "timestamp": "2026-10-30T10:31:24.794305962",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}
