@@ -74,7 +74,7 @@ process align_to_index {
     '''
 }
 
-// Estimate per-read accuracy of a sample's ONT reads against a reference with minimap2 all-vs-all alignment
+// Estimate per-read accuracy (BLAST identity) of a sample's ONT reads by aligning them to a reference with minimap2
 process ont_read_accuracy {
     label "process_medium"
     label "publish_final"
@@ -90,16 +90,24 @@ process ont_read_accuracy {
 
     shell:
     '''
-    minimap2 -x ava-ont -t !{task.cpus} !{reference} !{reads} > result.paf
+    # -c: base-level alignment, so PAF col 10 is matching bases (not seed hits)
+    # --secondary=no: keep only primary (+ supplementary) alignments, all tagged tp:A:P
+    minimap2 -c -x map-ont --secondary=no -t !{task.cpus} !{reference} !{reads} > result.paf
 
-    # calculate each read accuracy based on blast identity
+    # per-read BLAST identity: a read split into several pieces (primary + supplementary) is
+    # scored as sum(matches) / sum(alignment block lengths); unmapped reads are omitted
     awk -v OFS='\t' '
-    BEGIN {print "name", "length", "identity"}
-    {
-        read_name = $1;
-        read_length = $2;
-        read_identity = $10/$11;
-        print read_name, read_length, read_identity;
+    $0 ~ /\ttp:A:P(\t|$)/ {
+        if (!($1 in matches)) { order[++n] = $1; read_length[$1] = $2 }
+        matches[$1] += $10;
+        block_length[$1] += $11;
+    }
+    END {
+        print "name", "length", "identity";
+        for (i = 1; i <= n; i++) {
+            r = order[i];
+            print r, read_length[r], matches[r] / block_length[r];
+        }
     }
     ' result.paf > !{sampleid}.read_accuracy.tsv
 
