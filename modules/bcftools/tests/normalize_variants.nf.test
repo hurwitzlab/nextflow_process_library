@@ -1,0 +1,44 @@
+nextflow_process {
+    name "Test normalize_variants"
+    script "../bcftools.nf"
+    process "normalize_variants"
+    tag "bcftools"
+    tag "normalize_variants"
+
+    test("Splits multiallelic records and left-aligns indels against the reference") {
+        when {
+            process {
+                """
+                // 2000 G>A,C (multiallelic); 2436 TT>T and 2437 T>TT written at the right end
+                // of phiX174's T7 run (2431-2437)
+                input[0] = file("${moduleDir}/tests/testdata/unnormalized.vcf")
+                input[1] = file("${baseDir}/tests/data/genome.fasta")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def vcf = process.out.normalized_variants[0]
+            assert file(vcf).name == 'result.vcf.gz'
+            assert file(process.out.normalized_variants_tabix[0]).name == 'result.vcf.gz.tbi'
+
+            def lines = path(vcf).linesGzip
+            // bgzipped VCF text, not BCF (tabix can't index BCF)
+            assert lines[0].startsWith('##fileformat=VCF')
+
+            def records = lines.findAll { !it.startsWith('#') }.collect { it.split('\t') }
+            def site = { r -> "${r[1]}:${r[3]}>${r[4]}".toString() }
+
+            assert records.collect(site) == [
+                '2000:G>A', '2000:G>C', // split into one record per ALT
+                '2430:CT>C',            // deletion left-aligned from 2436 to the C before the T run
+                '2430:C>CT',            // insertion left-aligned from 2437
+            ]
+            // per-allele fields split with their alleles (INFO/AF is Number=A, FORMAT/AD is Number=R)
+            assert records[0][7] == 'AF=0.3' && records[0][9] == '1/0:2,6'
+            assert records[1][7] == 'AF=0.6' && records[1][9] == '0/1:2,12'
+            assert snapshot(records.collect { it.join('\t') }).match()
+        }
+    }
+}
