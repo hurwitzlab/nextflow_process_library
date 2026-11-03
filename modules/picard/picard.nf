@@ -13,7 +13,12 @@ process fastq_to_sam {
 
     shell:
     '''
-    java -jar /picard.jar FastqToSam F1=!{r1} F2=!{r2} O=!{sampleid}.unmapped.bam SM=!{sampleid} RG=!{sampleid}
+    picard -Xmx!{(task.memory.toMega() * 0.85) as int}m FastqToSam \
+        --FASTQ !{r1} \
+        --FASTQ2 !{r2} \
+        --OUTPUT !{sampleid}.unmapped.bam \
+        --SAMPLE_NAME !{sampleid} \
+        --READ_GROUP_NAME !{sampleid}
     '''
 }
 
@@ -31,7 +36,9 @@ process estimate_library_complexity {
 
     shell:
     '''
-    java -jar /picard.jar EstimateLibraryComplexity INPUT=!{unmapped_bam} OUTPUT=!{sampleid}.complexity.txt
+    picard -Xmx!{(task.memory.toMega() * 0.85) as int}m EstimateLibraryComplexity \
+        --INPUT !{unmapped_bam} \
+        --OUTPUT !{sampleid}.complexity.txt
     '''
 }
 
@@ -50,12 +57,12 @@ process mark_duplicates {
 
     shell:
     '''
-    java -Xmx!{Math.round(task.memory.toGiga() * 0.83)}g -jar /picard.jar MarkDuplicatesWithMateCigar \
-                                         INPUT=!{mapped_bam} \
-                                         OUTPUT=!{sampleid}.markdup.bam \
-                                         M=!{sampleid}.markdup_metrics.txt \
-                                         MINIMUM_DISTANCE=600 \
-                                         MAX_RECORDS_IN_RAM=500000
+    picard -Xmx!{(task.memory.toMega() * 0.85) as int}m MarkDuplicatesWithMateCigar \
+        --INPUT !{mapped_bam} \
+        --OUTPUT !{sampleid}.markdup.bam \
+        --METRICS_FILE !{sampleid}.markdup_metrics.txt \
+        --MINIMUM_DISTANCE 600 \
+        --MAX_RECORDS_IN_RAM 500000
     '''
 }
 
@@ -77,7 +84,11 @@ process collect_insert_size_metrics {
     touch !{sampleid}.insert_size_metrics.txt
     touch !{sampleid}.insert_size_histogram.pdf
 
-    java -jar /picard.jar CollectInsertSizeMetrics INPUT=!{mapped_bam} OUTPUT=!{sampleid}.insert_size_metrics.txt H=!{sampleid}.insert_size_histogram.pdf M=.5
+    picard -Xmx!{(task.memory.toMega() * 0.85) as int}m CollectInsertSizeMetrics \
+        --INPUT !{mapped_bam} \
+        --OUTPUT !{sampleid}.insert_size_metrics.txt \
+        --Histogram_FILE !{sampleid}.insert_size_histogram.pdf \
+        --MINIMUM_PCT 0.5
     '''
 }
 
@@ -98,7 +109,12 @@ process collect_gc_bias_metrics {
 
     shell:
     '''
-    java -jar /picard.jar CollectGcBiasMetrics INPUT=!{mapped_bam} R=!{reference} OUTPUT=!{sampleid}.gc_bias_metrics.txt CHART=!{sampleid}.gc_bias_metrics.pdf S=!{sampleid}.gc_bias_summary_metrics.txt
+    picard -Xmx!{(task.memory.toMega() * 0.85) as int}m CollectGcBiasMetrics \
+        --INPUT !{mapped_bam} \
+        --REFERENCE_SEQUENCE !{reference} \
+        --OUTPUT !{sampleid}.gc_bias_metrics.txt \
+        --CHART_OUTPUT !{sampleid}.gc_bias_metrics.pdf \
+        --SUMMARY_OUTPUT !{sampleid}.gc_bias_summary_metrics.txt
     '''
 }
 
@@ -117,7 +133,10 @@ process collect_alignment_summary_metrics {
 
     shell:
     '''
-    java -jar /picard.jar CollectAlignmentSummaryMetrics INPUT=!{mapped_bam} R=!{reference} OUTPUT=!{sampleid}.alignment_summary_metrics.txt
+    picard -Xmx!{(task.memory.toMega() * 0.85) as int}m CollectAlignmentSummaryMetrics \
+        --INPUT !{mapped_bam} \
+        --REFERENCE_SEQUENCE !{reference} \
+        --OUTPUT !{sampleid}.alignment_summary_metrics.txt
     '''
 }
 
@@ -135,7 +154,9 @@ process collect_quality_yield_metrics {
 
     shell:
     '''
-    java -jar /picard.jar CollectQualityYieldMetrics INPUT=!{mapped_bam} OUTPUT=!{sampleid}.quality_yield_metrics.txt
+    picard -Xmx!{(task.memory.toMega() * 0.85) as int}m CollectQualityYieldMetrics \
+        --INPUT !{mapped_bam} \
+        --OUTPUT !{sampleid}.quality_yield_metrics.txt
     '''
 }
 
@@ -157,7 +178,10 @@ process collect_base_distribution_by_cycle {
     touch !{sampleid}.base_dist_by_cycle.txt
     touch !{sampleid}.base_dist_by_cycle.pdf
 
-    java -jar /picard.jar CollectBaseDistributionByCycle INPUT=!{mapped_bam} OUTPUT=!{sampleid}.base_dist_by_cycle.txt CHART=!{sampleid}.base_dist_by_cycle.pdf
+    picard -Xmx!{(task.memory.toMega() * 0.85) as int}m CollectBaseDistributionByCycle \
+        --INPUT !{mapped_bam} \
+        --OUTPUT !{sampleid}.base_dist_by_cycle.txt \
+        --CHART_OUTPUT !{sampleid}.base_dist_by_cycle.pdf
     '''
 }
 
@@ -176,7 +200,10 @@ process collect_wgs_metrics {
 
     shell:
     '''
-    java -jar /picard.jar CollectWgsMetrics INPUT=!{mapped_bam} R=!{reference} OUTPUT=!{sampleid}.wgs_metrics.txt
+    picard -Xmx!{(task.memory.toMega() * 0.85) as int}m CollectWgsMetrics \
+        --INPUT !{mapped_bam} \
+        --REFERENCE_SEQUENCE !{reference} \
+        --OUTPUT !{sampleid}.wgs_metrics.txt
     '''
 }
 
@@ -187,14 +214,18 @@ process collect_variant_calling_metrics {
     container "${params.container__picard}"
 
     input:
-        tuple val(sampleid), path(variant_calls)
+        tuple val(sampleid), path(variant_calls), path(variant_calls_index)
         path(dbsnp_vcf)
 
     output:
-        tuple val(sampleid), path("${sampleid}.variant_calling_metrics.txt"), emit: variant_calling_metrics
+        tuple val(sampleid), path("${sampleid}.variant_calling_detail_metrics"), emit: variant_calling_detail_metrics
+        tuple val(sampleid), path("${sampleid}.variant_calling_summary_metrics"), emit: variant_calling_summary_metrics
 
     shell:
     '''
-    java -jar /picard.jar CollectVariantCallingMetrics INPUT=!{variant_calls} DBSNP=!{dbsnp_vcf} OUTPUT=!{sampleid}.variant_calling_metrics.txt
+    picard -Xmx!{(task.memory.toMega() * 0.85) as int}m CollectVariantCallingMetrics \
+        --INPUT !{variant_calls} \
+        --DBSNP !{dbsnp_vcf} \
+        --OUTPUT !{sampleid}
     '''
 }
