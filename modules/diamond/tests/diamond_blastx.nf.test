@@ -1,0 +1,53 @@
+nextflow_process {
+    name "Test diamond_blastx"
+    script "../diamond.nf"
+    process "diamond_blastx"
+    tag "diamond"
+    tag "diamond_blastx"
+
+    test("blastx of genes against a .dmnd of their translations") {
+        setup {
+            run("diamond_makedb") {
+                script "../diamond.nf"
+                process {
+                    """
+                    input[0] = file("${baseDir}/tests/data/proteins.faa")
+                    """
+                }
+            }
+        }
+        when {
+            process {
+                """
+                input[0] = [ 'test_blastx', file("${baseDir}/tests/data/transcripts.fasta") ]
+                input[1] = diamond_makedb.out.diamond_database
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, tsv_path) = process.out.blastx_hits[0]
+            // diamond's default outfmt 6: qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore
+            def rows = path(tsv_path).readLines().collect { it.split('\t') }
+            def protein_lengths = path("${baseDir}/tests/data/proteins.faa").text.split('>').drop(1)
+                .collectEntries { rec -> def lines = rec.readLines(); [lines[0].split(/\s+/)[0], lines.drop(1).join().length()] }
+
+            assert sampleid == 'test_blastx'
+            assert tsv_path.endsWith('test_blastx.tsv')
+            // every gene tx_N finds its own translation prot_N, full length, at 100% identity
+            (1..10).each { n ->
+                def own = rows.find { it[0] == "tx_${n}" && it[1] == "prot_${n}" }
+                assert own != null
+                assert (own[2] as double) == 100
+                assert (own[3] as int) == protein_lengths["prot_${n}"]
+            }
+            // The other 8 rows are also 100% hits, to *other* proteins: phiX174's genes overlap, so a
+            // gene's DNA read in another frame/strand encodes part of a neighbouring protein exactly.
+            // blastx translates all 6 frames and finds them; blastp (protein vs protein) can't.
+            assert rows.size() == 18
+            assert rows.every { (it[2] as double) == 100 }
+            assert snapshot(path(tsv_path)).match()
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "blastx of genes against a .dmnd of their translations": {
+        "content": [
+            "test_blastx.tsv:md5,1a899aedeeb0d0f2575aae773b8f6f3e"
+        ],
+        "timestamp": "2026-11-04T10:18:28.71130054",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

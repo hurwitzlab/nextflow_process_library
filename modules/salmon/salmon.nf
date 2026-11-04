@@ -1,12 +1,17 @@
 #!/usr/bin/env nextflow
 
-// Quantify reads already aligned to a reference transcriptome
+// Quantify reads already aligned to a reference transcriptome (concordant pairs only; see input note)
 process quantify_transcripts_aligned {
     label "process_medium"
     label "publish_final"
     container "${params.container__salmon}"
 
     input:
+        // SAM/BAM of reads aligned to `transcripts`, in aligner output order (each read's alignments
+        // together; not coordinate-sorted) and with concordant pairs only, e.g. STAR
+        // --quantMode TranscriptomeSAM, or bowtie2 --no-discordant --no-mixed. salmon 1.10.3 can
+        // segfault (exit 139) on discordant pairs whose mates align to different transcripts, which
+        // e.g. raw `bwa mem` output contains; filter those first (`samtools view -f 2`).
         tuple val(sampleid), path(aligned_reads)
         path(transcripts)
 
@@ -19,8 +24,9 @@ process quantify_transcripts_aligned {
     shell:
     '''
     salmon quant \
+    --no-version-check \
     --threads !{task.cpus} \
-    --libtype A \
+    --libType A \
     --seqBias \
     --gcBias \
     --targets !{transcripts} \
@@ -65,6 +71,7 @@ process quantify_transcripts_mapping_mode {
     # quant reads
     # -l library type, -i index (above), -1 r1, -2 r2, --validateMappings for better strategy, --output output
     salmon quant \
+    --no-version-check \
     --threads !{task.cpus} \
     -l A \
     --seqBias \

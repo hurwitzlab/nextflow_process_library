@@ -1,0 +1,44 @@
+nextflow_process {
+    name "Test index_bam"
+    script "../samtools.nf"
+    process "index_bam"
+    tag "samtools"
+    tag "index_bam"
+
+    test("Indexes a coordinate-sorted BAM") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_index_bam', file("${baseDir}/tests/data/alignments.sorted.bam") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, bam_path, bai_path) = process.out.mapped_files[0]
+
+            assert sampleid == 'test_index_bam'
+            assert bam_path.endsWith('alignments.sorted.bam') // the input BAM, passed through
+            assert bai_path.endsWith('alignments.sorted.bam.bai')
+            // same bytes as the fixture's index, built by tests/data/make_test_data.sh
+            assert path(bai_path).md5 == path("${baseDir}/tests/data/alignments.sorted.bam.bai").md5
+            assert snapshot(path(bai_path)).match()
+        }
+    }
+
+    test("Fails on a BAM that isn't coordinate-sorted") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_index_bam_unsorted', file("${baseDir}/tests/data/alignments.namesorted.bam") ]
+                """
+            }
+        }
+        then {
+            assert process.failed
+            // fails for the right reason: samtools refuses to index out-of-order records
+            assert process.errorReport.contains('Unsorted positions')
+        }
+    }
+}

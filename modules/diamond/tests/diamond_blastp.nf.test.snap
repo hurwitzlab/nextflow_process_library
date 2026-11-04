@@ -1,0 +1,12 @@
+{
+    "blastp of proteins against a .dmnd of themselves": {
+        "content": [
+            "test_blastp.tsv:md5,f915eb13362ad8ae92950c04044e7761"
+        ],
+        "timestamp": "2026-11-04T10:18:24.490769305",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

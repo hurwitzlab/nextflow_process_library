@@ -1,0 +1,13 @@
+{
+    "Classifies paired reads against a tiny phiX174-only db": {
+        "content": [
+            "test_kraken2.kreport:md5,04cdc7aba59ed57c03a4cb2a62f8e687",
+            "test_kraken2.kraken:md5,d1b2e9671f8a4a0cdc319230a03edc0c"
+        ],
+        "timestamp": "2026-11-04T11:28:50.974554001",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

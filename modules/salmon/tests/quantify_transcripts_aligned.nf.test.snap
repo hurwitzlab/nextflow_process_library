@@ -1,0 +1,23 @@
+{
+    "Quantifies concordant read pairs aligned to the transcriptome": {
+        "content": [
+            [
+                "tx_1\t1284\t42.000",
+                "tx_2\t987\t35.000",
+                "tx_3\t609\t5.000",
+                "tx_4\t558\t10.000",
+                "tx_5\t528\t11.000",
+                "tx_6\t459\t10.000",
+                "tx_7\t396\t3.000",
+                "tx_8\t318\t4.000",
+                "tx_9\t291\t4.000",
+                "tx_10\t261\t4.000"
+            ]
+        ],
+        "timestamp": "2026-11-04T11:13:25.016963496",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

@@ -1,0 +1,43 @@
+nextflow_process {
+    name "Test diamond_blastp"
+    script "../diamond.nf"
+    process "diamond_blastp"
+    tag "diamond"
+    tag "diamond_blastp"
+
+    test("blastp of proteins against a .dmnd of themselves") {
+        setup {
+            run("diamond_makedb") {
+                script "../diamond.nf"
+                process {
+                    """
+                    input[0] = file("${baseDir}/tests/data/proteins.faa")
+                    """
+                }
+            }
+        }
+        when {
+            process {
+                """
+                input[0] = [ 'test_blastp', file("${baseDir}/tests/data/proteins.faa") ]
+                input[1] = diamond_makedb.out.diamond_database
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, tsv_path) = process.out.blastp_hits[0]
+            // diamond's default outfmt 6: qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore
+            def rows = path(tsv_path).readLines().collect { it.split('\t') }
+            def proteins = (1..10).collect { "prot_${it}".toString() }
+
+            assert sampleid == 'test_blastp'
+            assert tsv_path.endsWith('test_blastp.tsv')
+            assert rows.size() == 10 // the 10 proteins share no sequence, so each hits only itself
+            assert rows.collect { it[0] }.sort() == proteins.sort()
+            assert rows.every { it[1] == it[0] && (it[2] as double) == 100 }
+            assert snapshot(path(tsv_path)).match()
+        }
+    }
+}
