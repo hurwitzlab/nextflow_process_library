@@ -1,0 +1,52 @@
+nextflow_process {
+    name "Test quantify_transcripts_aligned"
+    script "../salmon.nf"
+    process "quantify_transcripts_aligned"
+    tag "salmon"
+    tag "quantify_transcripts_aligned"
+
+    test("Quantifies concordant read pairs aligned to the transcriptome") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_salmon_aln', file("${baseDir}/modules/salmon/tests/testdata/transcriptome_aligned.bam") ]
+                input[1] = file("${baseDir}/tests/data/transcripts.fasta")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (q_id, quant) = process.out.quantifications[0]
+            def (m_id, meta) = process.out.meta_info[0]
+            def (a_id, ambig) = process.out.ambig_info[0]
+
+            assert [q_id, m_id, a_id].every { it == 'test_salmon_aln' }
+            assert quant.endsWith('test_salmon_aln/quant.sf')
+            assert meta.endsWith('test_salmon_aln/aux_info/meta_info.json')
+            assert ambig.endsWith('test_salmon_aln/aux_info/ambig_info.tsv')
+
+            // quant.sf: Name Length EffectiveLength TPM NumReads
+            def rows = path(quant).readLines().drop(1).collect { it.split('\t') }
+            def txLengths = [:]
+            def name = null
+            path("${baseDir}/tests/data/transcripts.fasta").readLines().each { line ->
+                if (line.startsWith('>')) { name = line.substring(1).trim(); txLengths[name] = 0 }
+                else { txLengths[name] += line.trim().length() }
+            }
+            def info = path(meta).json
+
+            assert rows.size() == 10
+            assert rows.collectEntries { [(it[0]): it[1] as int] } == txLengths // true lengths
+            assert info.num_processed == 130 // every pair in the fixture
+            assert info.num_mapped == 130
+            assert info.library_types == ['IU'] // --libType A detected inward, unstranded pairs
+            def assigned = rows.sum { it[4] as double }
+            assert assigned > 120 && assigned <= 130 // salmon assigns 128 of the 130 in its estimates (exact counts in the snapshot)
+            assert path(ambig).readLines().size() == 11 // header + one row per transcript
+            // Name, Length, NumReads only: identical across thread counts. EffectiveLength and TPM
+            // depend on the --seqBias/--gcBias models; the JSON embeds versions and timings.
+            assert snapshot(rows.collect { [it[0], it[1], it[4]].join('\t') }).match()
+        }
+    }
+}
