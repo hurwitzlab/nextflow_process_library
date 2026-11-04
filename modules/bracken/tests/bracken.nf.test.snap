@@ -1,0 +1,12 @@
+{
+    "Re-estimates species abundance from a kraken2 report": {
+        "content": [
+            "test_bracken.bracken:md5,fa81efd15862aa81d4f04510d3da3c58"
+        ],
+        "timestamp": "2026-11-04T11:52:12.419665544",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

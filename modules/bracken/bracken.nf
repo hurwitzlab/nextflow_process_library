@@ -20,5 +20,12 @@
     -i !{kreport} \
     -o !{sampleid}.bracken \
     -r !{params.bracken_readlen}
+
+    # bracken prints its errors to stdout and exits 0 (e.g. no kmer_distrib for this read length),
+    # so fail here with the likely cause rather than as a bare "missing output file"
+    if [[ ! -s !{sampleid}.bracken ]]; then
+        echo "ERROR: bracken produced no output; it needs !{kraken2_db}/database!{params.bracken_readlen}mers.kmer_distrib (built by bracken-build -l !{params.bracken_readlen})" >&2
+        exit 1
+    fi
     '''
 }
