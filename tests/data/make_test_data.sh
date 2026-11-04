@@ -58,6 +58,27 @@ for vcf in variants expected_variants variants_extra; do
     run bcftools tabix -f -p vcf "$vcf.vcf.gz"
 done
 
+# --- kraken2 db: phiX174 only, with a 3-node hand-made taxonomy (root -> Viruses -> phiX174,
+#     NCBI taxids 1 / 10239 / 10847), so kraken2 needs no NCBI taxonomy download. Only the three
+#     .k2d files are needed to classify; taxonomy/ is kept as the build's source.
+#     Note: opts.k2d has 5 bytes of uninitialized struct padding (offsets 34-38), so its md5 changes
+#     on every rebuild; hash.k2d and taxo.k2d are byte-reproducible, and classification is identical. ---
+K2="${TMP#$DATA/}/kraken2_db"
+mkdir -p "$K2/taxonomy"
+printf '1\t|\t1\t|\tno rank\t|\n10239\t|\t1\t|\tsuperkingdom\t|\n10847\t|\t10239\t|\tspecies\t|\n' \
+    > "$K2/taxonomy/nodes.dmp"
+printf '1\t|\troot\t|\t\t|\tscientific name\t|\n10239\t|\tViruses\t|\t\t|\tscientific name\t|\n10847\t|\tEscherichia virus phiX174\t|\t\t|\tscientific name\t|\n' \
+    > "$K2/taxonomy/names.dmp"
+sed '1s/^>.*/>phiX174|kraken:taxid|10847 phiX174/' genome.fasta > "$TMP/phiX174_taxid.fa"
+run kraken2 kraken2-build --add-to-library "${TMP#$DATA/}/phiX174_taxid.fa" --db "$K2" --no-masking >/dev/null
+run kraken2 kraken2-build --build --db "$K2" --threads 1 >/dev/null
+# bracken's k-mer distribution for 100 bp reads (the shared reads' length); needs the library/ that
+# only exists here in $TMP, and is all bracken reads from the db
+run bracken bracken-build -d "$K2" -k 35 -l 100 -t 1 >/dev/null
+rm -rf kraken2_db && mkdir -p kraken2_db/taxonomy
+cp "$K2"/{hash,opts,taxo}.k2d "$K2"/database100mers.kmer_distrib kraken2_db/
+cp "$K2"/taxonomy/{nodes,names}.dmp kraken2_db/taxonomy/
+
 # --- Report what was built ---
 echo "== alignments.sam: $(grep -vc '^@' alignments.sam) records, $(awk '!/^@/ && and($2, 4)' alignments.sam | wc -l) unmapped"
 ls -l "$DATA"
