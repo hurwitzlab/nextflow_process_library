@@ -24,7 +24,7 @@
     -o !{sampleid} \
     --provirus-off \
     -l !{params.virrep_minlen} \
-    -w !{task.cpus} \
+    -w !{params.virrep_window} \
     -m !{params.virrep_model}
     '''
 }
