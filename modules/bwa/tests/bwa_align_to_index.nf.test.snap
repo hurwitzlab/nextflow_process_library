@@ -1,0 +1,12 @@
+{
+    "Aligns paired-end reads to a bwa index packaged as a tarball": {
+        "content": [
+            "9ce32184af62da43c496f0fbccd6da47"
+        ],
+        "timestamp": "2026-11-04T10:09:05.027144113",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

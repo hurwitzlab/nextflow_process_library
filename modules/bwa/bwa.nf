@@ -90,10 +90,10 @@ process bwa_align_to_index {
     shell:
     '''
     mkdir index
-    # Assume index is gzipped and the sequence inside is called ref.fa
+    # The tarball (gzipped or not) must hold ref.fa and its bwa index files at its top level
     tar -xvf !{bwa_index_tarball} -C index
     if [ ! -f index/ref.fa ]; then
-        echo "Input reference, must be gzipped, and contain a bwa index"
+        echo "ERROR: !{bwa_index_tarball} has no ref.fa at its top level; expected ref.fa and its bwa index files (ref.fa.amb, .ann, .bwt, .pac, .sa)" >&2
         exit 1
     fi
 
