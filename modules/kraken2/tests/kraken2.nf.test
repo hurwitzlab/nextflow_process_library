@@ -1,0 +1,43 @@
+nextflow_process {
+    name "Test kraken2"
+    script "../kraken2.nf"
+    process "kraken2"
+    tag "kraken2"
+
+    test("Classifies paired reads against a tiny phiX174-only db") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_kraken2',
+                             file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                input[1] = file("${baseDir}/tests/data/kraken2_db")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, kreport, kraken) = process.out.classification[0]
+            // .kraken: C/U, read name, taxid, lengths, k-mer LCA mappings
+            def calls = path(kraken).readLines().collect { it.split('\t') }
+            def unclassified = calls.findAll { it[0] == 'U' }.collect { it[1] }.sort()
+            // the 10 random pairs: the only reads unmapped in the shared bwa alignment of the same reads
+            def random_pairs = path("${baseDir}/tests/data/alignments.sam").readLines()
+                .findAll { !it.startsWith('@') && ((it.split('\t')[1] as int) & 4) }
+                .collect { it.split('\t')[0] }.unique().sort()
+
+            assert sampleid == 'test_kraken2'
+            assert kreport.endsWith('test_kraken2.kreport')
+            assert kraken.endsWith('test_kraken2.kraken')
+            assert calls.size() == 210 // one line per read pair
+            assert calls.count { it[0] == 'C' && it[2] == '10847' } == 200 // phiX174
+            assert unclassified == random_pairs
+            // kreport: percent, clade reads, direct reads, rank, taxid, name
+            assert path(kreport).readLines().collect { it.split('\t')[1..4].join(' ') } ==
+                ['10 10 U 0', '200 0 R 1', '200 0 D 10239', '200 200 S 10847']
+            // both files are identical across thread counts and db rebuilds
+            assert snapshot(path(kreport), path(kraken)).match()
+        }
+    }
+}
