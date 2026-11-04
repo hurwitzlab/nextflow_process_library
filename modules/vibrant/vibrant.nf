@@ -15,7 +15,7 @@
 
     shell:
     '''
-    python3 ../VIBRANT_run.py \
+    VIBRANT_run.py \
     -i !{contigs} \
     -f !{params.vibrant_f} \
     -l !{params.vibrant_minlength} \

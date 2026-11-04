@@ -1,13 +1,7 @@
 #!/usr/bin/env nextflow
 
 // Classify sequence fragments as viral/non-viral with ViraLM (DNABERT-2 based)
-//
-// CAVEAT: same ENTRYPOINT caveat as deepmicroclass2.nf — the source script runs
-// this container with `apptainer run`, relying on its ENTRYPOINT to interpret
-// `--input ... --output ... --database ...`. Nextflow's container directive uses
-// `apptainer exec` and will not invoke that ENTRYPOINT. The binary name below is
-// a placeholder — confirm the real entrypoint command before relying on this
-// module.
+// viralm_db is the ViraLM model directory (not bundled in the image)
  process viralm {
     label "process_medium"
     label "publish_final"
@@ -23,12 +17,13 @@
 
     shell:
     '''
-    ViraLM \
+    viralm \
     --input !{contigs} \
     --output !{sampleid} \
     --database !{viralm_db} \
     --len !{params.viralm_minlen} \
     --threshold !{params.viralm_threshold} \
+    --threads !{task.cpus} \
     --force
     '''
 }

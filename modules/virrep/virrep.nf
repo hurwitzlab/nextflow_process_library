@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
 // Identify viral sequences from contigs with VirRep
+// params.virrep_model: the image bundles one at /opt/VirRep/src/model/VirRep.pth
  process virrep {
     label "process_medium"
     label "publish_final"
@@ -9,7 +10,6 @@
 
     input:
         tuple val(sampleid), path(contigs)
-        path(virrep_script)
 
     output:
         tuple val(sampleid), path("${sampleid}"), emit: viral_inferences
@@ -19,7 +19,7 @@
     export TORCH_COMPILE_DISABLE=1
     export TORCHINDUCTOR_DISABLE=1
 
-    python3 !{virrep_script} \
+    virrep \
     -i !{contigs} \
     -o !{sampleid} \
     --provirus-off \
