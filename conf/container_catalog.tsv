@@ -11,7 +11,7 @@ blast
 bowtie2	2.5.5	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bowtie2:2.5.5--ha27dd3b_0.sif	docker://quay.io/biocontainers/bowtie2:2.5.5--ha27dd3b_0		
 bracken	3.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bracken:3.1--h9948957_0.sif	docker://quay.io/biocontainers/bracken:3.1--h9948957_0		
 busco	6.0.0	no	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_busco:6.0.0--pyhdfd78af_0.sif	docker://quay.io/biocontainers/busco:6.0.0--pyhdfd78af_0		
-busco	6.1.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_busco:6.1.0--pyhdfd78af_0.sif	docker://quay.io/biocontainers/busco:6.1.0--pyhdfd78af_0		
+busco	6.1.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_busco:6.1.0--pyhdfd78af_2.sif	docker://quay.io/biocontainers/busco:6.1.0--pyhdfd78af_2		
 bwa	0.7.19	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bwa:0.7.19--h577a1d6_0.sif	docker://quay.io/biocontainers/bwa:0.7.19--h577a1d6_0		
 centrifuge						
 checkm	1.2.5	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_checkm-genome:1.2.5--pyhdfd78af_0.sif	docker://quay.io/biocontainers/checkm-genome:1.2.5--pyhdfd78af_0		checkm, not checkm2
