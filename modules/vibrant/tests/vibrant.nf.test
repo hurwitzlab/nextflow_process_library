@@ -1,0 +1,42 @@
+nextflow_process {
+    name "Test vibrant"
+    script "../vibrant.nf"
+    process "vibrant"
+    tag "vibrant"
+    // Needs the BRC VIBRANT databases (~11 GB) on /gpfs_backup, so it only runs on Hazel.
+    tag "needs_db"
+
+    test("Calls phiX174 a virus against the BRC VIBRANT databases") {
+        when {
+            params {
+                vibrant_f                = "nucl"
+                vibrant_minlength        = 1000
+                vibrant_minorfspercontig = 4
+            }
+            process {
+                """
+                input[0] = [ 'test_vibrant', file("${baseDir}/tests/data/genome.fasta") ]
+                input[1] = file("/gpfs_backup/bioinfo_data/databases/vibrant_db/v1.2.1/databases", type: 'dir')
+                """
+            }
+        }
+        then {
+            assert process.success
+            assert process.out.viral_inferences.size() == 1
+            def (sampleid, outdir) = process.out.viral_inferences[0]
+            assert sampleid == 'test_vibrant'
+            assert file(outdir).name == 'VIBRANT_genome'
+
+            // VIBRANT exits 0 on most errors (missing databases included) and only logs them, so
+            // assert on its outputs. phiX174 (5.4 kb, 11 genes) clears the 1000 bp / 4 ORF cutoffs.
+            // VIBRANT keeps the whole FASTA header as the scaffold name, so compare sequence IDs only.
+            def machine = path("${outdir}/VIBRANT_results_genome/VIBRANT_machine_genome.tsv").readLines()
+                .drop(1).collect { it.split('\t') }.collect { [ it[0].tokenize(' ')[0], it[1] ] }
+            assert machine == [ [ 'phiX174', 'virus' ] ]
+
+            def phages = path("${outdir}/VIBRANT_phages_genome/genome.phages_combined.fna").readLines()
+            assert phages.findAll { it.startsWith('>') }.collect { it.tokenize(' ')[0] } == [ '>phiX174' ]
+            assert phages.findAll { !it.startsWith('>') }.join('').size() == 5386
+        }
+    }
+}
