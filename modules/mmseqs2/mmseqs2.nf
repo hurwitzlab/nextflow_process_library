@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 // Cluster sequences into representative OTU-style clusters with mmseqs2 easy-cluster
-process mmseqs_cluster {
+process mmseqs_easy_cluster {
     label "process_high"
     container "${params.container__mmseqs2}"
     // No sampleid here (clusters a whole sequence corpus, not per-sample) so
