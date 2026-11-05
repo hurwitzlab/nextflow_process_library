@@ -1,0 +1,48 @@
+nextflow_process {
+    name "Test evaluate_assembly_with_reference"
+    script "../quast.nf"
+    process "evaluate_assembly_with_reference"
+    tag "quast"
+    tag "evaluate_assembly_with_reference"
+
+    test("Reports stats and reference metrics for the 3 phiX174 contigs against phiX174") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_quast_ref', file("${baseDir}/tests/data/contigs.fasta"), file("${baseDir}/tests/data/reads_R1.fastq.gz"), file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                input[1] = file("${baseDir}/tests/data/genome.fasta")
+                """
+            }
+        }
+        then {
+            assert process.success
+            // report.tsv: one "<metric>\t<value>" row per metric for the one assembly
+            def report = { lines -> lines.collect { it.split('\t') }.findAll { it.size() == 2 }
+                .collectEntries { [ (it[0]): it[1] ] } }
+
+            assert process.out.quast_results_dir[0][0] == 'test_quast_ref' && file(process.out.quast_results_dir[0][1]).isDirectory()
+            assert process.out.basic_stats_dir[0][0] == 'test_quast_ref' && file(process.out.basic_stats_dir[0][1]).isDirectory()
+            assert process.out.icarus_viewers_dir[0][0] == 'test_quast_ref' && file(process.out.icarus_viewers_dir[0][1]).isDirectory()
+            assert process.out.reads_stats_dir[0][0] == 'test_quast_ref' && file(process.out.reads_stats_dir[0][1]).isDirectory()
+            assert process.out.summary_report[0][0] == 'test_quast_ref' && process.out.summary_report[0][1].endsWith('test_quast_ref/quast_results/report.tsv')
+            assert process.out.reads_stats_report[0][0] == 'test_quast_ref' && process.out.reads_stats_report[0][1].endsWith('test_quast_ref/quast_results/reads_stats/reads_report.tsv')
+            // BUSCO (--conserved-genes-finding) was removed: it downloaded odb9 + Augustus at run time
+            assert !file("${process.out.quast_results_dir[0][1]}/busco_stats").exists()
+
+            def stats = report(path(process.out.summary_report[0][1]).readLines())
+            // tests/data/contigs.fasta is phiX174 (5386 bp) cut into contigs of 2500, 1800 and 1086 bp
+            assert stats['# contigs'] == '3'
+            assert stats['Total length'] == '5386'
+            assert stats['Largest contig'] == '2500'
+            assert stats['N50'] == '1800'
+            // the contigs are exact pieces of the reference
+            assert stats['Genome fraction (%)'] == '100.000'
+            assert stats['# misassemblies'] == '0'
+            assert stats['# mismatches per 100 kbp'] == '0.00'
+
+            def reads_report = report(path(process.out.reads_stats_report[0][1]).readLines())
+            assert (reads_report['# total reads'] as int) > 0
+            assert reads_report.containsKey('Mapped (%)')
+        }
+    }
+}

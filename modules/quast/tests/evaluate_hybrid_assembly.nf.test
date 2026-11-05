@@ -1,0 +1,44 @@
+nextflow_process {
+    name "Test evaluate_hybrid_assembly"
+    script "../quast.nf"
+    process "evaluate_hybrid_assembly"
+    tag "quast"
+    tag "evaluate_hybrid_assembly"
+
+    test("Reports stats for the 3 phiX174 contigs with paired-end and ONT reads") {
+        when {
+            process {
+                """
+                input[0] = 'nanopore'
+                input[1] = [ 'test_quast_hybrid', file("${baseDir}/tests/data/contigs.fasta"), file("${baseDir}/tests/data/reads_R1.fastq.gz"), file("${baseDir}/tests/data/reads_R2.fastq.gz"), file("${baseDir}/tests/data/long_reads.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+            // report.tsv: one "<metric>\t<value>" row per metric for the one assembly
+            def report = { lines -> lines.collect { it.split('\t') }.findAll { it.size() == 2 }
+                .collectEntries { [ (it[0]): it[1] ] } }
+
+            assert process.out.quast_results_dir[0][0] == 'test_quast_hybrid' && file(process.out.quast_results_dir[0][1]).isDirectory()
+            assert process.out.basic_stats_dir[0][0] == 'test_quast_hybrid' && file(process.out.basic_stats_dir[0][1]).isDirectory()
+            assert process.out.icarus_viewers_dir[0][0] == 'test_quast_hybrid' && file(process.out.icarus_viewers_dir[0][1]).isDirectory()
+            assert process.out.reads_stats_dir[0][0] == 'test_quast_hybrid' && file(process.out.reads_stats_dir[0][1]).isDirectory()
+            assert process.out.summary_report[0][0] == 'test_quast_hybrid' && process.out.summary_report[0][1].endsWith('test_quast_hybrid/quast_results/report.tsv')
+            assert process.out.reads_stats_report[0][0] == 'test_quast_hybrid' && process.out.reads_stats_report[0][1].endsWith('test_quast_hybrid/quast_results/reads_stats/reads_report.tsv')
+            // BUSCO (--conserved-genes-finding) was removed: it downloaded odb9 + Augustus at run time
+            assert !file("${process.out.quast_results_dir[0][1]}/busco_stats").exists()
+
+            def stats = report(path(process.out.summary_report[0][1]).readLines())
+            // tests/data/contigs.fasta is phiX174 (5386 bp) cut into contigs of 2500, 1800 and 1086 bp
+            assert stats['# contigs'] == '3'
+            assert stats['Total length'] == '5386'
+            assert stats['Largest contig'] == '2500'
+            assert stats['N50'] == '1800'
+
+            def reads_report = report(path(process.out.reads_stats_report[0][1]).readLines())
+            assert (reads_report['# total reads'] as int) > 0
+            assert reads_report.containsKey('Mapped (%)')
+        }
+    }
+}
