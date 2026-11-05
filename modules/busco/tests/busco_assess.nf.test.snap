@@ -1,0 +1,19 @@
+{
+    "Scores M. genitalium G37 against the BRC bacteria_odb12.2 lineage, offline": {
+        "content": [
+            {
+                "C": 67,
+                "S": 67,
+                "D": 0,
+                "F": 6,
+                "M": 43,
+                "n": 116
+            }
+        ],
+        "timestamp": "2026-11-05T16:14:22.578743699",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

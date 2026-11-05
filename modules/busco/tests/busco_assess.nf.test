@@ -1,0 +1,55 @@
+nextflow_process {
+    name "Test busco_assess"
+    script "../busco.nf"
+    process "busco_assess"
+    tag "busco"
+    tag "busco_assess"
+    // Needs the BRC BUSCO odb12.2 lineages on /gpfs_backup, so it only runs on Hazel.
+    tag "needs_db"
+
+    test("Scores M. genitalium G37 against the BRC bacteria_odb12.2 lineage, offline") {
+        when {
+            // The fixture is committed gzipped; BUSCO is given the plain fasta
+            def genome = new File("${outputDir}/mgenitalium_G37.fna")
+            genome.parentFile.mkdirs()
+            genome.withOutputStream { out ->
+                new java.util.zip.GZIPInputStream(new FileInputStream("${moduleDir}/tests/testdata/mgenitalium_G37.fna.gz")).withStream { out << it }
+            }
+            process {
+                """
+                input[0] = [ 'test_busco', file("${genome}") ]
+                input[1] = file("/gpfs_backup/bioinfo_data/databases/busco_db/odb12.2_20260527/lineages/bacteria_odb12.2", type: 'dir')
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (json_id, json) = process.out.json_report[0]
+            def (txt_id, txt) = process.out.txt_report[0]
+            def (dir_id, dir) = process.out.busco_results[0]
+            assert [json_id, txt_id, dir_id].every { it == 'test_busco' }
+            assert json.endsWith('test_busco_busco_out/short_summary.specific.bacteria_odb12.2.test_busco_busco_out.json')
+            assert txt.endsWith('test_busco_busco_out/short_summary.specific.bacteria_odb12.2.test_busco_busco_out.txt')
+            assert file(dir).name == 'test_busco_busco_out'
+
+            // short_summary .txt: one "<count>\t<category>" line per BUSCO category
+            def counts = path(txt).readLines()
+                .collect { it =~ /^\s+(\d+)\s+(.+?)\s*$/ }.findAll { it.matches() }
+                .collectEntries { [ (it.group(2)): it.group(1) as int ] }
+            def complete   = counts['Complete BUSCOs (C)']
+            def single     = counts['Complete and single-copy BUSCOs (S)']
+            def duplicated = counts['Complete and duplicated BUSCOs (D)']
+            def fragmented = counts['Fragmented BUSCOs (F)']
+            def missing    = counts['Missing BUSCOs (M)']
+            def total      = counts['Total BUSCO groups searched']
+
+            assert total == 116 // number_of_BUSCOs in bacteria_odb12.2's dataset.cfg
+            assert complete == single + duplicated
+            assert complete + fragmented + missing == total
+            assert complete > 0 // a real bacterium: BUSCO finds its marker genes
+            // prodigal + hmmsearch on one genome: the counts don't vary between runs
+            assert snapshot([C: complete, S: single, D: duplicated, F: fragmented, M: missing, n: total]).match()
+        }
+    }
+}
