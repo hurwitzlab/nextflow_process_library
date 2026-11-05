@@ -4,13 +4,19 @@
 // Index a reference sequence with bwa; emits the reference together with its index files
  process bwa_index {
     label "process_single"
+    label "publish_intermediate_pooled"
     container "${params.container__bwa}"
-                        
+    // One index for the whole run (e.g. a pooled viral catalog, or a host
+    // genome): pooledid names that reference and is what the
+    // publish_*_pooled labels pass to params.bwa_index_outdir. Drop it before
+    // combining with per-sample reads for bwa_mem, e.g.
+    // reads.combine(bwa_index.out.indexed_sequence.map { _id, ref, idx -> tuple(ref, idx) })
+
     input:
-        path(reference_genome)
+        tuple val(pooledid), path(reference_genome)
 
     output:
-        tuple path(reference_genome), path("${reference_genome}.{amb,ann,bwt,pac,sa}"), emit: indexed_sequence
+        tuple val(pooledid), path(reference_genome), path("${reference_genome}.{amb,ann,bwt,pac,sa}"), emit: indexed_sequence
 
     shell:
     '''
@@ -18,7 +24,7 @@
     '''
 }
 
-// Align paired-end reads to a reference indexed by bwa_index (e.g. reads.combine(bwa_index.out.indexed_sequence))
+// Align paired-end reads to a reference indexed by bwa_index (see bwa_index for how to combine its output with reads)
 process bwa_mem {
     label "process_high"
     container "${params.container__bwa}"
