@@ -84,7 +84,7 @@ process single_end_read_classification {
 // Select paired-end reads matching a set of Kraken taxids (and their children)
 process paired_end_read_selector {
     label "process_single"
-    container "${params.container__kraken2}"
+    container "${params.container__krakentools}"
 
     input:
         tuple val(sampleid), path(r1), path(r2), path(kraken_results), path(kraken_report)
@@ -96,7 +96,7 @@ process paired_end_read_selector {
 
     shell:
     '''
-    python3 /KrakenTools-master/extract_kraken_reads.py \
+    extract_kraken_reads.py \
     -k !{kraken_results} \
     --report !{kraken_report} \
     -s1 !{r1} \
@@ -116,7 +116,7 @@ process paired_end_read_selector {
 // Exclude paired-end reads matching a set of Kraken taxids (and their children)
 process paired_end_read_excluder {
     label "process_single"
-    container "${params.container__kraken2}"
+    container "${params.container__krakentools}"
 
     input:
         tuple val(sampleid), path(r1), path(r2), path(kraken_results), path(kraken_report)
@@ -128,7 +128,7 @@ process paired_end_read_excluder {
 
     shell:
     '''
-    python3 /KrakenTools-master/extract_kraken_reads.py \
+    extract_kraken_reads.py \
     -k !{kraken_results} \
     --report !{kraken_report} \
     -s1 !{r1} \
@@ -149,7 +149,7 @@ process paired_end_read_excluder {
 // Select single-end reads matching a set of Kraken taxids (and their children)
 process single_end_read_selector {
     label "process_single"
-    container "${params.container__kraken2}"
+    container "${params.container__krakentools}"
 
     input:
         tuple val(sampleid), path(r1), path(kraken_results), path(kraken_report)
@@ -160,7 +160,7 @@ process single_end_read_selector {
 
     shell:
     '''
-    python3 /KrakenTools-master/extract_kraken_reads.py \
+    extract_kraken_reads.py \
     -k !{kraken_results} \
     --report !{kraken_report} \
     -s1 !{r1} \
@@ -177,7 +177,7 @@ process single_end_read_selector {
 // Exclude single-end reads matching a set of Kraken taxids (and their children)
 process single_end_read_excluder {
     label "process_single"
-    container "${params.container__kraken2}"
+    container "${params.container__krakentools}"
 
     input:
         tuple val(sampleid), path(r1), path(kraken_results), path(kraken_report)
@@ -188,7 +188,7 @@ process single_end_read_excluder {
 
     shell:
     '''
-    python3 /KrakenTools-master/extract_kraken_reads.py \
+    extract_kraken_reads.py \
     -k !{kraken_results} \
     --report !{kraken_report} \
     -s1 !{r1} \

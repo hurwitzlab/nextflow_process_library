@@ -46,6 +46,7 @@ interproscan	5.59-91.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_bio
 iphop						
 kmergo						
 kraken2	2.17.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_kraken2:2.17.1--pl5321h077b44d_0.sif	docker://quay.io/biocontainers/kraken2:2.17.1--pl5321h077b44d_0		
+krakentools	1.2.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_krakentools:1.2.1--pyh7e72e81_0.sif	docker://quay.io/biocontainers/krakentools:1.2.1--pyh7e72e81_0		
 mafft	7.525	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_mafft:7.525--h031d066_1.sif	docker://quay.io/biocontainers/mafft:7.525--h031d066_1		
 marvel						
 maxbin2	2.2.7	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_maxbin2:2.2.7--h503566f_8.sif	docker://quay.io/biocontainers/maxbin2:2.2.7--h503566f_8		
