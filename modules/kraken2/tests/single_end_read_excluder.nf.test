@@ -1,0 +1,55 @@
+nextflow_process {
+    name "Test single_end_read_excluder"
+    script "../kraken2.nf"
+    process "single_end_read_excluder"
+    tag "kraken2"
+    tag "krakentools"
+    tag "single_end_read_excluder"
+
+    test("Excludes the 200 phiX174 reads (10847) from R1, keeping the 10 random reads") {
+        setup {
+            run("kraken2") {
+                script "../kraken2.nf"
+                process {
+                    """
+                    input[0] = [ 'test_se_exclude',
+                                 file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                                 file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                    input[1] = file("${baseDir}/tests/data/kraken2_db")
+                    """
+                }
+            }
+        }
+        when {
+            process {
+                """
+                // kraken2's paired output names reads without the mate suffix, so it also matches R1 alone
+                input[0] = kraken2.out.classification.map { sampleid, kreport, kraken ->
+                    [ sampleid, file("${baseDir}/tests/data/reads_R1.fastq.gz"), kraken, kreport ] }
+                // taxid 10847 (phiX174) itself
+                input[1] = Channel.value([ '10847' ])
+                """
+            }
+        }
+        then {
+            assert process.success
+            // Read names from a fastq.gz, without the /1 or /2 mate suffix
+            def names = { f -> path(f).linesGzip.withIndex().findAll { l, i -> i % 4 == 0 }
+                .collect { l, i -> l.substring(1).tokenize(' ')[0].replaceAll('/[12]$', '') } }
+            // The 10 random pairs (unclassified by kraken2): the only reads unmapped in the shared bwa
+            // alignment of the same reads. The other 200 pairs are phiX174 (taxid 10847).
+            def random_pairs = path("${baseDir}/tests/data/alignments.sam").readLines()
+                .findAll { !it.startsWith('@') && ((it.split('\t')[1] as int) & 4) }
+                .collect { it.split('\t')[0] }.unique().sort()
+            def all_pairs = names("${baseDir}/tests/data/reads_R1.fastq.gz").sort()
+            def phix_pairs = all_pairs - random_pairs
+            assert random_pairs.size() == 10 && phix_pairs.size() == 200
+
+            def (id1, r1) = process.out.excluded_r1[0]
+            assert id1 == 'test_se_exclude'
+            assert r1.endsWith('test_se_exclude.excluded_R1.fastq.gz')
+            assert names(r1).sort() == random_pairs
+            assert path(r1).linesGzip.size() == 4 * random_pairs.size()
+        }
+    }
+}

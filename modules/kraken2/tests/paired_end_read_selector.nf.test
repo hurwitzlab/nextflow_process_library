@@ -1,0 +1,59 @@
+nextflow_process {
+    name "Test paired_end_read_selector"
+    script "../kraken2.nf"
+    process "paired_end_read_selector"
+    tag "kraken2"
+    tag "krakentools"
+    tag "paired_end_read_selector"
+
+    test("Selects the 200 phiX174 pairs under Viruses (10239) with --include-children") {
+        setup {
+            run("kraken2") {
+                script "../kraken2.nf"
+                process {
+                    """
+                    input[0] = [ 'test_pe_select',
+                                 file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                                 file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                    input[1] = file("${baseDir}/tests/data/kraken2_db")
+                    """
+                }
+            }
+        }
+        when {
+            process {
+                """
+                input[0] = kraken2.out.classification.map { sampleid, kreport, kraken ->
+                    [ sampleid,
+                      file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                      file("${baseDir}/tests/data/reads_R2.fastq.gz"),
+                      kraken, kreport ] }
+                // taxid 10239 (Viruses, phiX174's parent): only matches the phiX reads via --include-children
+                input[1] = Channel.value([ '10239' ])
+                """
+            }
+        }
+        then {
+            assert process.success
+            // Read names from a fastq.gz, without the /1 or /2 mate suffix
+            def names = { f -> path(f).linesGzip.withIndex().findAll { l, i -> i % 4 == 0 }
+                .collect { l, i -> l.substring(1).tokenize(' ')[0].replaceAll('/[12]$', '') } }
+            // The 10 random pairs (unclassified by kraken2): the only reads unmapped in the shared bwa
+            // alignment of the same reads. The other 200 pairs are phiX174 (taxid 10847).
+            def random_pairs = path("${baseDir}/tests/data/alignments.sam").readLines()
+                .findAll { !it.startsWith('@') && ((it.split('\t')[1] as int) & 4) }
+                .collect { it.split('\t')[0] }.unique().sort()
+            def all_pairs = names("${baseDir}/tests/data/reads_R1.fastq.gz").sort()
+            def phix_pairs = all_pairs - random_pairs
+            assert random_pairs.size() == 10 && phix_pairs.size() == 200
+
+            def (id1, r1) = process.out.selected_r1[0]
+            def (id2, r2) = process.out.selected_r2[0]
+            assert id1 == 'test_pe_select' && id2 == 'test_pe_select'
+            assert r1.endsWith('test_pe_select.selected_R1.fastq.gz')
+            assert r2.endsWith('test_pe_select.selected_R2.fastq.gz')
+            assert names(r1).sort() == phix_pairs
+            assert names(r2) == names(r1) // mates stay paired, in the same order
+        }
+    }
+}

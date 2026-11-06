@@ -1,0 +1,39 @@
+nextflow_process {
+    name "Test evaluate_illumina_metagenome_assembly_paired_end"
+    script "../quast.nf"
+    process "evaluate_illumina_metagenome_assembly_paired_end"
+    tag "quast"
+    tag "evaluate_illumina_metagenome_assembly_paired_end"
+
+    test("metaQUAST reports stats for the 3 phiX174 contigs with paired-end reads") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_metaquast_pe', file("${baseDir}/tests/data/contigs.fasta"), file("${baseDir}/tests/data/reads_R1.fastq.gz"), file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+            // report.tsv: one "<metric>\t<value>" row per metric for the one assembly
+            def report = { lines -> lines.collect { it.split('\t') }.findAll { it.size() == 2 }
+                .collectEntries { [ (it[0]): it[1] ] } }
+
+            def (sampleid, tarball) = process.out.metagenome_qc_report[0]
+            assert sampleid == 'test_metaquast_pe'
+            assert tarball.endsWith('test_metaquast_pe_quast_results.tar.gz')
+            def members = ['tar', '-tzf', tarball].execute().text.readLines()
+            // BUSCO (--conserved-genes-finding) was removed: it downloaded odb9 + Augustus at run time
+            assert !members.any { it.contains('busco_stats') }
+
+            // no references (--max-ref-number 0), so metaQUAST reports on the contigs alone
+            assert members.contains('quast_results/report.tsv')
+            def stats = report(['tar', '-xzOf', tarball, 'quast_results/report.tsv'].execute().text.readLines())
+            // tests/data/contigs.fasta is phiX174 (5386 bp) cut into contigs of 2500, 1800 and 1086 bp
+            assert stats['# contigs'] == '3'
+            assert stats['Total length'] == '5386'
+            assert stats['Largest contig'] == '2500'
+            assert stats['N50'] == '1800'
+        }
+    }
+}

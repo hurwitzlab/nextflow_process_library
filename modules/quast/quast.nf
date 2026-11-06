@@ -12,7 +12,6 @@ process evaluate_assembly {
     output:
         tuple val(sampleid), path("${sampleid}/quast_results", type: 'dir'), emit: quast_results_dir
         tuple val(sampleid), path("${sampleid}/quast_results/basic_stats", type: 'dir'), emit: basic_stats_dir
-        tuple val(sampleid), path("${sampleid}/quast_results/busco_stats", type: 'dir'), emit: busco_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/icarus_viewers", type: 'dir'), emit: icarus_viewers_dir
         tuple val(sampleid), path("${sampleid}/quast_results/reads_stats", type: 'dir'), emit: reads_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/reads_stats/reads_report.tsv"), emit: reads_stats_report
@@ -25,8 +24,6 @@ process evaluate_assembly {
       --pe2 !{trimmed_r2} \
       --output-dir !{sampleid}/quast_results \
       --split-scaffolds \
-      --conserved-genes-finding \
-      --k-mer-stats \
       --circos \
       --threads !{task.cpus}
     '''
@@ -45,7 +42,6 @@ process evaluate_assembly_with_reference {
     output:
         tuple val(sampleid), path("${sampleid}/quast_results", type: 'dir'), emit: quast_results_dir
         tuple val(sampleid), path("${sampleid}/quast_results/basic_stats", type: 'dir'), emit: basic_stats_dir
-        tuple val(sampleid), path("${sampleid}/quast_results/busco_stats", type: 'dir'), emit: busco_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/icarus_viewers", type: 'dir'), emit: icarus_viewers_dir
         tuple val(sampleid), path("${sampleid}/quast_results/reads_stats", type: 'dir'), emit: reads_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/reads_stats/reads_report.tsv"), emit: reads_stats_report
@@ -59,8 +55,6 @@ process evaluate_assembly_with_reference {
       --pe2 !{trimmed_r2} \
       --output-dir !{sampleid}/quast_results \
       --split-scaffolds \
-      --conserved-genes-finding \
-      --k-mer-stats \
       --circos \
       --threads !{task.cpus}
     '''
@@ -78,7 +72,6 @@ process evaluate_long_read_assembly {
     output:
         tuple val(sampleid), path("${sampleid}/quast_results", type: 'dir'), emit: quast_results_dir
         tuple val(sampleid), path("${sampleid}/quast_results/basic_stats", type: 'dir'), emit: basic_stats_dir
-        tuple val(sampleid), path("${sampleid}/quast_results/busco_stats", type: 'dir'), emit: busco_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/icarus_viewers", type: 'dir'), emit: icarus_viewers_dir
         tuple val(sampleid), path("${sampleid}/quast_results/reads_stats", type: 'dir'), emit: reads_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/reads_stats/reads_report.tsv"), emit: reads_stats_report
@@ -90,8 +83,6 @@ process evaluate_long_read_assembly {
       --pacbio !{long_reads} \
       --output-dir !{sampleid}/quast_results \
       --split-scaffolds \
-      --conserved-genes-finding \
-      --k-mer-stats \
       --circos \
       --threads !{task.cpus}
     '''
@@ -109,7 +100,6 @@ process evaluate_ont_phage_assembly {
     output:
         tuple val(sampleid), path("${sampleid}/quast_results", type: 'dir'), emit: quast_results_dir
         tuple val(sampleid), path("${sampleid}/quast_results/basic_stats", type: 'dir'), emit: basic_stats_dir
-        tuple val(sampleid), path("${sampleid}/quast_results/busco_stats", type: 'dir'), emit: busco_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/icarus_viewers", type: 'dir'), emit: icarus_viewers_dir
         tuple val(sampleid), path("${sampleid}/quast_results/reads_stats", type: 'dir'), emit: reads_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/reads_stats/reads_report.tsv"), emit: reads_stats_report
@@ -121,8 +111,6 @@ process evaluate_ont_phage_assembly {
       --nanopore !{long_reads} \
       --output-dir !{sampleid}/quast_results \
       --split-scaffolds \
-      --conserved-genes-finding \
-      --k-mer-stats \
       --circos \
       --threads !{task.cpus}
     '''
@@ -141,7 +129,6 @@ process evaluate_hybrid_assembly {
     output:
         tuple val(sampleid), path("${sampleid}/quast_results", type: 'dir'), emit: quast_results_dir
         tuple val(sampleid), path("${sampleid}/quast_results/basic_stats", type: 'dir'), emit: basic_stats_dir
-        tuple val(sampleid), path("${sampleid}/quast_results/busco_stats", type: 'dir'), emit: busco_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/icarus_viewers", type: 'dir'), emit: icarus_viewers_dir
         tuple val(sampleid), path("${sampleid}/quast_results/reads_stats", type: 'dir'), emit: reads_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/reads_stats/reads_report.tsv"), emit: reads_stats_report
@@ -155,8 +142,6 @@ process evaluate_hybrid_assembly {
       --!{long_read_platform} !{long_reads} \
       --output-dir !{sampleid}/quast_results \
       --split-scaffolds \
-      --conserved-genes-finding \
-      --k-mer-stats \
       --circos \
       --threads !{task.cpus}
     '''
@@ -181,7 +166,6 @@ process evaluate_illumina_metagenome_assembly_paired_end {
                  --pe2 !{r2} \
                  --output-dir quast_results/ \
                  --split-scaffolds \
-                 --conserved-genes-finding \
                  --max-ref-number 0 \
                  --threads !{task.cpus}
     tar -czf !{sampleid}_quast_results.tar.gz quast_results
@@ -206,7 +190,6 @@ process evaluate_illumina_metagenome_assembly_single_end {
                  --single !{r1} \
                  --output-dir quast_results/ \
                  --split-scaffolds \
-                 --conserved-genes-finding \
                  --max-ref-number 0 \
                  --threads !{task.cpus}
     tar -czf !{sampleid}_quast_results.tar.gz quast_results
@@ -231,7 +214,6 @@ process evaluate_ont_metagenome_assembly {
                  --nanopore !{r1} \
                  --output-dir quast_results/ \
                  --split-scaffolds \
-                 --conserved-genes-finding \
                  --max-ref-number 0 \
                  --threads !{task.cpus}
     tar -czf !{sampleid}_quast_results.tar.gz quast_results
@@ -250,7 +232,6 @@ process evaluate_contigs {
     output:
         tuple val(sampleid), path("${sampleid}/quast_results", type: 'dir'), emit: quast_results_dir
         tuple val(sampleid), path("${sampleid}/quast_results/basic_stats", type: 'dir'), emit: basic_stats_dir
-        tuple val(sampleid), path("${sampleid}/quast_results/busco_stats", type: 'dir'), emit: busco_stats_dir
         tuple val(sampleid), path("${sampleid}/quast_results/report.tsv"), emit: summary_report
 
     shell:
@@ -258,8 +239,6 @@ process evaluate_contigs {
     quast.py !{contigs} \
       --output-dir !{sampleid}/quast_results \
       --split-scaffolds \
-      --conserved-genes-finding \
-      --k-mer-stats \
       --circos \
       --threads !{task.cpus}
     '''
