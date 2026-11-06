@@ -1,0 +1,31 @@
+nextflow_process {
+    name "Test fastq_to_sam"
+    script "../picard.nf"
+    process "fastq_to_sam"
+    tag "picard"
+    tag "fastq_to_sam"
+
+    test("Converts paired FASTQs to an unmapped BAM") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_fastq_to_sam',
+                             file("${baseDir}/tests/data/reads_R1.fastq.gz"),
+                             file("${baseDir}/tests/data/reads_R2.fastq.gz") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def (sampleid, bam_path) = process.out.unmapped_bam[0]
+            def reads = bam(bam_path).getSamLines()
+
+            assert sampleid == 'test_fastq_to_sam'
+            assert bam_path.endsWith('test_fastq_to_sam.unmapped.bam')
+            assert reads.size() == 420 // 210 pairs
+            assert reads.every { ((it.split('\t')[1] as int) & 4) != 0 } // all unmapped
+            assert reads.every { it.contains('RG:Z:test_fastq_to_sam') }
+        }
+    }
+}

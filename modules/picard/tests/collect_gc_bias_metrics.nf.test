@@ -1,0 +1,43 @@
+nextflow_process {
+    name "Test collect_gc_bias_metrics"
+    script "../picard.nf"
+    process "collect_gc_bias_metrics"
+    tag "picard"
+    tag "collect_gc_bias_metrics"
+
+    test("Collects GC bias metrics against the reference") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_gc_bias',
+                             file("${baseDir}/tests/data/alignments.sorted.bam"),
+                                 file("${baseDir}/tests/data/alignments.sorted.bam.bai") ]
+                input[1] = file("${baseDir}/tests/data/genome.fasta")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            // Picard metrics files start with '#' lines (command line, date), then a tab-separated
+            // header + rows; read rows as maps keyed by column name rather than snapshotting the file
+            def metricRows = { p ->
+                def lines = path(p).readLines().dropWhile { !it || it.startsWith('#') }
+                def header = lines[0].split('\t')
+                // the metrics table ends at the first blank line (a histogram section may follow)
+                lines.drop(1).takeWhile { it }
+                     .collect { [header, it.split('\t', -1)].transpose().collectEntries() }
+            }
+            def (sampleid, summary) = process.out.gc_summary_metrics[0]
+            def (sampleid2, detail) = process.out.gc_bias_metrics[0]
+            def (sampleid3, pdf) = process.out.gc_bias_chart[0]
+            def s = metricRows(summary)[0]
+
+            assert sampleid == 'test_gc_bias' && sampleid2 == sampleid && sampleid3 == sampleid
+            assert s.TOTAL_CLUSTERS == '210'
+            assert s.ALIGNED_READS == '400'
+            assert metricRows(detail).size() == 101 // one row per GC% 0-100
+            assert path(pdf).toFile().length() > 0
+        }
+    }
+}

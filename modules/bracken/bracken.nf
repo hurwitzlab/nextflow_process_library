@@ -20,28 +20,12 @@
     -i !{kreport} \
     -o !{sampleid}.bracken \
     -r !{params.bracken_readlen}
-    '''
-}
 
-// Build Bracken's kmer-distribution file for a kraken2 database
-process bracken_build {
-    label "process_high"
-    container "${params.container__bracken}"
-    publishDir "${params.bracken_build_outdir}", mode: 'copy'
-
-    input:
-        path(kraken2_db)
-        val(read_len)
-
-    output:
-        path("${kraken2_db}/database${read_len}mers.kmer_distrib"), emit: kmer_distrib
-
-    shell:
-    '''
-    bracken-build \
-    -d !{kraken2_db} \
-    -t !{task.cpus} \
-    -k !{params.bracken_build_kmer_len} \
-    -l !{read_len}
+    # bracken prints its errors to stdout and exits 0 (e.g. no kmer_distrib for this read length),
+    # so fail here with the likely cause rather than as a bare "missing output file"
+    if [[ ! -s !{sampleid}.bracken ]]; then
+        echo "ERROR: bracken produced no output; it needs !{kraken2_db}/database!{params.bracken_readlen}mers.kmer_distrib (built by bracken-build -l !{params.bracken_readlen})" >&2
+        exit 1
+    fi
     '''
 }

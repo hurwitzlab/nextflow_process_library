@@ -1,0 +1,41 @@
+nextflow_process {
+    name "Test collect_alignment_summary_metrics"
+    script "../picard.nf"
+    process "collect_alignment_summary_metrics"
+    tag "picard"
+    tag "collect_alignment_summary_metrics"
+
+    test("Collects alignment summary metrics against the reference") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_aln_summary',
+                             file("${baseDir}/tests/data/alignments.sorted.bam"),
+                                 file("${baseDir}/tests/data/alignments.sorted.bam.bai") ]
+                input[1] = file("${baseDir}/tests/data/genome.fasta")
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            // Picard metrics files start with '#' lines (command line, date), then a tab-separated
+            // header + rows; read rows as maps keyed by column name rather than snapshotting the file
+            def metricRows = { p ->
+                def lines = path(p).readLines().dropWhile { !it || it.startsWith('#') }
+                def header = lines[0].split('\t')
+                // the metrics table ends at the first blank line (a histogram section may follow)
+                lines.drop(1).takeWhile { it }
+                     .collect { [header, it.split('\t', -1)].transpose().collectEntries() }
+            }
+            def (sampleid, txt) = process.out.alignment_summary_metrics[0]
+            def pair = metricRows(txt).find { it.CATEGORY == 'PAIR' }
+
+            assert sampleid == 'test_aln_summary'
+            assert pair.TOTAL_READS == '420'
+            assert pair.PF_READS_ALIGNED == '400' // the 10 random pairs don't map
+            assert pair.READS_ALIGNED_IN_PAIRS == '400'
+            assert pair.MEAN_READ_LENGTH == '100'
+        }
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "Finds the prot_10 family in a gzipped protein catalog with a one-model HMM db": {
+        "content": [
+            [
+                "prot_10 - prot_10_family - 2.9e-63 200.0",
+                "prot_10_var3 - prot_10_family - 1.5e-62 197.7",
+                "prot_10_var1 - prot_10_family - 1.4e-61 194.5",
+                "prot_10_var2 - prot_10_family - 1.2e-57 181.9"
+            ]
+        ],
+        "timestamp": "2026-11-04T10:29:03.539645819",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    },
+    "Searches a gzipped catalog with a multi-model HMM db, like Pfam-A.hmm": {
+        "content": [
+            [
+                "prot_10 - prot_10_family - 2.9e-63 200.0",
+                "prot_10_var3 - prot_10_family - 1.5e-62 197.7",
+                "prot_10_var1 - prot_10_family - 1.4e-61 194.5",
+                "prot_10_var2 - prot_10_family - 1.2e-57 181.9",
+                "prot_10 - prot_10 - 2.5e-64 203.3",
+                "prot_10_var3 - prot_10 - 2.7e-61 193.6",
+                "prot_10_var1 - prot_10 - 1.3e-59 188.2",
+                "prot_10_var2 - prot_10 - 9.4e-57 179.0"
+            ]
+        ],
+        "timestamp": "2026-11-04T10:29:07.393643988",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "Indexes a coordinate-sorted BAM": {
+        "content": [
+            "alignments.sorted.bam.bai:md5,02d204499238bd049442ffc133f96310"
+        ],
+        "timestamp": "2026-11-03T15:35:15.339935861",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

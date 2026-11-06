@@ -1,0 +1,87 @@
+nextflow_process {
+    name "Test hmmsearch"
+    script "../hmmsearch.nf"
+    process "hmmsearch"
+    tag "hmmsearch"
+
+    // tblout hit rows only: the '#' header/footer carries the version, date, cwd and command line
+    def hits = { p -> path(p).readLines().findAll { !it.startsWith('#') }.collect { it.split(/\s+/) } }
+
+    test("Finds the prot_10 family in a gzipped protein catalog with a one-model HMM db") {
+        setup {
+            run("hmmbuild") {
+                script "../../hmmer/hmmer.nf"
+                process {
+                    """
+                    input[0] = [ 'prot_10_family', file("${baseDir}/modules/hmmer/tests/testdata/prot_10_family.sto") ]
+                    """
+                }
+            }
+        }
+        when {
+            params {
+                hmmsearch_evalue = 10
+                hmmsearch_outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = file("${baseDir}/modules/hmmer/tests/testdata/protein_db.faa.gz")
+                input[1] = hmmbuild.out.hmm_profile.map { sampleid, hmm -> hmm }
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def tbl = process.out.domain_hits[0]
+            def rows = hits(tbl) // target, accession, query, accession, E-value, score, ...
+
+            assert file(tbl).name == 'catalog_pfam_hmmout.txt'
+            // the family and its 3 variants; none of the other 9 phiX174 proteins
+            assert rows.collect { it[0] }.sort() == ['prot_10', 'prot_10_var1', 'prot_10_var2', 'prot_10_var3']
+            assert rows.every { it[2] == 'prot_10_family' }
+            assert snapshot(rows.collect { it[0..5].join(' ') }).match()
+        }
+    }
+
+    test("Searches a gzipped catalog with a multi-model HMM db, like Pfam-A.hmm") {
+        setup {
+            run("hmmbuild") {
+                script "../../hmmer/hmmer.nf"
+                process {
+                    """
+                    input[0] = Channel.of(
+                        [ 'prot_10_family', file("${baseDir}/modules/hmmer/tests/testdata/prot_10_family.sto") ],
+                        [ 'prot_10_single', file("${baseDir}/modules/hmmer/tests/testdata/prot_10.faa") ] )
+                    """
+                }
+            }
+        }
+        when {
+            params {
+                hmmsearch_evalue = 10
+                hmmsearch_outdir = "$outputDir"
+            }
+            process {
+                """
+                input[0] = file("${baseDir}/modules/hmmer/tests/testdata/protein_db.faa.gz")
+                input[1] = hmmbuild.out.hmm_profile.map { sampleid, hmm -> hmm }
+                               .collectFile(name: 'models.hmm', sort: { it.name })
+                """
+            }
+        }
+        then {
+            // hmmsearch rereads the catalog once per model; before the module decompressed a .gz catalog,
+            // this failed with "Target sequence file ... isn't rewindable; can't search it with multiple queries"
+            assert process.success
+
+            def rows = hits(process.out.domain_hits[0])
+            def family = ['prot_10', 'prot_10_var1', 'prot_10_var2', 'prot_10_var3']
+
+            assert rows.collect { it[2] }.unique().sort() == ['prot_10', 'prot_10_family'] // both models searched
+            assert rows.findAll { it[2] == 'prot_10_family' }.collect { it[0] }.sort() == family
+            assert rows.findAll { it[2] == 'prot_10' }.collect { it[0] }.sort() == family
+            assert snapshot(rows.collect { it[0..5].join(' ') }).match()
+        }
+    }
+}

@@ -30,3 +30,4 @@ of every test that uses it.
 | `variants.vcf[.gz + .tbi]` | 3 SNVs on phiX174 (pos 100, 1500, 3000), sample `1`, `INFO/AF`, `FORMAT/GT:AD` |
 | `expected_variants.vcf[.gz + .tbi]` | 2 SNVs (pos 100, 4000), sample `expected` |
 | `variants_extra.vcf[.gz + .tbi]` | 1 SNV (pos 4500), sample `1` |
+| `kraken2_db/` | A tiny kraken2 db: phiX174 only, built with a 3-node hand-made taxonomy (`taxonomy/nodes.dmp`, `names.dmp`: root 1 → Viruses 10239 → *Escherichia virus phiX174* 10847). `hash.k2d`/`opts.k2d`/`taxo.k2d` (~53 KB) are all kraken2 needs to classify; `database100mers.kmer_distrib` (from `bracken-build -k 35 -l 100`) is all bracken needs, for 100 bp reads. Classifies the 200 phiX pairs of `reads_R1/R2` as 10847, the 10 random pairs as unclassified. `opts.k2d`'s md5 changes on every rebuild (5 bytes of uninitialized struct padding); classification doesn't |
