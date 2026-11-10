@@ -20,7 +20,7 @@ checkm2	1.1.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainer
 checkv	1.1	yes	/usr/local/usrapps/brc/brc_modules/images/phorager-checkv-bundle-1.1.sif			checkv is provided by the phorager bundle
 comparem						
 concoct	1.1.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_concoct:1.1.0--py312hb1d17a5_9.sif	docker://quay.io/biocontainers/concoct:1.1.0--py312hb1d17a5_9		
-coverm						
+coverm	0.8.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_coverm:0.8.0--h750ce8b_0.sif	docker://quay.io/biocontainers/coverm:0.8.0--h750ce8b_0		
 cutadapt	5.2	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_cutadapt:5.2--py311haab0aaa_0.sif	docker://quay.io/biocontainers/cutadapt:5.2--py311haab0aaa_0		
 deepmicroclass2	git-9622bd6	yes	/usr/local/usrapps/brc/brc_modules/images/DeepMicroClass2-git-9622bd6.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/DeepMicroClass2	
 deepvirfinder	1.0	yes	/usr/local/usrapps/brc/brc_modules/images/DeepVirFinder.1.0.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/DeepVirFinder	
@@ -59,8 +59,8 @@ metaphlan	4.2.4	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontain
 metapop	0.0.60	yes	/usr/local/usrapps/brc/brc_modules/images/metapop-0.0.60.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/metapop	
 minimap2	2.30	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_minimap2:2.30--h577a1d6_0.sif	docker://quay.io/biocontainers/minimap2:2.30--h577a1d6_0		
 mlst						
-mmseqs						
-mmseqs2						
+mmseqs	18-8cc5c	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_mmseqs2:18-8cc5c.sif	docker://quay.io/biocontainers/mmseqs2:18-8cc5c		cluster_proteins uses the older param name
+mmseqs2	18-8cc5c	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_mmseqs2:18-8cc5c.sif	docker://quay.io/biocontainers/mmseqs2:18-8cc5c		
 mothur						
 mummer	4.0.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_mummer4:4.0.1--pl5321h9948957_0.sif	docker://quay.io/biocontainers/mummer4:4.0.1--pl5321h9948957_0		
 muscle						
