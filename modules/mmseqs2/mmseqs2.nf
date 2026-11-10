@@ -32,7 +32,7 @@ process mmseqs_easy_cluster {
 // Cluster a merged protein database into groups with mmseqs easy-cluster, then split the result into one fasta per cluster
 process cluster_proteins {
     label "process_high"
-    container "${params.container__mmseqs}"
+    container "${params.container__mmseqs2}"
     // No sampleid here (clusters a whole protein database, not per-sample)
     // so the Closure-based publishDir convention doesn't apply -- stays a
     // plain path.
