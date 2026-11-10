@@ -5,9 +5,6 @@ process mmseqs_easy_cluster {
     label "process_high"
     label "publish_final_pooled"
     container "${params.container__mmseqs2}"
-    // Clusters ONE file pooling all samples, not one sample: pooledid names that
-    // pooled input (e.g. 'viral_catalog'); it is both the output file prefix and
-    // what the publish_*_pooled labels pass to params.mmseqs_easy_cluster_outdir.
 
     input:
         tuple val(pooledid), path(all_seqs)

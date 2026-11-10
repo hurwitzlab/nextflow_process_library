@@ -1,0 +1,36 @@
+nextflow_process {
+    name "Test evaluate_contigs"
+    script "../quast.nf"
+    process "evaluate_contigs"
+    tag "quast"
+    tag "evaluate_contigs"
+
+    test("Reports stats for the 3 phiX174 contigs with no reads") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_quast_contigs', file("${baseDir}/tests/data/contigs.fasta") ]
+                """
+            }
+        }
+        then {
+            assert process.success
+            // report.tsv: one "<metric>\t<value>" row per metric for the one assembly
+            def report = { lines -> lines.collect { it.split('\t') }.findAll { it.size() == 2 }
+                .collectEntries { [ (it[0]): it[1] ] } }
+
+            assert process.out.quast_results_dir[0][0] == 'test_quast_contigs' && file(process.out.quast_results_dir[0][1]).isDirectory()
+            assert process.out.basic_stats_dir[0][0] == 'test_quast_contigs' && file(process.out.basic_stats_dir[0][1]).isDirectory()
+            assert process.out.summary_report[0][0] == 'test_quast_contigs' && process.out.summary_report[0][1].endsWith('test_quast_contigs/quast_results/report.tsv')
+            // BUSCO (--conserved-genes-finding) was removed: it downloaded odb9 + Augustus at run time
+            assert !file("${process.out.quast_results_dir[0][1]}/busco_stats").exists()
+
+            def stats = report(path(process.out.summary_report[0][1]).readLines())
+            // tests/data/contigs.fasta is phiX174 (5386 bp) cut into contigs of 2500, 1800 and 1086 bp
+            assert stats['# contigs'] == '3'
+            assert stats['Total length'] == '5386'
+            assert stats['Largest contig'] == '2500'
+            assert stats['N50'] == '1800'
+        }
+    }
+}

@@ -15,7 +15,8 @@
 
     shell:
     '''
-    dvf.py \
+    python /opt/DeepVirFinder/dvf.py \
+    -m /opt/DeepVirFinder/models \
     -i !{contigs} \
     -o !{sampleid}  \
     -l !{params.viralinference_minlength} \

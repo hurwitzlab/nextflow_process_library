@@ -2,8 +2,8 @@
 
 // Quality-trim paired reads with trimmomatic
  process trimmomatic {
-    label "process_low"
     label "publish_final"
+    label "process_low"
     container "${params.container__trimmomatic}"
 
     input:
