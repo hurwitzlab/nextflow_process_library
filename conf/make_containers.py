@@ -43,6 +43,7 @@ OVERRIDES = {
     "bbnorm":       {"image": "bbtools", "note": "bbnorm is part of bbtools"},
     "gatk":         {"image": "gatk4"},
     "mummer":       {"image": "mummer4"},
+    "mmseqs":       {"image": "mmseqs2", "note": "cluster_proteins uses the older param name"},
     "checkm":       {"image": "checkm-genome", "note": "checkm, not checkm2"},
     "checkv":       {"image": "phorager-checkv-bundle", "note": "checkv is provided by the phorager bundle"},
     "eggnogmapper": {"image": "eggnog-mapper", "default": "2.1.13", "note": "2.1.13 pinned over the 3.0.0 beta"},
