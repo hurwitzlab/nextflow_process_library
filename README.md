@@ -52,7 +52,10 @@ Every process reads its container, output directory, and tool options from
 
 - `params.container__<tool>` — path to the tool's container image
 - `params.<process>_outdir` — where output gets published, for a process
-  carrying a `publish_final`/`publish_intermediate` label. Keyed by the
+  carrying a `publish_final`/`publish_intermediate` label (or a `*_pooled`
+  variant, for a process whose output is one file for all samples, e.g.
+  `mmseqs_easy_cluster` -- its Closure receives the `pooledid` instead of
+  the `sampleid`). Keyed by the
   **process** name, not the file's tool name: `bbmap.nf`'s `pileup` publishes
   to `params.pileup_outdir`. (A process with its own in-module `publishDir`
   uses whatever `params.*_outdir` that line names — usually `<tool>_outdir`.)
@@ -61,13 +64,13 @@ Every process reads its container, output directory, and tool options from
 The consuming pipeline is also expected to define `withLabel:process_single`,
 `withLabel:process_low`, `withLabel:process_medium`, and
 `withLabel:process_high` resource selectors, plus the
-`withLabel:publish_final`/`withLabel:publish_intermediate` blocks that give
-labeled processes a `publishDir` — every process tags itself with one
+`withLabel:publish_final`/`withLabel:publish_intermediate` blocks (and their
+`*_pooled` variants) that give labeled processes a `publishDir` — every process tags itself with one
 resource label (and at most one publish label), but resource amounts are the
 pipeline's call, not this repo's.
 
 **Starting point:** [`templates/base.config`](templates/base.config) defines
-all six labels. Copy it into your pipeline (e.g. as `conf/base.config`),
+all eight labels. Copy it into your pipeline (e.g. as `conf/base.config`),
 `includeConfig` it from your `nextflow.config`, and tune the numbers to what
 your tools actually use (check the run's trace/report files or `seff`). Copy
 it rather than `includeConfig`-ing it from this repo, so later edits here

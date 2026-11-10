@@ -57,13 +57,22 @@ described below.
     next process in the same file/tool-chain = `publish_intermediate`), not
     a reflexive default. Document the precedent you matched in the module's
     one-line comment or your PR/commit description.
-  - **Exception: a process with no `sampleid` in scope cannot use this
-    label-based form at all.** The centralized dispatch closure references
-    `sampleid` as an argument; a process whose input isn't per-sample — it
-    builds/consumes a reference index, merges or compares across multiple
-    samples, or runs once per whole batch/run (e.g. an `*_index`/`build_*`
-    step, a cross-sample `compare_*`/`cluster_*` step, a demux step) — has
-    no such variable, and referencing it anyway is a hard compile-time error
+  - **Pooled outputs: `publish_final_pooled` / `publish_intermediate_pooled`.**
+    A process whose output is ONE file for all samples together (a
+    cross-sample catalog clustered with `mmseqs_easy_cluster`, a final
+    count table) takes `tuple val(pooledid), path(...)` instead of
+    `val(sampleid)` and carries `label "publish_final_pooled"` (or
+    `publish_intermediate_pooled`), again with no `publishDir`. `pooledid`
+    is a name the consuming workflow chooses for that pooled output (e.g.
+    `'viral_catalog'`); it is passed to a Closure-valued
+    `params.<process>_outdir` the same way `sampleid` is, and is a good
+    output file prefix. Preserve it through the output tuple. See
+    `mmseqs2.nf`'s `mmseqs_easy_cluster`.
+  - **Exception: a process with neither `sampleid` nor `pooledid` in scope
+    cannot use the label-based form at all.** The centralized dispatch closure references
+    `sampleid` (or `pooledid`) as an argument; a process whose input isn't
+    per-sample and that hasn't been given a `pooledid` — e.g. an
+    `*_index`/`build_*` step or a demux step — has no such variable, and referencing it anyway is a hard compile-time error
     (`sampleid is not defined`), not a harmless no-op. These processes use
     a plain in-module `publishDir` instead, with no publish label:
     `publishDir "${params.<tool>_outdir}", mode: 'copy'`
@@ -75,8 +84,10 @@ described below.
     `sampleid is not defined`. When a file has several non-per-sample
     processes that would otherwise publish over each other, give each its
     own `params.<process>_outdir` instead of sharing `<tool>_outdir`. See
-    `coverm.nf`'s `coverm`, `bakta.nf`, `bcftools.nf`, and `metapop.nf`'s
-    `metapop_*` processes for worked examples.
+    `bakta.nf`, `bcftools.nf`, and `metapop.nf`'s `metapop_*` processes for
+    worked examples. (If such a process really produces one output for all
+    samples, prefer giving it a `pooledid` and a `publish_*_pooled` label, as
+    `coverm` and `mmseqs_easy_cluster` do.)
 
 ## Input / output
 
@@ -129,10 +140,12 @@ described below.
 ## Checklist before considering a module done
 
 1. Shebang, comment, process name, label, container, and for terminal output
-   either a `publish_*` label (per-sample) or a plain in-module `publishDir`
-   (no `sampleid` in scope), per above.
-2. Inputs as `tuple val(sampleid), path(...)` + separate db paths as needed.
-3. Outputs all named via `emit:`, `sampleid` preserved.
+   either a `publish_*` label (per-sample), a `publish_*_pooled` label
+   (one output for all samples, `pooledid` in scope), or a plain in-module
+   `publishDir` (neither in scope), per above.
+2. Inputs as `tuple val(sampleid), path(...)` (or `tuple val(pooledid), path(...)`
+   for pooled processes) + separate db paths as needed.
+3. Outputs all named via `emit:`, `sampleid`/`pooledid` preserved.
 4. `shell:` + `!{...}`, no `${...}` mixed in.
 5. Threads from `task.cpus`.
 6. No comments on `\`-continued shell lines.
