@@ -127,7 +127,29 @@ cd tests
 sbatch run_tests.sh                    # every test, default container versions
 sbatch run_tests.sh modules/samtools   # extra args pass through to nf-test
 sbatch run_tests.sh --all-versions     # each tested module, once per image version in the catalog
+sbatch run_tests.sh --stale            # only tests whose inputs changed since they last passed
 ```
+
+**Only re-run what changed (`--stale`).** Each test file gets a pass record next to it,
+`<process>.nf.test.pass`, written when it passes under `--stale`. The record holds a fingerprint:
+a hash of the test, its snapshot, the **text of the process it tests** (and of any process its
+`setup` block runs), the module's code outside process blocks, the fixtures it references, its
+resolved container image, `tests/nextflow.config`, `nf-test.config` and the Nextflow/nf-test
+versions `run_tests.sh` loads. A test is stale when it has no record or the fingerprint changed;
+editing one process in `samtools.nf` makes only that process's test stale, and editing a comment
+between processes makes none stale. Hashes are used rather than timestamps because commit dates
+survive rebases and merges unchanged, and uncommitted edits have no commit date.
+
+```bash
+# from the repo root (test_ledger.py only hashes files, so a login node is fine)
+python3 tests/test_ledger.py status --why modules/samtools   # what's stale and why
+sbatch tests/run_tests.sh --stale modules/samtools           # run the stale ones, record passes
+sbatch tests/run_tests.sh --stale --force modules/bwa        # rerun and re-record everything under a path
+```
+
+**Commit the updated `.pass` files with your change** — that's how others (and review) know the
+change was tested. `python3 tests/test_ledger.py check` exits 1 if any test is stale. The
+fingerprint covers the default (Hazel) image only; `--all-versions` runs don't write records.
 
 **Test data:** shared inputs live in [`tests/data/`](tests/data/README.md) — a small,
 generated "mini world" around the phiX174 genome (contigs, paired/amplicon/long reads, proteins,
