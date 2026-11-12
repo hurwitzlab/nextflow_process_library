@@ -1,0 +1,21 @@
+{
+    "Annotates the phiX174 genome against the BRC bakta full db": {
+        "content": [
+            [
+                "contig_1\tcds\t51\t221\t+\tCJFNOL_01\t\tK protein",
+                "contig_1\tcds\t390\t848\t+\tCJFNOL_02\t\tExternal scaffolding protein D",
+                "contig_1\tcds\t848\t964\t+\tCJFNOL_03\t\tDNA-binding protein J",
+                "contig_1\tcds\t1001\t2284\t+\tCJFNOL_04\t\tCapsid protein F",
+                "contig_1\tcds\t2395\t2922\t+\tCJFNOL_05\t\tMajor spike protein G",
+                "contig_1\tcds\t2931\t3917\t+\tCJFNOL_06\t\tMinor spike protein H",
+                "contig_1\tcds\t3981\t5384\t+\tCJFNOL_07\t\t(3' truncated) A' protein"
+            ],
+            "test_annotate_bacterial.faa:md5,57ad8cc7b9dcb25e4fadb343743c0672"
+        ],
+        "timestamp": "2026-11-12T14:17:42.644575478",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.3"
+        }
+    }
+}

@@ -57,8 +57,6 @@ process annotate_bacterial {
 
     shell:
     '''
-    file_handler !{bakta_db}
-
     bakta !{contigs} \
           --db !{bakta_db} \
           --prefix !{sampleid} \
