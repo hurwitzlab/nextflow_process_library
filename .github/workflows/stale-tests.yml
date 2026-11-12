@@ -1,0 +1,55 @@
+# Fail when any nf-test is stale: it has no pass record, or something it depends on (its process,
+# snapshot, fixtures, container image, test config) changed since the record was written.
+# Tests can't run here (they need Hazel's containers); this only compares content hashes, so it
+# takes seconds. To fix a failure, run the stale tests on Hazel and commit the records:
+#   sbatch tests/run_tests.sh --stale
+# See "Testing" in README.md and tests/test_ledger.py.
+name: Stale tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stale-tests:
+    name: No stale tests
+    runs-on: ubuntu-latest
+    steps:
+      # On pull_request this checks out the PR merged into main, so a test is also flagged
+      # when main changed something it depends on after the PR's tests were run
+      - uses: actions/checkout@v4
+
+      - name: Check every nf-test has a current pass record
+        run: |
+          set -o pipefail
+          if python3 tests/test_ledger.py check 2>&1 | tee check.txt; then
+            echo "All nf-tests have current pass records." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # One annotation per stale test, shown on the test file in the PR
+          grep -E '^(stale|new): ' check.txt | while read -r state test reasons; do
+            echo "::error file=${test}::${state%:} test: ${reasons:-no pass record}"
+          done
+
+          {
+            echo "### Stale nf-tests"
+            echo
+            echo "These tests changed (or something they depend on did) since they last passed."
+            echo "Run them on Hazel and commit the updated \`.nf.test.pass\` records:"
+            echo
+            echo '```bash'
+            echo 'sbatch tests/run_tests.sh --stale'
+            echo '```'
+            echo
+            echo '```'
+            python3 tests/test_ledger.py status --why 2>/dev/null | grep -v '^ok ' || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
