@@ -1,0 +1,26 @@
+{
+  "record_version": 1,
+  "fingerprint": "25c29c367a76368a26cec120dda1e9930179659848d160cbad64ce36239df8db",
+  "passed_at": "2026-11-11T15:46:52-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "b0f6796f862febc2d8eb5e74add11ddc2c885c0628e133713252ec86e0f63667",
+    "snap": "none",
+    "process:modules/kraken2/kraken2.nf:single_end_read_selector": "a7e6ec20adf24fa95d6fc0a4bd51b11372d8e5fd7468b8ccf8054841aa60964c",
+    "shared:modules/kraken2/kraken2.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "process:modules/kraken2/kraken2.nf:kraken2": "1413f65ee782be31f0d5763f2fb588443349fb116724fc74539e74f07428b425",
+    "container:container__kraken2": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_kraken2:2.17.1--pl5321h077b44d_0.sif",
+    "container:container__krakentools": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_krakentools:1.2.1--pyh7e72e81_0.sif",
+    "fixture:tests/data/alignments.sam": "6e51a9c554cd83530722f585e09a9daff94f1d8128537b6e289c6b52591660c7",
+    "fixture:tests/data/kraken2_db": "08e45743207c33f307afd0bf23ac2a18ad69f43a7e10002ca075844298406e07",
+    "fixture:tests/data/reads_R1.fastq.gz": "920fb2e82ea16ed9efc900f113a340fcfd084489d12703ca1c113a1653cae423",
+    "fixture:tests/data/reads_R2.fastq.gz": "cbf8abcd624cdb9d6349b4c9a6d0dd61690545d2476aa6e422c6625f508c1952",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

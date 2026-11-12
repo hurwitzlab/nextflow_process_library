@@ -15,6 +15,14 @@
 #   sbatch run_tests.sh --all-versions [nf-test args]  every module that has tests is run once per
 #                                                       image version in conf/container_catalog.tsv;
 #                                                       all versions must match the same snapshot
+#   sbatch run_tests.sh --stale [--force] [PATH ...] [nf-test flags]
+#                                                       run only tests whose code, snapshot, fixtures,
+#                                                       container or config changed since they last
+#                                                       passed (tests/test_ledger.py), one test file at
+#                                                       a time, and write a <test>.nf.test.pass record
+#                                                       for each that passes; commit those records.
+#                                                       --force reruns (and re-records) every test in
+#                                                       PATH. PATH: test files or dirs (default: all)
 #
 # Runs on compute nodes, which have no internet. The only download the suite needs is the nf-test
 # plugins in nf-test.config, cached under .nf-test/plugins/ after the first run; on a fresh clone,
@@ -23,11 +31,22 @@
 
 set -euo pipefail
 
-ALL_VERSIONS=false
-if [[ "${1:-}" == "--all-versions" ]]; then
-    ALL_VERSIONS=true
+MODE=default
+case "${1:-}" in
+    --all-versions) MODE=all_versions; shift ;;
+    --stale)        MODE=stale; shift ;;
+esac
+FORCE=false
+if [[ $MODE == stale && "${1:-}" == --force ]]; then
+    FORCE=true
     shift
 fi
+for arg in "$@"; do
+    [[ "$arg" == --all-versions || "$arg" == --stale ]] && {
+        echo "ERROR: $arg must be the first argument, and --all-versions and --stale can't be combined" >&2; exit 1; }
+done
+
+SUBMIT_DIR="$PWD"   # under sbatch, the directory the job was submitted from
 
 # --- Environment --- (Comment out if not on hazel)
 module use /usr/local/usrapps/brc/brc_modules/modules
@@ -43,6 +62,17 @@ export NXF_DISABLE_CHECK_LATEST=true
 # script in Slurm's spool dir, so resolve the repo from the submit dir instead.
 REPO="$(git -C "${SLURM_SUBMIT_DIR:-$(dirname "$0")}" rev-parse --show-toplevel)"
 cd "$REPO"
+
+# --stale: split arguments into test paths and nf-test flags. Like nf-test's own path arguments, a
+# path may be relative to the repo root; one relative to the submit dir is accepted too.
+STALE_PATHS=() NFTEST_FLAGS=()
+if [[ $MODE == stale ]]; then
+    for arg in "$@"; do
+        if [[ -e "$arg" ]]; then STALE_PATHS+=("$(realpath "$arg")")
+        elif [[ -e "$SUBMIT_DIR/$arg" ]]; then STALE_PATHS+=("$(realpath "$SUBMIT_DIR/$arg")")
+        else NFTEST_FLAGS+=("$arg"); fi
+    done
+fi
 
 # nf-test downloads the plugins listed in nf-test.config on first use. Compute nodes can't, so fail
 # early with instructions unless they're cached (no internet check needed on xfer or a login node).
@@ -67,8 +97,36 @@ trap 'rm -f .nf-test.${RUN_ID}.*config' EXIT
 sed -E "s|^([[:space:]]*workDir[[:space:]]+).*|\1\"${WORK_DIR}\"|" nf-test.config > "$RUN_CONFIG"
 grep -q "workDir \"${WORK_DIR}\"" "$RUN_CONFIG" || { echo "ERROR: could not set workDir in $RUN_CONFIG" >&2; exit 1; }
 
-if ! $ALL_VERSIONS; then
+if [[ $MODE == default ]]; then
     nf-test test -c "$RUN_CONFIG" "$@"
+elif [[ $MODE == stale ]]; then
+    LEDGER=(python3 tests/test_ledger.py)
+    if $FORCE; then
+        mapfile -t tests < <("${LEDGER[@]}" stale --all "${STALE_PATHS[@]}")
+    else
+        "${LEDGER[@]}" status --why "${STALE_PATHS[@]}" | grep -v '^ok ' || true
+        mapfile -t tests < <("${LEDGER[@]}" stale "${STALE_PATHS[@]}")
+    fi
+    echo "run_tests.sh: ${#tests[@]} test file(s) to run"
+
+    # One nf-test call per file, so each file's pass/fail is known and only passes are recorded
+    failed=()
+    for t in "${tests[@]}"; do
+        echo "=== ${t}"
+        if nf-test test -c "$RUN_CONFIG" "${NFTEST_FLAGS[@]}" "$t"; then
+            "${LEDGER[@]}" record "$t"
+        else
+            echo "=== FAIL: ${t}"
+            failed+=("$t")
+        fi
+    done
+
+    echo "run_tests.sh: ${#tests[@]} test file(s) run, ${#failed[@]} failed"
+    if (( ${#failed[@]} )); then
+        printf '  FAILED: %s\n' "${failed[@]}"
+        exit 1
+    fi
+    echo "run_tests.sh: commit the updated *.nf.test.pass records with your change"
 else
     for arg in "$@"; do
         [[ "$arg" == --update-snapshot || "$arg" == --updateSnapshot ]] && {

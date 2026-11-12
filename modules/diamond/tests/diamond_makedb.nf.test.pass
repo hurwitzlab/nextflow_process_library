@@ -1,0 +1,21 @@
+{
+  "record_version": 1,
+  "fingerprint": "25aff6504b0e247cdfb8f56cf86073c1b17fbb78aacdfefc4cd656a509679440",
+  "passed_at": "2026-11-11T15:44:56-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "8209fa855c0eeb4905ef11cd34879475ae97c7550d1a0b9d739ef38a475d0fca",
+    "snap": "none",
+    "process:modules/diamond/diamond.nf:diamond_makedb": "638b1cf04dfd6019ffe847ba435bc5683552cc41078d59b4b57cc631c25f8d08",
+    "shared:modules/diamond/diamond.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__diamond": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_diamond:2.2.0--he361c42_0.sif",
+    "fixture:tests/data/proteins.faa": "88b899e4f0a6251acf174ade19d7b46a8148cbea0240635ac2cf3a2ce2413919",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "record_version": 1,
+  "fingerprint": "3e8fb1f4a8599da55e683776e7b717af0fea0005a635084235385a458edb50d4",
+  "passed_at": "2026-11-11T15:44:31-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "26d322fe93ed8f5828ef9b81813233b57baed69cee016da15b1097c32a71954e",
+    "snap": "0e76c393c8d0a48f2be3dfe87d05fb106665a8be1c588b20d999e9b4c349000f",
+    "process:modules/cutadapt/cutadapt.nf:trim_merged_fastq": "24aab69dbeb022996baea7c311e39c22b15713f1461671019acc056f9cb40819",
+    "shared:modules/cutadapt/cutadapt.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__cutadapt": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_cutadapt:5.2--py311haab0aaa_0.sif",
+    "fixture:tests/data/amplicon_merged.fastq.gz": "79d3ddf318675dcd90dfb4457db55b4d43e2c1b9ae062a4855fae96a97efcd9a",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

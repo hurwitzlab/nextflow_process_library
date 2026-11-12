@@ -1,0 +1,26 @@
+{
+  "record_version": 1,
+  "fingerprint": "b1dec893b47bf8f6e4f58dc12e277a28cb923c0c58acc36a19a1c08f4b0627d4",
+  "passed_at": "2026-11-11T15:44:05-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "100609d9f979a5310d07ebbe3a4cf12d8a9b3b7ba5df3a23ffcdff298c1eba1b",
+    "snap": "1c129f33ab4e9ac0f4c4b4a29012c7d1510a5eab20f462da820e7f4a85fbff0a",
+    "process:modules/bwa/bwa.nf:bwa_align_to_index": "83d86c95db44b5c5a953100f889461dff26be091416a8a9eceb3a14c240d4195",
+    "shared:modules/bwa/bwa.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__bwa": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bwa:0.7.19--h577a1d6_0.sif",
+    "fixture:modules/bwa/tests/testdata/nested_ref.tar.gz": "d86a50196ce60b3abec6e08b536a476f9901b7dd99aa550f8df1f68767058077",
+    "fixture:modules/bwa/tests/testdata/ref_index.tar.gz": "ac93384e27e96b170298c60e8148de2e04a50acd6281b579cf8d2361e6034d20",
+    "fixture:modules/minimap2/tests/testdata/ref.tar.gz": "afc22bb2e74838695fd5fcf235d60151a10e2e0bc8f33ab0d69b851373ef44e3",
+    "fixture:tests/data/alignments.sam": "6e51a9c554cd83530722f585e09a9daff94f1d8128537b6e289c6b52591660c7",
+    "fixture:tests/data/reads_R1.fastq.gz": "920fb2e82ea16ed9efc900f113a340fcfd084489d12703ca1c113a1653cae423",
+    "fixture:tests/data/reads_R2.fastq.gz": "cbf8abcd624cdb9d6349b4c9a6d0dd61690545d2476aa6e422c6625f508c1952",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

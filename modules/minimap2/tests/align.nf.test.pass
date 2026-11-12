@@ -1,0 +1,22 @@
+{
+  "record_version": 1,
+  "fingerprint": "7b1c9ef5237846b9709b7602693e4e2abcd1ca871a9bfd3793d1114a9a11cf76",
+  "passed_at": "2026-11-11T15:47:05-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "2f443cdae8efdfdc11db9d04cb361c94406cb47d2d936542a953b094fe17fef3",
+    "snap": "def93fb171577309a412ea0ece2476dde0b308d5617c4e67407e8b1fa1b8e0a4",
+    "process:modules/minimap2/minimap2.nf:align": "f7b9479f7a5d0047ff9744536ba1278fb4ee580a07a3a30a200c28e294a83fcd",
+    "shared:modules/minimap2/minimap2.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__minimap2": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_minimap2:2.30--h577a1d6_0.sif",
+    "fixture:tests/data/genome.fasta": "94fa1771e36d1371fb955b9bd4eff5d7f69320ca7e311ee5aa18ae2866251580",
+    "fixture:tests/data/long_reads.fastq.gz": "d56ccd68370a145171cf5c7bb25ddb6fcb84d76f34c95dda1d6520624544050e",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "record_version": 1,
+  "fingerprint": "6e29d436e236ee8e0bebe595e3616d02b58f41c131de0169b18e285ccd7c35ff",
+  "passed_at": "2026-11-11T15:47:32-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "e4c6fa9adc5abea6a778522d81adbd12d2f1a579318a27825d6259bfa573ad9a",
+    "snap": "79ffa7491008de7a00b72113c30f206405b60ca1c5e26e84d9387b0dcfc2026d",
+    "process:modules/nanoplot/nanoplot.nf:nanoplot_qc": "fe700267ce9962fd5d193d7da80c461f337f6df49325c05c3cc09232037b5d14",
+    "shared:modules/nanoplot/nanoplot.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__nanoplot": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_nanoplot:1.46.2--pyhdfd78af_0.sif",
+    "fixture:tests/data/long_reads.fastq.gz": "d56ccd68370a145171cf5c7bb25ddb6fcb84d76f34c95dda1d6520624544050e",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

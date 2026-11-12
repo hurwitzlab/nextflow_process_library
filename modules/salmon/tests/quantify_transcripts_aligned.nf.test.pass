@@ -1,0 +1,22 @@
+{
+  "record_version": 1,
+  "fingerprint": "ccda411977bdf2b4ba5dcd6d7270d6e464d40787a38ff2a930f753aa000beeae",
+  "passed_at": "2026-11-11T15:50:53-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "6c416cc10537e4597af766f83c993659f7074f11378f8c428619533f4099620f",
+    "snap": "22e1e1de98581fc460ce8b44b6494f0fc7072ce1cfaa79fa8683423401c8ecc7",
+    "process:modules/salmon/salmon.nf:quantify_transcripts_aligned": "22644c83a8e43f49018b726f48b28eac486d1ed809f7deebbdeef7eab390e364",
+    "shared:modules/salmon/salmon.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__salmon": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_salmon:1.10.3--h45fbf2d_5.sif",
+    "fixture:modules/salmon/tests/testdata/transcriptome_aligned.bam": "89166f042bae92c81560d879273846399fb95d0f87e0377def8d15a10e659081",
+    "fixture:tests/data/transcripts.fasta": "07b20171df6c83c3ceb96af4f2cf62b3bfc6344db5ddd31b622cf7abe958fc12",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

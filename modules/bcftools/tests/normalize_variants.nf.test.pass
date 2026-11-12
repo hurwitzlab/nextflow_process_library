@@ -1,0 +1,22 @@
+{
+  "record_version": 1,
+  "fingerprint": "84749592998dac51d278fd939a6164e2222d6add08db013f0e7ff11e47adb733",
+  "passed_at": "2026-11-11T15:42:59-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "ca433f1609c479693361ee36b9fe204e8c37decb0b416b9cdade2986092ba4ea",
+    "snap": "7d9ce1efa13419508adf974ecd7ae56cc07193f1a942206bf0a26022a56190ba",
+    "process:modules/bcftools/bcftools.nf:normalize_variants": "b37b61a7c2925a6305ce856cfade9f0a2dabf828244f98c84121bcfe0f0b2a5a",
+    "shared:modules/bcftools/bcftools.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__bcftools": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bcftools:1.23.1--hb2cee57_0.sif",
+    "fixture:tests/data/genome.fasta": "94fa1771e36d1371fb955b9bd4eff5d7f69320ca7e311ee5aa18ae2866251580",
+    "fixture:modules/bcftools/tests/testdata/unnormalized.vcf": "7553fdbcd80fff1526e2d97e8ce617d80b7e3ff2e60578cae808644f48144e91",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}
