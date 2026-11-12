@@ -1,0 +1,24 @@
+{
+  "record_version": 1,
+  "fingerprint": "0aaf203d4e164e7c1c98c48b560d5e45d954051062489640029fe7679a4a676c",
+  "passed_at": "2026-11-11T15:44:25-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "37d301f8fc347981918367b91a4fd87afc2d5b1d6ebbd1b302d1d5722f4fe8aa",
+    "snap": "715c57ab245d31e72b9453b3368c4d9588a0936c4c836afddbc5de36d2e215b0",
+    "process:modules/cutadapt/cutadapt.nf:trim_amplicon_reads": "9c72f476ee76560b7bc41ce3767fea5b3bd5c7174f5b920bfdf1e1cc4b11e6d1",
+    "shared:modules/cutadapt/cutadapt.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__cutadapt": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_cutadapt:5.2--py311haab0aaa_0.sif",
+    "fixture:tests/data/amplicon_R1.fastq.gz": "6d8ccc69913103250bd363da52628543e4944357a3f19f0fc2f2b0aa4f413567",
+    "fixture:tests/data/amplicon_R2.fastq.gz": "d1f25ec89daca5d4842816fec3a171c1cb9cadd67b67da7a30142858ecb25298",
+    "fixture:tests/data/reads_R1.fastq.gz": "920fb2e82ea16ed9efc900f113a340fcfd084489d12703ca1c113a1653cae423",
+    "fixture:tests/data/reads_R2.fastq.gz": "cbf8abcd624cdb9d6349b4c9a6d0dd61690545d2476aa6e422c6625f508c1952",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

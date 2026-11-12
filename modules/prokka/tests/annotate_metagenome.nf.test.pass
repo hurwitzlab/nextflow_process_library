@@ -1,0 +1,21 @@
+{
+  "record_version": 1,
+  "fingerprint": "1e0d9e7c15e64f83bb974ddca1484ba06ca6830b0c77fd084a2b6a546e2e82a0",
+  "passed_at": "2026-11-11T15:49:19-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "4989e661bc6eb47f97156a5c6a3007829d6011c2c1caed00891bb6e24b14d159",
+    "snap": "c5089554e8a3ee196f6f0ec943a2a8397be02de988dba3d5374631efde278109",
+    "process:modules/prokka/prokka.nf:annotate_metagenome": "db888a4b404ccf72cde029351fd4b9e45d66abb449b1ca6eb21361d75d018101",
+    "shared:modules/prokka/prokka.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__prokka": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_prokka:1.15.6--pl5321hdfd78af_0.sif",
+    "fixture:tests/data/contigs.fasta": "d3a529019365b9b47f45d80adadd3477085152cccd28aa530317821cd6b4b96d",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

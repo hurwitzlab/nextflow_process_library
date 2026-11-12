@@ -1,0 +1,23 @@
+{
+  "record_version": 1,
+  "fingerprint": "96468a6eb12750cd164d51a8f4fadee0a0a6e45b5295cd9cba62020ee8fd679a",
+  "passed_at": "2026-11-11T15:42:30-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "ab96ac9a265c0bb9054b62751cc3143d7d52b10962051ba0f91504330accf6a5",
+    "snap": "none",
+    "process:modules/bbnorm/bbnorm.nf:downsample_paired_end": "251e4ebde56853bab3a1ab3df29e766f415052b79e6bfa6ba0956a4ad70caaa7",
+    "shared:modules/bbnorm/bbnorm.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__bbnorm": "/usr/local/usrapps/brc/brc_modules/images/quay.io_staphb_bbtools:40.01.sif",
+    "fixture:tests/data/reads_R1.fastq": "ce00c81468c47c1936bb5046c39a398c701d4010b034ab4a1a2c002dce349458",
+    "fixture:tests/data/reads_R1.fastq.gz": "920fb2e82ea16ed9efc900f113a340fcfd084489d12703ca1c113a1653cae423",
+    "fixture:tests/data/reads_R2.fastq.gz": "cbf8abcd624cdb9d6349b4c9a6d0dd61690545d2476aa6e422c6625f508c1952",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

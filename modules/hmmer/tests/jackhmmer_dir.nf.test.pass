@@ -1,0 +1,22 @@
+{
+  "record_version": 1,
+  "fingerprint": "a9471b850e2811ddf6b312059fc9d07697c49f826d8a8f9e867309c50a30a530",
+  "passed_at": "2026-11-11T15:45:59-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "becbd4d288e2e96257e0294b557a8fc8e85fe77a77b1ac17cd31357086357f34",
+    "snap": "dea79370401770c284cbea47e9d9bce75041e2df76a36aa8993816e48d3bee10",
+    "process:modules/hmmer/hmmer.nf:jackhmmer_dir": "e90afa8d9fcdc2762864c0f20a155761f0239871a942f6bda0301da2bb4f89ba",
+    "shared:modules/hmmer/hmmer.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__hmmer": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_hmmer:3.4--h7d74f8d_5.sif",
+    "fixture:modules/hmmer/tests/testdata/protein_db.faa.gz": "2312729c83e7cfb75a1d4ecd1ed0bb373ad8f25a17cb3c23a3c0b0641475e072",
+    "fixture:modules/hmmer/tests/testdata/queries.tar.gz": "c7295616f1cb92d3b5bc020e78d8266d0629f54d71e34d686830daae2d0673df",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

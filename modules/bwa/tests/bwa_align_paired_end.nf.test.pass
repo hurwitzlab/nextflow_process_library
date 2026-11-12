@@ -1,0 +1,24 @@
+{
+  "record_version": 1,
+  "fingerprint": "784e2194644e789c50412d998bb238758eff757a2e31549232a99fe16f20f782",
+  "passed_at": "2026-11-11T15:43:48-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "1b6941e92dce7899859ba729c892225109327ba200c24c410b4fa42b60f33e29",
+    "snap": "b0aacbc5c55f74b962ab057ecd062a759128da046d3e46d3e6a20f699b9f58dd",
+    "process:modules/bwa/bwa.nf:bwa_align_paired_end": "c78af19f2ae8cda4be8d537b28b25e591942d1c340107a1c3b2d71f7fee76ce6",
+    "shared:modules/bwa/bwa.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__bwa": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bwa:0.7.19--h577a1d6_0.sif",
+    "fixture:tests/data/alignments.sam": "6e51a9c554cd83530722f585e09a9daff94f1d8128537b6e289c6b52591660c7",
+    "fixture:tests/data/genome.fasta": "94fa1771e36d1371fb955b9bd4eff5d7f69320ca7e311ee5aa18ae2866251580",
+    "fixture:tests/data/reads_R1.fastq.gz": "920fb2e82ea16ed9efc900f113a340fcfd084489d12703ca1c113a1653cae423",
+    "fixture:tests/data/reads_R2.fastq.gz": "cbf8abcd624cdb9d6349b4c9a6d0dd61690545d2476aa6e422c6625f508c1952",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

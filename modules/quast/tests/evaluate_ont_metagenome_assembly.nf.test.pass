@@ -1,0 +1,22 @@
+{
+  "record_version": 1,
+  "fingerprint": "2d166fea374c8eada9da1ab3446d4cd59fc1b3f5f7d8c79057000333eb2b5d05",
+  "passed_at": "2026-11-11T15:50:37-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "99d23674ccb9df78daa103bde72626a3952f7e91a0987944bb9f418d35993d46",
+    "snap": "none",
+    "process:modules/quast/quast.nf:evaluate_ont_metagenome_assembly": "c94e454820879811fbf9cd018fc26994519d8a4e76fe87a54df8767e9b7141b2",
+    "shared:modules/quast/quast.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__quast": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_quast:5.3.0--py313pl5321h5ca1c30_2.sif",
+    "fixture:tests/data/contigs.fasta": "d3a529019365b9b47f45d80adadd3477085152cccd28aa530317821cd6b4b96d",
+    "fixture:tests/data/long_reads.fastq.gz": "d56ccd68370a145171cf5c7bb25ddb6fcb84d76f34c95dda1d6520624544050e",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

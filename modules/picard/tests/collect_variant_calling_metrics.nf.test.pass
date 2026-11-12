@@ -1,0 +1,23 @@
+{
+  "record_version": 1,
+  "fingerprint": "6d1ca53c90fcaf3ec89883d0642dd48ea926b192487e003b4939b55623b82ec0",
+  "passed_at": "2026-11-11T15:48:17-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "7978d2c9d9f5119b9d90fd897df65cb166bcbd39dcc1f0d4b17c680a6560c3aa",
+    "snap": "none",
+    "process:modules/picard/picard.nf:collect_variant_calling_metrics": "71b4644644b0afa4c39dfddfdc2745451c0643d1f58c029b61c8e0a3c98e5645",
+    "shared:modules/picard/picard.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__picard": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_picard:3.4.0--hdfd78af_0.sif",
+    "fixture:tests/data/expected_variants.vcf.gz": "3130a4b7c1f4c51d6f2915521e08bf24c57c63e85c9bde450fd718830cc54bb9",
+    "fixture:tests/data/variants.vcf.gz": "96656029ed4c35c0c4d13ef384e47328db0085782a7bcdba19cc6f19d7bfafbc",
+    "fixture:tests/data/variants.vcf.gz.tbi": "eeb88982fd152bbf46cce64aa3fd4db5936cc3f4a59f11e5a67e38463a597cf3",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

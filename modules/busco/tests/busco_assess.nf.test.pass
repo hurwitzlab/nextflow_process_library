@@ -1,0 +1,21 @@
+{
+  "record_version": 1,
+  "fingerprint": "763ee032c8ccea70d8e94c69d8828468b0b9d8a31e9c100f7741bd47d87573ad",
+  "passed_at": "2026-11-11T15:43:41-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "96fec527852e936e716b2e8e5a5f270edbc3fd1e2e032acde095652306fe3861",
+    "snap": "bbdffaaf20704f81033a2be6b4bd105afda53e0c01eebba397966db695557186",
+    "process:modules/busco/busco.nf:busco_assess": "06c6d6f1d4cad43f93db490a7cbada384091b6fb3c81dc10e8aa672b7b63e4d4",
+    "shared:modules/busco/busco.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__busco": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_busco:6.1.0--pyhdfd78af_2.sif",
+    "fixture:modules/busco/tests/testdata/mgenitalium_G37.fna.gz": "f4cf20fd8d476f91515b79a06a405508c88b64dcc85eec925b55338f987bb80d",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "record_version": 1,
+  "fingerprint": "877043fea9074820c44ac2694bb9fa1ad960b36afa105925649c6ef0fb5641c5",
+  "passed_at": "2026-11-11T15:42:22-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "6972ba261ae8de3e0c08ab2721e1a5926baff096f536e009785b5ccb35762ce1",
+    "snap": "bd403463b1823dedbaba054801c4e4590201bf12261c49b21b50b6be79ef6d32",
+    "process:modules/bbmerge/bbmerge.nf:merge_fastqs": "3a75298fab78abf27ebe1a19e1b6f8b375f271526ee35b8e5bb10a6938c277f7",
+    "shared:modules/bbmerge/bbmerge.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__bbmerge": "/usr/local/usrapps/brc/brc_modules/images/quay.io_staphb_bbtools:40.01.sif",
+    "fixture:tests/data/amplicon_R1.fastq.gz": "6d8ccc69913103250bd363da52628543e4944357a3f19f0fc2f2b0aa4f413567",
+    "fixture:tests/data/amplicon_R2.fastq.gz": "d1f25ec89daca5d4842816fec3a171c1cb9cadd67b67da7a30142858ecb25298",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

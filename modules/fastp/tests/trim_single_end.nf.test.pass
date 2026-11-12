@@ -1,0 +1,22 @@
+{
+  "record_version": 1,
+  "fingerprint": "26425afb27497399f658c947570513796fdcf8011eb50a653c23df87f5fc8207",
+  "passed_at": "2026-11-11T15:45:20-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "a474aa2fe680f5da45107289e81f90d239fdbb62b3edbd411723e36a458bdb3f",
+    "snap": "209a5ddf401df9ba8469293d889d2f3ab4a7e5bac7f51bee9462b95a1bd7c4e7",
+    "process:modules/fastp/fastp.nf:trim_single_end": "4031d22207fa8323596f36aa77d44d1bcb4dd7b4e1dec5fd9ef69c90858400d4",
+    "shared:modules/fastp/fastp.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__fastp": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_fastp:1.3.3--h43da1c4_0.sif",
+    "fixture:tests/data/reads_R1.fastq": "ce00c81468c47c1936bb5046c39a398c701d4010b034ab4a1a2c002dce349458",
+    "fixture:tests/data/reads_R1.fastq.gz": "920fb2e82ea16ed9efc900f113a340fcfd084489d12703ca1c113a1653cae423",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

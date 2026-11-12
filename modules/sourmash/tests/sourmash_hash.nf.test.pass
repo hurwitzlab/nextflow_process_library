@@ -1,0 +1,21 @@
+{
+  "record_version": 1,
+  "fingerprint": "348248ccb4ddfa312aa5bbaa20abcf629adf5babd188349c0fdf683ac855ac7d",
+  "passed_at": "2026-11-11T15:52:41-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "48d1441660932ed0e744eade46a29e7de1bbf9f33b5adedbe2e2bad7ecf252c3",
+    "snap": "ef0b12184a9f1c54373e9946615c6c41f2b488ced11e44f6ee937bc0189644d7",
+    "process:modules/sourmash/sourmash.nf:sourmash_hash": "b7832e8f3e03fc528b6c9c12449f35b6886df6b2dc587bde8104737135b2a12e",
+    "shared:modules/sourmash/sourmash.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__sourmash": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_sourmash:4.9.4--hdfd78af_0.sif",
+    "fixture:tests/data/contigs.fasta": "d3a529019365b9b47f45d80adadd3477085152cccd28aa530317821cd6b4b96d",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}

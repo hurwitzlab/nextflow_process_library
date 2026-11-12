@@ -1,0 +1,21 @@
+{
+  "record_version": 1,
+  "fingerprint": "14655438c0d24e87e5cc16b9b98c067eaa9e172d1d6411d9de1c13259af1b8e5",
+  "passed_at": "2026-11-11T15:43:17-05:00",
+  "passed_by": "sdweave2",
+  "commit": "f8af473",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1835062",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "3000bf12a6b28dfa6bd53d6ce4bc110b70183b44148c6a4e3a7c33cdc006319e",
+    "snap": "68b28122350c5156e6dcbcf8c235d0215ca462cd4fc4b5255c0bca325573fcf3",
+    "process:modules/bowtie2/bowtie2.nf:bowtie2_build": "8fee2ceaa13b0a942bbf28dfd888f5ad3c4368c863993971ac5bd62080f13027",
+    "shared:modules/bowtie2/bowtie2.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__bowtie2": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bowtie2:2.5.5--ha27dd3b_0.sif",
+    "fixture:tests/data/genome.fasta": "94fa1771e36d1371fb955b9bd4eff5d7f69320ca7e311ee5aa18ae2866251580",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}
