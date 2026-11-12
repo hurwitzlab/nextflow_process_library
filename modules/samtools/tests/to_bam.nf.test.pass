@@ -1,0 +1,22 @@
+{
+  "record_version": 1,
+  "fingerprint": "2bbc5ac60632007fa019ab8b460ee82b5af5d75390fe1f2be50fe5b00b8a0d32",
+  "passed_at": "2026-11-12T10:25:57-05:00",
+  "passed_by": "sdweave2",
+  "commit": "0366985",
+  "uncommitted_changes": false,
+  "slurm_job_id": "1852288",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "ba5a4fd0c315582ab362f2121067d8ddfa3cba5aaebe383b056a3ea9b8c995a4",
+    "snap": "e34e87d7cd0b5b89fc235f7ff558cd4ce8404f23c503cedc02317ddd4562711d",
+    "process:modules/samtools/samtools.nf:to_bam": "d875fb3e715dfccf619be50a5eabac645dcbccc45157b55965a3ae9ee344e68d",
+    "shared:modules/samtools/samtools.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__samtools": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_samtools:1.24--h9dcdb79_1.sif",
+    "fixture:tests/data/alignments.sam": "6e51a9c554cd83530722f585e09a9daff94f1d8128537b6e289c6b52591660c7",
+    "fixture:tests/data/alignments.sorted.bam": "5eec331daa949c6aefcb56b715522a38f72a4ad155ecde95157ff47c2f3ad7d6",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}
