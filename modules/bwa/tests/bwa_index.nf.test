@@ -9,15 +9,17 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = file("${baseDir}/tests/data/genome.fasta")
+                input[0] = [ 'test_bwa_index', file("${baseDir}/tests/data/genome.fasta") ]
                 """
             }
         }
         then {
             assert process.success
 
-            def (reference, index_files) = process.out.indexed_sequence[0]
+            assert process.out.indexed_sequence[0].size() == 3 // (pooledid, reference, index files)
+            def (pooledid, reference, index_files) = process.out.indexed_sequence[0]
 
+            assert pooledid == 'test_bwa_index' // passed through unchanged, for the pooled publish label
             assert file(reference).name == 'genome.fasta'
             assert path(reference).text == path("${baseDir}/tests/data/genome.fasta").text
             assert index_files.collect { file(it).name }.sort() ==
