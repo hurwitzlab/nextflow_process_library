@@ -154,10 +154,11 @@ modules/
             └── tests/                            # Directory containing all testing-related files
                   ├── <process_A>.nf.test         # A nf-test file, testing a single process from <tool_name>.nf 
                   ├── <process_A>.nf.test.snap    # The intended output of the *.test file, used to validate correctness
-                  ├── <process_A>.nf.test.pass    # A record of the last time the test passed, and what was used as an input. Need for the --stale option on run_tests.sh
+                  ├── <process_A>.nf.test.pass    # A record of the last time the test passed and what was used as an input.
                   ├── <process_B>.nf.test         # A second process from the <tool_name>.nf file
                   ├── <process_B>.nf.test.snap    
-                  ├── <process_B>.nf.test.pass    
+                  ├── <process_B>.nf.test.pass
+                  └── testdata/                   # Optional directory containing process-specific (not-shared) test data 
 ```
 
 **Test data:** shared inputs live in [`tests/data/`](tests/data/README.md) — a small,
