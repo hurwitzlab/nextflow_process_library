@@ -144,6 +144,33 @@ survive rebases and merges unchanged, and uncommitted edits have no commit date.
 change was tested. `python3 tests/test_ledger.py check` exits 1 if any test is stale. The
 fingerprint covers the default (Hazel) image only; `--all-versions` runs don't write records.
 
+**Merging to `main` requires no stale tests.** The GitHub Actions workflow
+[`.github/workflows/stale-tests.yml`](.github/workflows/stale-tests.yml) runs
+`python3 tests/test_ledger.py check` (check name **No stale tests**) on every PR to `main` and every
+push to `main`. It only compares hashes against the committed `.pass` records, so it needs no
+containers and takes seconds; the tests themselves still run on Hazel. On a PR it checks the PR
+merged into `main`, so a test also goes stale when `main` changed something it depends on after
+you ran it. Each stale test is annotated on its file in the PR, and the run's summary lists what
+changed.
+
+Two repository rulesets protect `main` (Settings → Rules → Rulesets), with no bypass:
+
+| Ruleset | Enforces |
+|---|---|
+| `main: no stale tests` | **No stale tests** must pass, and the branch must be up to date with `main` before merging; no force pushes or deletion of `main` |
+| `PR approval requirement` | Changes reach `main` through a PR with at least one approving review |
+
+If **No stale tests** fails on your PR:
+
+```bash
+python3 tests/test_ledger.py status --why    # from the repo root: which tests are stale, and what changed
+sbatch tests/run_tests.sh --stale            # run them on Hazel; passes write new .pass records
+git add modules/*/tests/*.nf.test.pass && git commit -m "Update test pass records" && git push
+```
+
+If GitHub says the branch is out of date, update it from `main` first (merge or rebase), then
+re-check — `main`'s changes can make more of your tests stale.
+
 **General testing layout**
 The testing suite for a process has a general layout that all processes should follow:
 
