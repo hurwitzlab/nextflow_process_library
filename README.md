@@ -119,13 +119,13 @@ only through that commit.
 
 ## Testing
 
-Tests are nf-test, run on Hazel against the BRC images, via
-`tests/run_tests.sh` (submit from `tests/`):
+Tests are run with nf-test, on Hazel using local BRC images, via the
+`tests/run_tests.sh` utility (submit from `tests/`):
 
 ```bash
 cd tests
 sbatch run_tests.sh                    # every test, default container versions
-sbatch run_tests.sh modules/samtools   # extra args pass through to nf-test
+sbatch run_tests.sh modules/samtools   # extra args pass through to nf-test (e.g: run only the samtools tests)
 sbatch run_tests.sh --all-versions     # each tested module, once per image version in the catalog
 sbatch run_tests.sh --stale            # only tests whose inputs changed since they last passed
 ```
@@ -140,16 +140,25 @@ editing one process in `samtools.nf` makes only that process's test stale, and e
 between processes makes none stale. Hashes are used rather than timestamps because commit dates
 survive rebases and merges unchanged, and uncommitted edits have no commit date.
 
-```bash
-# from the repo root (test_ledger.py only hashes files, so a login node is fine)
-python3 tests/test_ledger.py status --why modules/samtools   # what's stale and why
-sbatch tests/run_tests.sh --stale modules/samtools           # run the stale ones, record passes
-sbatch tests/run_tests.sh --stale --force modules/bwa        # rerun and re-record everything under a path
-```
-
 **Commit the updated `.pass` files with your change** — that's how others (and review) know the
 change was tested. `python3 tests/test_ledger.py check` exits 1 if any test is stale. The
 fingerprint covers the default (Hazel) image only; `--all-versions` runs don't write records.
+
+**General testing layout**
+The testing suite for a process has a general layout that all processes should follow:
+
+```
+modules/
+   └── <tool_name>/                               # e.g: samtools
+            ├── <tool_name>.nf                    # File with nextflow processes
+            └── tests/                            # Directory containing all testing-related files
+                  ├── <process_A>.nf.test         # A nf-test file, testing a single process from <tool_name>.nf 
+                  ├── <process_A>.nf.test.snap    # The intended output of the *.test file, used to validate correctness
+                  ├── <process_A>.nf.test.pass    # A record of the last time the test passed, and what was used as an input. Need for the --stale option on run_tests.sh
+                  ├── <process_B>.nf.test         # A second process from the <tool_name>.nf file
+                  ├── <process_B>.nf.test.snap    
+                  ├── <process_B>.nf.test.pass    
+```
 
 **Test data:** shared inputs live in [`tests/data/`](tests/data/README.md) — a small,
 generated "mini world" around the phiX174 genome (contigs, paired/amplicon/long reads, proteins,
