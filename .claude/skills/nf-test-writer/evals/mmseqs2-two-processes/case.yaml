@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: mmseqs2-two-processes
+expected_outcome: |
+  One test file per process (mmseqs_easy_cluster.nf.test and cluster_proteins.nf.test) using the 
+  shared proteins.faa (or another shared fixture), setting the params each process reads (e.g. 
+  mmseqs_prefix), asserting output shape, names and cluster content that can be predicted (10 
+  distinct phiX174 proteins cluster into themselves); run on Hazel with run_tests.sh --stale; 
+  passing tests get .pass records; any failure caused by the module itself is reported with the 
+  error and a proposed fix rather than silently changed in mmseqs2.nf. Nothing is committed.

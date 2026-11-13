@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: coverm-pooled-bam
+expected_outcome: |
+  A modules/coverm/tests/coverm.nf.test that passes a (pooledid, [BAM files]) tuple built from 
+  the shared tests/data BAMs, sets every params.coverm_* option in a params block, checks the 
+  output tuple's shape, the pooledid and file name, and asserts predictable content of the count 
+  table (e.g. phiX174 has reads); it is run on Hazel with run_tests.sh --stale, passes, and 
+  leaves a .snap (if snapshotting) and a .pass record. Nothing is committed and coverm.nf is 
+  unchanged.
