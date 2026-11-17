@@ -1,0 +1,23 @@
+nextflow_process {
+    name "Test genomad"
+    script "../genomad.nf"
+    process "genomad"
+    tag "genomad"
+    // Needs the BRC geNomad db v1.9 on /rs1, so it only runs on Hazel.
+    tag "needs_db"
+
+    test("Classifies phiX174 as a virus with the BRC geNomad db") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_genomad', file("${baseDir}/tests/data/genome.fasta") ]
+                input[1] = file("/rs1/shares/brc/admin/databases/genomad_db/genomad_db", type: 'dir')
+                """
+            }
+        }
+        then {
+            assert process.success
+            println process.out
+        }
+    }
+}

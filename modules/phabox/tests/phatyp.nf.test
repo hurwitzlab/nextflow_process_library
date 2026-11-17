@@ -1,0 +1,28 @@
+nextflow_process {
+    name "Test phatyp"
+    script "../phabox.nf"
+    process "phatyp"
+    tag "phabox"
+    tag "phatyp"
+    // Needs the BRC PhaBOX db v2.2 on /rs1, so it only runs on Hazel.
+    tag "needs_db"
+
+    test("Predicts the lifestyle of phiX174 with the BRC PhaBOX db") {
+        when {
+            params {
+                phabox_outdir = "${outputDir}/results"
+            }
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/genome.fasta")
+                input[1] = file("/rs1/shares/brc/admin/databases/phabox_db_v2_2", type: 'dir')
+                """
+            }
+        }
+        then {
+            assert process.success
+            def outdir = process.out.lifestyle_predictions[0]
+            "find ${outdir} -type f".execute().text.eachLine { println it }
+        }
+    }
+}

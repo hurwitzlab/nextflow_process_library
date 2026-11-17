@@ -1,0 +1,29 @@
+nextflow_process {
+    name "Test bakta"
+    script "../bakta.nf"
+    process "bakta"
+    tag "bakta"
+    // Needs the BRC bakta full db v6.0 (~90 GB) on /rs1, so it only runs on Hazel.
+    tag "needs_db"
+
+    test("Annotates the phiX174 genome against the BRC bakta full db") {
+        when {
+            params {
+                bakta_outdir = "${outputDir}/results"
+            }
+            process {
+                """
+                input[0] = file("${baseDir}/tests/data/genome.fasta")
+                input[1] = file("/rs1/shares/brc/admin/databases/bakta_db/db", type: 'dir')
+                """
+            }
+        }
+        then {
+            assert process.success
+            def outdir = process.out.annotations[0]
+            println file(outdir).listFiles().collect { it.name }.sort()
+            println path("${outdir}/genome.tsv").text
+            println path("${outdir}/genome.txt").text
+        }
+    }
+}

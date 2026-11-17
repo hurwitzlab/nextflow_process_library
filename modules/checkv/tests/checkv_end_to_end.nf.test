@@ -1,0 +1,27 @@
+nextflow_process {
+    name "Test checkv_end_to_end"
+    script "../checkv.nf"
+    process "checkv_end_to_end"
+    tag "checkv"
+    tag "checkv_end_to_end"
+
+    test("Emits six empty outputs for an empty input fasta, without touching the db") {
+        when {
+            def empty = new File("${outputDir}/empty.fasta")
+            empty.parentFile.mkdirs()
+            empty.text = ''
+            def dummy_db = new File("${outputDir}/not_a_db.tar.gz")
+            dummy_db.text = ''
+            process {
+                """
+                input[0] = [ 'test_checkv_end_to_end_empty', file("${empty}") ]
+                input[1] = file("${dummy_db}")
+                """
+            }
+        }
+        then {
+            assert process.success
+            println process.out
+        }
+    }
+}

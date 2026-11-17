@@ -1,0 +1,26 @@
+nextflow_process {
+    name "Test checkv"
+    script "../checkv.nf"
+    process "checkv"
+    tag "checkv"
+    // Needs the BRC CheckV db v1.5 on /rs1, so it only runs on Hazel.
+    tag "needs_db"
+
+    test("Assesses the phiX174 genome against the BRC CheckV db") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_checkv', file("${baseDir}/tests/data/genome.fasta") ]
+                input[1] = file("/rs1/shares/brc/admin/databases/checkv_db/checkv-db-v1.5", type: 'dir')
+                """
+            }
+        }
+        then {
+            assert process.success
+            println process.out.quality_assessment
+            def (sampleid, outdir) = process.out.quality_assessment[0]
+            println file(outdir).listFiles().collect { it.name }.sort()
+            println path("${outdir}/quality_summary.tsv").text
+        }
+    }
+}
