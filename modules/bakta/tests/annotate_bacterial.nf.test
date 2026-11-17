@@ -1,0 +1,60 @@
+nextflow_process {
+    name "Test annotate_bacterial"
+    script "../bakta.nf"
+    process "annotate_bacterial"
+    tag "bakta"
+    tag "annotate_bacterial"
+    // Needs the BRC bakta full db v6.0 (~90 GB) on /rs1, so it only runs on Hazel.
+    tag "needs_db"
+
+    test("Annotates the phiX174 genome against the BRC bakta full db") {
+        when {
+            process {
+                """
+                input[0] = [ 'test_annotate_bacterial', file("${baseDir}/tests/data/genome.fasta") ]
+                input[1] = file("/rs1/shares/brc/admin/databases/bakta_db/db", type: 'dir')
+                """
+            }
+        }
+        then {
+            assert process.success
+
+            def emits = [ 'annotation_table': 'tsv', 'annotation_gff3': 'gff3', 'annotation_genbank': 'gbff',
+                          'annotation_embl': 'embl', 'annotated_contigs': 'fna', 'annotated_genes': 'ffn',
+                          'annotated_proteins': 'faa', 'hypothetical_proteins_table': 'hypotheticals.tsv',
+                          'hypothetical_proteins': 'hypotheticals.faa', 'summary': 'txt',
+                          'summary_plot_png': 'png', 'summary_plot_svg': 'svg', 'annotation_json': 'json' ]
+            emits.each { emit, ext ->
+                assert process.out[emit].size() == 1
+                assert process.out[emit][0].size() == 2
+                def (sampleid, outfile) = process.out[emit][0]
+                assert sampleid == 'test_annotate_bacterial'
+                assert outfile.endsWith("test_annotate_bacterial.${ext}")
+            }
+
+            // TSV: Sequence Id, Type, Start, Stop, Strand, Locus Tag, Gene, Product, DbXrefs
+            def features = path(process.out.annotation_table[0][1]).readLines()
+                .findAll { !it.startsWith('#') }.collect { it.split('\t') }
+            // phiX174's genes on its single contig, all named, no tRNAs/rRNAs
+            assert features.size() == 7
+            assert features.every { it[0] == 'contig_1' && it[1] == 'cds' && it[4] == '+' }
+            assert features.collect { it[7] } == [
+                'K protein', 'External scaffolding protein D', 'DNA-binding protein J', 'Capsid protein F',
+                'Major spike protein G', 'Minor spike protein H', "(3' truncated) A' protein" ]
+
+            def summary = path(process.out.summary[0][1]).readLines()
+            assert summary.contains('CDSs: 7')
+            assert summary.contains('hypotheticals: 0')
+            assert summary.contains('tRNAs: 0')
+            assert path(process.out.annotated_proteins[0][1]).readLines().count { it.startsWith('>') } == 7
+            assert path(process.out.hypothetical_proteins[0][1]).text.isEmpty()
+
+            // gbff/embl/json/txt carry dates or bakta/db versions, and the plots are images, so
+            // only the feature table (minus DbXrefs, which follow db releases) and proteins are snapshotted
+            assert snapshot(
+                features.collect { it[0..7].join('\t') },
+                path(process.out.annotated_proteins[0][1])
+            ).match()
+        }
+    }
+}

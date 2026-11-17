@@ -1,0 +1,21 @@
+{
+  "record_version": 1,
+  "fingerprint": "0337d0a6d8ed43cf0d47e26976758b82b689e220edb04f0c71e87b10f932a373",
+  "passed_at": "2026-11-12T14:22:21-05:00",
+  "passed_by": "sdweave2",
+  "commit": "62a254d",
+  "uncommitted_changes": true,
+  "slurm_job_id": "1856704",
+  "modules_loaded": "java/17:nextflow/26.04.3:nf-test/0.9.5:apptainer/1.4.2-1",
+  "components": {
+    "test": "9c0014cf10f98e941f550c2797890d6084ac4477054eb8673bdfccb7fe69c65d",
+    "snap": "7a55e10bb569320756121756ae4df79daa2f274f3cdd4043196a5210f7dd4ccf",
+    "process:modules/bakta/bakta.nf:annotate_bacterial": "6bb709e4af6ea5c8b53c94e5076038621682efa70a6672409d1f2b254ba6e2c6",
+    "shared:modules/bakta/bakta.nf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "container:container__bakta": "/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_bakta:1.12.1--pyhdfd78af_0.sif",
+    "fixture:tests/data/genome.fasta": "94fa1771e36d1371fb955b9bd4eff5d7f69320ca7e311ee5aa18ae2866251580",
+    "config:tests/nextflow.config": "9e5390b64474e889a8630a3e8cdc3ec1770cfb38d63b81e3b58cfbf619c25b0d",
+    "config:nf-test.config": "ee112d04f3bbc5f218380299581496bcc446de0165742bd8bf734a3effc1288a",
+    "config:runner_versions": "ace555649141e4f8003b5cbc8b75c68cb302ff855adf3afac0fe2a9c104657a0"
+  }
+}
