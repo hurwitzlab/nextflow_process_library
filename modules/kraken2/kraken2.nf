@@ -1,27 +1,30 @@
 #!/usr/bin/env nextflow
 
 // Classify paired reads taxonomically with kraken2
- process kraken2 {
-    label "process_high"
-    label "publish_final"
-    container "${params.container__kraken2}"
+process kraken2 {
+  label "process_high"
+  label "publish_intermediate"
+  container "${params.container__kraken2}"
 
-    input:
-        tuple val(sampleid), path(clean_r1), path(clean_r2)
-        path(kraken2_db)
+  input:
+    tuple val(sample_id), path(r1), path(r2)
+    path(kraken2_db)
 
-    output:
-        tuple val(sampleid), path("${sampleid}.kreport"), path("${sampleid}.kraken"), emit: classification
+  output:
+    tuple val(sample_id), path("${sample_id}.report"), emit: report
+    tuple val(sample_id), path("${sample_id}.kraken"), emit: kraken
 
-    shell:
-    '''
-    kraken2 \
-    --db !{kraken2_db} \
-    --threads !{task.cpus} \
-    --report !{sampleid}.kreport \
-    --paired !{clean_r1} !{clean_r2} \
-    > !{sampleid}.kraken
-    '''
+  shell:
+  '''
+  kraken2 \
+  --db !{kraken2_db} \
+  --threads !{task.cpus} \
+  --paired \
+  --use-names \
+  --output !{sample_id}.kraken \
+  --report !{sample_id}.report \
+  !{r1} !{r2}
+  '''
 }
 
 // Classify paired-end reads taxonomically with kraken2 to identify contamination
