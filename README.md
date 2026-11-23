@@ -200,6 +200,16 @@ alignment fields rather than BAM headers (samtools appends version-stamped
 `@PG` lines). Create or update snapshots with a default run
 (`sbatch run_tests.sh --update-snapshot ...`); `--all-versions` refuses to.
 
+**Writing tests with Claude Code:** the repo includes a project skill,
+[`.claude/skills/nf-test-writer/`](.claude/skills/nf-test-writer/SKILL.md), that follows the
+conventions above. It reads the process, picks shared data or builds a small reproducible
+fixture in `testdata/`, writes the test, runs it with `--stale` on Hazel and checks the
+snapshot. It reports module bugs to you instead of editing the process, and it asks before
+changing anything in `tests/data/`. Anyone who clones the repo gets the skill with no setup.
+Claude loads it on its own for requests like "add tests for coverm"; type `/nf-test-writer`
+to make sure it's used. You'll see a `Skill(nf-test-writer)` call in the transcript when it
+loads.
+
 ## Repo layout: `modules/` vs `modules/dev/`
 
 - **`modules/`** — the reviewed set. If a pipeline can `include` it today,
