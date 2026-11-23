@@ -24,8 +24,8 @@ nextflow_process {
             process {
                 """
                 // kraken2's paired output names reads without the mate suffix, so it also matches R1 alone
-                input[0] = kraken2.out.classification.map { sampleid, kreport, kraken ->
-                    [ sampleid, file("${baseDir}/tests/data/reads_R1.fastq.gz"), kraken, kreport ] }
+                input[0] = kraken2.out.kraken.join(kraken2.out.report).map { sampleid, kraken, report ->
+                    [ sampleid, file("${baseDir}/tests/data/reads_R1.fastq.gz"), kraken, report ] }
                 // taxid 10847 (phiX174) itself
                 input[1] = Channel.value([ '10847' ])
                 """

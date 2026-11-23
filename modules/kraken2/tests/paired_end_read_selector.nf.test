@@ -23,11 +23,11 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = kraken2.out.classification.map { sampleid, kreport, kraken ->
+                input[0] = kraken2.out.kraken.join(kraken2.out.report).map { sampleid, kraken, report ->
                     [ sampleid,
                       file("${baseDir}/tests/data/reads_R1.fastq.gz"),
                       file("${baseDir}/tests/data/reads_R2.fastq.gz"),
-                      kraken, kreport ] }
+                      kraken, report ] }
                 // taxid 10239 (Viruses, phiX174's parent): only matches the phiX reads via --include-children
                 input[1] = Channel.value([ '10239' ])
                 """
