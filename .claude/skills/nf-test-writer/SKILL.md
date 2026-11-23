@@ -40,6 +40,12 @@ Prefer the shared "mini world" in `tests/data/` (phiX174 genome, contigs, reads,
 proteins, a tiny kraken2 db). Its README says exactly what each file contains — e.g. the
 paired reads align as 420 records, 20 unmapped — and those known facts make the best assertions.
 
+Before making a new fixture, list `modules/*/tests/testdata/` and skim their READMEs. If another
+module already has what you need, or if your new fixture is generic rather than tailored to this
+process, don't copy it and don't reference it across modules. Tell the user and propose promoting
+it to `tests/data/`: name the file, the tests that would go stale, and the README entry to add.
+Promote only with their OK, and only when a second module will use it.
+
 When nothing shared fits, make a **module-specific fixture** in `modules/<tool>/tests/testdata/`:
 - Keep it tiny (KB, not MB) and derive it from the shared data where you can (e.g. phiX174 with
   three planted SNVs), so expected results are known exactly.
