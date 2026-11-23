@@ -62,7 +62,7 @@ minimap2	2.30	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainer
 mlst	2.35.0	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_mlst:2.35.0--hdfd78af_1.sif	docker://quay.io/biocontainers/mlst:2.35.0--hdfd78af_1		
 mmseqs2	18-8cc5c	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_mmseqs2:18-8cc5c.sif	docker://quay.io/biocontainers/mmseqs2:18-8cc5c		
 mothur	1.48.6	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_mothur:1.48.6--he5e4d49_0.sif	docker://quay.io/biocontainers/mothur:1.48.6--he5e4d49_0		
-mummer	4.0.1	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_mummer4:4.0.1--pl5321h9948957_0.sif	docker://quay.io/biocontainers/mummer4:4.0.1--pl5321h9948957_0		
+mummer	4.0.1	yes	/usr/local/usrapps/brc/brc_modules/images/mummer4-4.0.1.sif		https://github.com/sweavs111/custom_container_module/tree/main/tools/mummer4	
 muscle	5.3	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_muscle:5.3--h9948957_3.sif	docker://quay.io/biocontainers/muscle:5.3--h9948957_3		
 nanoplot	1.46.2	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_nanoplot:1.46.2--pyhdfd78af_0.sif	docker://quay.io/biocontainers/nanoplot:1.46.2--pyhdfd78af_0		
 nanosim	3.2.3	yes	/usr/local/usrapps/brc/brc_modules/images/quay.io_biocontainers_nanosim:3.2.3--hdfd78af_2.sif	docker://quay.io/biocontainers/nanosim:3.2.3--hdfd78af_2		
