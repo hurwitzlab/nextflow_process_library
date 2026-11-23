@@ -18,9 +18,11 @@ nextflow_process {
         then {
             assert process.success
 
-            def (sampleid, kreport, kraken) = process.out.classification[0]
-            // .kraken: C/U, read name, taxid, lengths, k-mer LCA mappings
+            def (sampleid, kreport) = process.out.report[0]
+            def (kraken_id, kraken) = process.out.kraken[0]
+            // .kraken: C/U, read name, "name (taxid N)" (--use-names), lengths, k-mer LCA mappings
             def calls = path(kraken).readLines().collect { it.split('\t') }
+            def taxid = { call -> (call[2] =~ /\(taxid (\d+)\)$/).with { it.find() ? it.group(1) : null } }
             def unclassified = calls.findAll { it[0] == 'U' }.collect { it[1] }.sort()
             // the 10 random pairs: the only reads unmapped in the shared bwa alignment of the same reads
             def random_pairs = path("${baseDir}/tests/data/alignments.sam").readLines()
@@ -28,10 +30,13 @@ nextflow_process {
                 .collect { it.split('\t')[0] }.unique().sort()
 
             assert sampleid == 'test_kraken2'
-            assert kreport.endsWith('test_kraken2.kreport')
+            assert kraken_id == 'test_kraken2'
+            assert kreport.endsWith('test_kraken2.report')
             assert kraken.endsWith('test_kraken2.kraken')
             assert calls.size() == 210 // one line per read pair
-            assert calls.count { it[0] == 'C' && it[2] == '10847' } == 200 // phiX174
+            assert calls.every { taxid(it) != null } // --use-names: every call carries "(taxid N)"
+            assert calls.count { it[0] == 'C' && taxid(it) == '10847' } == 200 // phiX174
+            assert calls.findAll { it[0] == 'U' }.every { taxid(it) == '0' }
             assert unclassified == random_pairs
             // kreport: percent, clade reads, direct reads, rank, taxid, name
             assert path(kreport).readLines().collect { it.split('\t')[1..4].join(' ') } ==

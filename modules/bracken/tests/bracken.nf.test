@@ -24,7 +24,7 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = kraken2.out.classification.map { sampleid, kreport, kraken -> [ sampleid, kreport ] }
+                input[0] = kraken2.out.report
                 input[1] = file("${baseDir}/tests/data/kraken2_db")
                 """
             }
@@ -64,7 +64,7 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = kraken2.out.classification.map { sampleid, kreport, kraken -> [ sampleid, kreport ] }
+                input[0] = kraken2.out.report
                 input[1] = file("${baseDir}/tests/data/kraken2_db")
                 """
             }
