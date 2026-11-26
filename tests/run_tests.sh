@@ -1,9 +1,7 @@
 #!/bin/bash
-#SBATCH --partition=compute_partners
-#SBATCH --qos=p_brc
 #SBATCH --job-name=nf-test
-#SBATCH --output=test_logs/%x_%j.out
-#SBATCH --err=test_logs/%x_%j.err
+#SBATCH --output=/dev/null   # the script redirects itself to <repo>/tests/test_logs/ (see Logging below)
+#SBATCH --error=/dev/null
 #SBATCH --cpus-per-task=4   # = process_high in tests/nextflow.config; Nextflow won't start a task needing more CPUs than the job has
 #SBATCH --mem=12G
 #SBATCH --time=03:00:00
@@ -30,6 +28,21 @@
 #   sbatch --partition=xfer --qos=xfer run_tests.sh [nf-test args]
 
 set -euo pipefail
+
+# --- Logging ---
+# #SBATCH --output paths resolve against the submit dir and can't use variables, so under sbatch
+# send stdout/stderr to <repo>/tests/test_logs/<job-name>_<jobid>.{out,err} wherever it was
+# submitted from. Under sbatch, $0 points at a copy of this script in Slurm's spool dir, so the
+# repo is resolved from the submit dir. Run directly (not under Slurm), output stays on the terminal.
+REPO="$(git -C "${SLURM_SUBMIT_DIR:-$(dirname "$0")}" rev-parse --show-toplevel 2>/dev/null)" || {
+    msg="ERROR: ${SLURM_SUBMIT_DIR:-$(dirname "$0")} is not inside the nextflow_process_library repo; submit from within it"
+    [[ -n "${SLURM_JOB_ID:-}" ]] && echo "$msg" > "${SLURM_SUBMIT_DIR:-.}/${SLURM_JOB_NAME:-nf-test}_${SLURM_JOB_ID}.err"
+    echo "$msg" >&2; exit 1; }
+if [[ -n "${SLURM_JOB_ID:-}" ]]; then
+    LOG_DIR="$REPO/tests/test_logs"
+    mkdir -p "$LOG_DIR"
+    exec >"$LOG_DIR/${SLURM_JOB_NAME:-nf-test}_${SLURM_JOB_ID}.out" 2>"$LOG_DIR/${SLURM_JOB_NAME:-nf-test}_${SLURM_JOB_ID}.err"
+fi
 
 MODE=default
 case "${1:-}" in
@@ -58,9 +71,7 @@ module load apptainer   # processes run in their containers; don't rely on the s
 export NXF_DISABLE_CHECK_LATEST=true
 
 # --- Run test(s) ---
-# Run from the repo root, where nf-test.config lives. Under sbatch, $0 points at a copy of this
-# script in Slurm's spool dir, so resolve the repo from the submit dir instead.
-REPO="$(git -C "${SLURM_SUBMIT_DIR:-$(dirname "$0")}" rev-parse --show-toplevel)"
+# Run from the repo root ($REPO, resolved under Logging above), where nf-test.config lives.
 cd "$REPO"
 
 # --stale: split arguments into test paths and nf-test flags. Like nf-test's own path arguments, a
