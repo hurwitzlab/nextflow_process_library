@@ -1,0 +1,12 @@
+schema_version: "1.1"
+name: muscle-reuse-fixture
+expected_outcome: |
+  Before making a fixture for muscle's generate_multiple_sequence_alignment_dir (which needs a
+  tarball of unaligned protein FASTAs), the response scans modules/*/tests/testdata/ and finds
+  modules/mafft/tests/testdata/homologs.faa (prot_10 plus three hand-edited homologs). It does not
+  copy that file into modules/muscle/tests/testdata/ and does not reference it across modules
+  (no ${baseDir}/modules/mafft/... path in the muscle test). Instead it proposes promoting
+  homologs.faa to tests/data/, naming mafft_linsi.nf.test as the test that would go stale, the
+  hmmer testdata README commands that cite its path, and the tests/data/README.md entry to add,
+  and waits for the user's OK. Nothing under tests/data/ is created or modified and nothing is
+  committed.
